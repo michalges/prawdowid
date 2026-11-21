@@ -32,6 +32,31 @@ class PIIRule:
 
 PHONE_CONTEXT = r"(?:tel\.?|telefon\w*|komórk\w*|kom\.|nr|numer\w*|dzwo\w*|sms\w*)"
 
+# Require a Polish message cue and title-case spelling. Keep the cue outside the replacement.
+NAME_PART = r"[A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+"
+NAME_WORD = rf"{NAME_PART}(?:-{NAME_PART})?"
+NAME_VALUE = rf"(?P<value>{NAME_WORD}(?:[^\S\r\n]+{NAME_WORD})?)\b"
+PRIVATE_NAME_CONTEXT = (
+    r"nazywam[ \t]+się|mam[ \t]+na[ \t]+imię|pan(?:a|u|em|i|ią)?"
+    r"|(?:mój|moja|moją|mojej|mojego|mojemu|moim)[ \t]+"
+    r"(?:sąsiad(?:a|owi|em|ka|kę|ki|ką|ce)?|sąsiedzie|"
+    r"koledze|koleg(?:a|ę|i|ą|ank(?:a|ę|i|ą))|koleżance)"
+)
+NON_PERSON_NAME_PART = re.compile(
+    r"(?:premier\w*|wicepremier\w*|minister\w*|ministr\w*|prezydent\w*|"
+    r"marszał\w*|poseł|posł\w*|senator\w*|ambasador\w*|wojewod\w*|"
+    r"burmistrz\w*|radn\w*|dyrektor\w*|doktor\w*|profesor\w*|"
+    r"policj\w*|urząd|urzę\w*|sejm\w*|senat\w*|gmin\w*|"
+    r"polska|polski|polsce|warszaw\w*|gdyni\w*|gdańsk\w*|krakow\w*|kraków|"
+    r"szanown\w*|dzień|dobry|dziękuj\w*|proszę|pan(?:a|u|em|i|ią)?)",
+    re.IGNORECASE,
+)
+
+
+def is_obvious_person_name(value: str) -> bool:
+    return not any(NON_PERSON_NAME_PART.fullmatch(part) for part in value.split())
+
+
 PII_RULES = (
     PIIRule("EMAIL", re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+")),
     PIIRule("IBAN", re.compile(r"\b[A-Z]{2}\d{2}(?:[ ]?\d{4}){5,7}\b")),
@@ -49,6 +74,30 @@ PII_RULES = (
         ),
     ),
     PIIRule("DOWOD", re.compile(r"\b[A-Z]{3}[ ]?\d{6}\b")),
+    PIIRule(
+        "IMIE_NAZWISKO",
+        re.compile(rf"(?P<prefix>\b(?i:{PRIVATE_NAME_CONTEXT})[ \t]+){NAME_VALUE}"),
+        is_obvious_person_name,
+    ),
+    PIIRule(
+        "IMIE_NAZWISKO",
+        re.compile(
+            rf"(?P<prefix>^[ \t]*(?i:cześć|witaj|dzień dobry|dobry wieczór)[ \t]*,?[ \t]+)"
+            rf"{NAME_VALUE}(?=[ \t]*[,!]|[ \t]*$)",
+            re.MULTILINE,
+        ),
+        is_obvious_person_name,
+    ),
+    PIIRule(
+        "IMIE_NAZWISKO",
+        re.compile(
+            r"(?P<prefix>^[ \t]*(?i:pozdrawiam(?: serdecznie)?|z poważaniem|z wyrazami szacunku)"
+            rf"(?:[ \t]*,[ \t]*|[ \t]+|(?=\r?$))[ \t]*(?:\r?\n[ \t]*)?){NAME_VALUE}"
+            r"(?=[ \t]*[.!]?[ \t]*\r?$)",
+            re.MULTILINE,
+        ),
+        is_obvious_person_name,
+    ),
 )
 
 

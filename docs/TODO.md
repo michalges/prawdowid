@@ -47,7 +47,7 @@ What's missing or incomplete, kept current while working. Order follows CONCEPT 
 
 ### A5. Safety, privacy, ops
 - [x] PII masking before the LLM and before storage (emails, phones, PESEL, IBAN/account numbers, cards, ID numbers)
-- [ ] PII: mask person names "when obvious" (CONCEPT §4 step 2) — not implemented
+- [x] PII: mask person names "when obvious" (CONCEPT §4 step 2)
 - [x] Injection detection (input + sources), events, user notice
 - [x] Check log, `GET /v1/checks/{id}`, `DELETE /v1/sessions/{id}`, retention purge on startup
 - [ ] Periodic retention purge (currently only at startup)

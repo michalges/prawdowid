@@ -306,7 +306,9 @@ class ChannelAdapter(Protocol):
 ## 8. Privacy, security, observability
 
 - **Data minimization:** store the masked input, claims, citation ids, verdicts, timings and cost. No raw images after processing (OCR text only, masked).
-- **PII masking** before the LLM call **and** before storage.
+- **PII masking** before the LLM call **and** before storage. The Polish name heuristic
+  uses self-introductions, honorifics, personal relationships, greetings and signatures
+  as cues. Public titles, institutions and names outside these cues remain available to check.
 - **Retention:** checks auto-delete after **30 days** (configurable), with `DELETE /v1/sessions/{id}`.
 - **Security:** input validation and size limits (text ≤ 10k characters, image ≤ 5 MB), URL allowlist of schemes (http/https only), SSRF protection (block private IPs), rate limiting per session/IP/Discord user, secrets only via env, **no keys or personal data in the repo or demo materials**.
 - **Event log:** `check_started/finished`, `abstained`, `technical_error`, `injection_attempt`, `retrieval_error`, `case_created`.

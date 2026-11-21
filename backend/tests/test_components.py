@@ -101,6 +101,53 @@ def test_pii_is_masked(text: str, label: str) -> None:
 
 
 @pytest.mark.parametrize(
+    ("text", "name"),
+    [
+        ("Nazywam się Żaneta Bąk-Łoś i piszę w sprawie alertu.", "Żaneta Bąk-Łoś"),
+        ("Mam na imię Łukasz.", "Łukasz"),
+        ("Proszę spytać pana Jana Kowalskiego o szczegóły.", "Jana Kowalskiego"),
+        ("Pani Świątek zgłosiła usterkę.", "Świątek"),
+        ("Wspomniałem o moim sąsiedzie Józefie Bąku.", "Józefie Bąku"),
+        ("Poszłam do mojego sąsiada Pawła Żółcińskiego.", "Pawła Żółcińskiego"),
+        ("Przekaż wiadomość mojej koleżance Annie Łęckiej.", "Annie Łęckiej"),
+        ("Mój kolega Grzegorz zgłosił usterkę.", "Grzegorz"),
+        ("Treść wiadomości.\nPozdrawiam, Jan Kowalski", "Jan Kowalski"),
+        ("Z poważaniem\r\nEwa Łuczak\r\n", "Ewa Łuczak"),
+        ("Cześć, Aniu!\nSprawdź proszę tę informację.", "Aniu"),
+        ("Dzień dobry, Michale Żaku,\nproszę o informację.", "Michale Żaku"),
+    ],
+)
+def test_private_names_are_masked_by_context(text: str, name: str) -> None:
+    result = get_masked_text(text)
+
+    assert result.text == text.replace(name, "[IMIE_NAZWISKO]")
+    assert result.masked_counts == {"IMIE_NAZWISKO": 1}
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "Premier Tusk powiedział, że odbędzie się posiedzenie.",
+        "Minister Adam Nowak ogłosił nowe przepisy.",
+        "Pan Prezydent Andrzej Duda podpisał ustawę.",
+        "Czy pan poseł Kowalski przedstawił projekt?",
+        "Policja w Gdyni opublikowała komunikat.",
+        "Warszawa i Łódź podpisały umowę.",
+        "Dzień dobry, Warszawo!",
+        "Dzień dobry, Polska Policja opublikowała komunikat.",
+        "Zwykłe zdanie zaczyna się wielką literą.",
+        "Rozmawiałam z moją sąsiadką.",
+        "Anna Kowalska wypowiedziała się na konferencji.",
+    ],
+)
+def test_factual_claim_entities_are_preserved(text: str) -> None:
+    result = get_masked_text(text)
+
+    assert result.text == text
+    assert result.masked_counts == {}
+
+
+@pytest.mark.parametrize(
     "text",
     [
         "Budżet wyniesie 500 000 000 zł w 2026 roku.",

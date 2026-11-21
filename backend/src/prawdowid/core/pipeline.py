@@ -70,6 +70,7 @@ BASE_LIMITATIONS_PL = (
     "Sprawdzamy tylko w jawnym katalogu źródeł. "
     "Brak źródła nie oznacza, że informacja jest fałszywa.",
 )
+PII_NOTICE_PL = "Zamaskowaliśmy oczywiste dane osobowe w przesłanej treści."
 OFFLINE_LIMITATION_PL = (
     "Działa tryb demonstracyjny bez modelu językowego: system nie porównuje treści dowodów "
     "i nie wydaje werdyktów."
@@ -174,14 +175,18 @@ class VerificationPipeline:
                 session_id=session_id,
             )
         masked = get_masked_text(get_stripped_hidden_text(normalized.analysable_text))
+        input_notices = [INJECTION_NOTICE_PL] if findings else []
         if masked.masked_counts:
             self.database.log_event("pii_masked", masked.masked_counts, session_id=session_id)
+            input_notices.append(PII_NOTICE_PL)
 
         cache_key = get_cache_key(input_type, masked.text, self.corpus_version, self.llm.model_id)
         cached = self.cache.get(cache_key)
         if cached is not None:
             self.database.log_event("cache_hit", {}, session_id=session_id)
-            return self._get_cached_copy(cached, started_at), LLMUsage(), masked.text, input_type
+            result = self._get_cached_copy(cached, started_at)
+            result.input_notices_pl = input_notices
+            return result, LLMUsage(), masked.text, input_type
 
         retriever = self.retriever
         if retriever is None or not retriever.is_ready:
@@ -191,6 +196,7 @@ class VerificationPipeline:
             result = self._get_status_result(
                 CheckStatus.TECHNICAL_ERROR, CORPUS_MISSING_MESSAGE_PL, started_at
             )
+            result.input_notices_pl = input_notices
             return result, LLMUsage(), masked.text, input_type
 
         today = get_today()
@@ -203,12 +209,9 @@ class VerificationPipeline:
         if extraction.status != "ok":
             status = CheckStatus(extraction.status)
             message = extraction.message_pl or "Napisz dokładniej, co mamy sprawdzić."
-            return (
-                self._get_status_result(status, message, started_at, usage),
-                usage,
-                masked.text,
-                input_type,
-            )
+            result = self._get_status_result(status, message, started_at, usage)
+            result.input_notices_pl = input_notices
+            return result, usage, masked.text, input_type
 
         outcomes = await asyncio.gather(
             *[
@@ -225,7 +228,7 @@ class VerificationPipeline:
             extracted_text_pl=get_masked_text(normalized.ocr_text).text
             if normalized.ocr_text
             else None,
-            input_notices_pl=[INJECTION_NOTICE_PL] if findings else [],
+            input_notices_pl=input_notices,
             limitations_pl=self._get_limitations(normalized, outcomes),
             case=case,
             model_info=self._get_model_info(),

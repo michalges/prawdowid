@@ -276,6 +276,26 @@ def test_pii_is_masked_before_llm_and_in_log(make_client) -> None:
     assert "[EMAIL]" in exported
 
 
+def test_private_name_stays_out_of_llm_prompts_and_stored_check(make_client) -> None:
+    llm = MockLLMProvider(responder=get_scripted_responder())
+    client = make_client(llm=llm)
+    name = "Żaneta Łuczak"
+    text = f"Nazywam się {name}. {STORM_CLAIM}"
+
+    response = client.post("/v1/checks", json=get_text_request(text))
+    result = client.get(f"/v1/checks/{response.json()['check_id']}")
+    exported = client.get("/v1/export?table=checks&format=json", headers=ADMIN_HEADERS).text
+    events = client.get("/v1/export?table=events&format=json", headers=ADMIN_HEADERS).text
+    sent = " ".join(block.content for call in llm.calls for block in call.data_blocks)
+
+    assert response.status_code == 200
+    assert result.status_code == 200
+    assert name not in sent and name not in result.text and name not in exported
+    assert "[IMIE_NAZWISKO]" in sent and "[IMIE_NAZWISKO]" in exported
+    assert "IMIE_NAZWISKO" in events
+    assert any("Zamaskowaliśmy" in notice for notice in response.json()["input_notices_pl"])
+
+
 def test_repeated_unresolved_reports_update_one_case(make_client) -> None:
     notifier = RecordingNotifier(succeed=True)
     client = make_client(notifier=notifier)
