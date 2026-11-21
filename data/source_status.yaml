@@ -1,0 +1,9 @@
+# Neutral source-status warnings (brief §5 "Ograniczenia"). Shown as a separate notice and never decides a
+# verdict. Only entries with `verified: true` are used. Each one must cite an official legal basis.
+#
+# - domain: example.org
+#   status_pl: "podmiot objęty sankcjami UE (zakaz nadawania treści w UE)"
+#   reference_url: "https://eur-lex.europa.eu/..."   # the exact legal act
+#   checked_at: "2026-11-21"
+#   verified: true
+[]

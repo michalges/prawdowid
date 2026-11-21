@@ -23,14 +23,15 @@
   # The organizer's ...#/_/mazowieckie/wszystkie link is the same page with a client-side region filter.
   type: official_primary
   quality_tier: A
-  fetch_mode: listing
-  use: evidence
-  store_mode: full_text
+  fetch_mode: live_link
+  use: pointer
+  store_mode: metadata_only
   update: daily
   license: "Public sector information (verify gov.pl terms)"
   license_verified: false
   qualification: "Official national warnings portal"
-  notes: "Check whether the warnings list renders without JS; if not, switch to live_link."
+  notes: "Checked 2026-11-21: the warnings list is rendered client-side (no links in the HTML). Pointer only until an official feed/API is found."
+  keywords: ["ostrzeżen", "alert", "rso", "zagrożen"]
   excluded: false
   exclusion_reason: null
 
@@ -60,13 +61,14 @@
     - https://www.gov.pl/web/rcb/raport-dobowy3
   type: official_primary
   quality_tier: A
-  fetch_mode: listing
+  fetch_mode: page
   use: evidence
   store_mode: full_text
   update: daily
   license: "Public sector information (verify gov.pl terms)"
   license_verified: false
   qualification: "Daily summary of crisis situations in Poland and relevant events abroad, by KCZK/RCB"
+  time_sensitive: true
   excluded: false
   exclusion_reason: null
 
@@ -134,13 +136,15 @@
     - https://www.gov.pl/web/dyplomacja/informacje-dla-podrozujacych
   type: official_primary
   quality_tier: A
-  fetch_mode: listing
-  use: evidence
-  store_mode: full_text
+  fetch_mode: live_link
+  use: pointer
+  store_mode: metadata_only
   update: daily
   license: "Public sector information (verify gov.pl terms)"
   license_verified: false
   qualification: "Official MSZ travel advisories per country"
+  notes: "Checked 2026-11-21: the country list is rendered client-side. Pointer only; ingest per-country advisory pages once their URLs are confirmed."
+  keywords: ["podróż", "wyjazd", "za granic", "ambasad", "konsul", "wiza"]
   excluded: false
   exclusion_reason: null
 
@@ -160,6 +164,7 @@
   license_verified: false
   qualification: "MSZ registration service for Polish citizens travelling abroad"
   notes: "Application, not a content source. Recommend it to users; don't ingest."
+  keywords: ["podróż", "wyjazd", "za granic", "ewakuac", "konsul"]
   excluded: false
   exclusion_reason: null
 
@@ -254,6 +259,7 @@
   license: "Public sector information (verify gov.pl terms)"
   license_verified: false
   qualification: "Official public-health warnings (e.g. product recalls)"
+  time_sensitive: true
   excluded: false
   exclusion_reason: null
 
@@ -291,6 +297,7 @@
   license_verified: false
   qualification: "Live radiation monitoring"
   notes: "Live dashboard. Point users to it for 'radiation level' claims."
+  keywords: ["promieniow", "radiac", "skażen", "atom", "jądrow"]
   excluded: false
   exclusion_reason: null
 
@@ -310,6 +317,7 @@
   license_verified: false
   qualification: "Official air-quality measurements"
   notes: "Live data. An API may be a later premium source."
+  keywords: ["smog", "powietrz", "pył", "zanieczyszcz"]
   excluded: false
   exclusion_reason: null
 
@@ -328,8 +336,8 @@
   license: "Verify terms"
   license_verified: false
   qualification: "National CSIRT security advisories (phishing, scams)"
-  excluded: false
-  exclusion_reason: null
+  excluded: true
+  exclusion_reason: "robots.txt disallows /komunikaty/ (checked 2026-11-21); look for an allowed feed or the cert.pl news section"
 
 # --- Transport: road, rail, air, sea, inland water --------------------------------
 
@@ -389,6 +397,7 @@
   license_verified: false
   qualification: "Official national-road disruption list"
   notes: "Changes fast. Freshness matters more than usual (archival notice after 1 day)."
+  time_sensitive: true
   excluded: false
   exclusion_reason: null
 
@@ -407,6 +416,7 @@
   license: "Verify terms"
   license_verified: false
   qualification: "Live road map"
+  keywords: ["droga", "drodze", "autostrad", "ekspresow", "utrudnien", "korek"]
   excluded: false
   exclusion_reason: null
 
@@ -481,6 +491,7 @@
   license_verified: false
   qualification: "Rail infrastructure manager's timetable and disruption portal"
   notes: "Live search app. Disruption notices may be ingestable; check first."
+  keywords: ["pociąg", "kolej", "opóźnien", "rozkład"]
   excluded: false
   exclusion_reason: null
 
@@ -571,6 +582,7 @@
   license: "Verify terms"
   license_verified: false
   qualification: "Maritime administration (Szczecin), navigation conditions"
+  time_sensitive: true
   excluded: false
   exclusion_reason: null
 
@@ -589,6 +601,7 @@
   license: "Public sector information (verify gov.pl terms)"
   license_verified: false
   qualification: "Inland waterway navigation notices"
+  time_sensitive: true
   excluded: false
   exclusion_reason: null
 
@@ -610,6 +623,7 @@
   license_verified: false
   qualification: "Official weather service, forecasts and warnings"
   notes: "Live app. IMGW public data (danepubliczne.imgw.pl) may serve warnings via API; check later."
+  keywords: ["pogod", "burz", "wichur", "upał", "mróz", "śnieg", "ostrzeżenie meteo"]
   excluded: false
   exclusion_reason: null
 
@@ -628,6 +642,7 @@
   license: "Verify terms"
   license_verified: false
   qualification: "Official hydrological service (river levels, flood warnings)"
+  keywords: ["powód", "rzek", "stan wody", "podtopien"]
   excluded: false
   exclusion_reason: null
 
@@ -646,6 +661,7 @@
   license: "Verify terms"
   license_verified: false
   qualification: "Official Baltic Sea conditions"
+  keywords: ["bałtyk", "morz", "sztorm"]
   excluded: false
   exclusion_reason: null
 
