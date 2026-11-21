@@ -19,7 +19,7 @@ The recent public references include the [GUS preliminary GDP estimate](https://
 
 ## Run
 
-From the repository root, prepare the corpus and configure the model using the main README. Install Tesseract with Polish and English language data for F. Live evaluation calls the configured provider and may incur charges.
+From the repository root, prepare the source collection and configure the model using the main README. Install Tesseract with Polish and English language data for F. Live evaluation calls the configured provider and may incur charges.
 
 ```sh
 cd backend

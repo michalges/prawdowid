@@ -5,7 +5,7 @@ It is seeded from the **organizer's example list** (MSZ challenge Discord). The 
 
 ## 1. Coverage at a glance
 
-The local demo corpus contains **116 documents across 12 distinct URL hostnames and two source
+The local demo source collection contains **116 documents across 12 distinct URL hostnames and two source
 types**. This meets the brief's numerical minimum (100 documents, 10 domains and two types)
 using the ingest CLI's hostname count. All 116 rows have `published_at` and `retrieved_at`
 populated at date precision. Publication metadata can reflect a publisher's update date.
@@ -29,7 +29,7 @@ populated at date precision. Publication metadata can reflect a publisher's upda
 The build extended the existing 102-document local seed. Its legacy licence flags still need
 a per-source review before redistribution. The 14 new documents use verified terms and curated
 `page` entries so the dated evidence stays addressable. The two GUS hosts share a publisher,
-as do the Commission and its Polish Representation. Hostname count measures corpus coverage.
+as do the Commission and its Polish Representation. Hostname count measures the breadth of the source collection.
 It does not establish publisher independence.
 
 ### Rebuild and audit the expansion
@@ -107,7 +107,7 @@ The development SQLite file is gitignored.
   - Each match becomes an evidence item of type `fact_check`, tier **B only if the publisher is an IFCN/EFCSN signatory**, otherwise C. Keep an allowlist in config.
   - The quote must come verbatim from the API response (the claim + rating) or from the fetched review page (if robots.txt allows it). The citation verifier treats these like any other chunk.
   - **The textual rating is not our verdict.** The judge compares the reviewed claim with the user's claim. If it's a different or only similar claim, the item is context, not evidence.
-- Key: `GOOGLE_FACTCHECK_API_KEY`. No key or a quota error means the source is skipped and the gap is listed in `limitations_pl`. It's never a technical error for the whole check, as long as the corpus path still works.
+- Key: `GOOGLE_FACTCHECK_API_KEY`. No key or a quota error means the source is skipped and the gap is listed in `limitations_pl`. It's never a technical error for the whole check, as long as the local source collection remains available.
 - Mock: `providers/factcheck/mock.py` with recorded real responses (no invented reviews).
 
 ### EUvsDisinfo (`euvsdisinfo`)

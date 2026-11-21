@@ -8,7 +8,7 @@
 
 ## 1. One-liner
 
-A citizen sends a claim, a link or a screenshot **through a channel they already use** (web, Discord, or the mobile app, including straight from another app's **Share** menu or text-selection menu). Prawdowid splits it into checkable claims, searches a **clearly defined, auditable corpus** of official and fact-checking sources, and returns a plain-Polish result for each claim **with citations**. When the evidence isn't enough, it **honestly declines to give a verdict**.
+A citizen sends a claim, a link or a screenshot **through a channel they already use** (web, Discord, or the mobile app, including straight from another app's **Share** menu or text-selection menu). Prawdowid splits it into checkable claims, searches a **clearly defined, auditable collection of official documents and fact checks**, and returns a plain-Polish result for each claim **with citations**. When the evidence isn't enough, it **honestly declines to give a verdict**.
 
 It supports informed judgement. **It is not an automatic "judge of truth"** (brief §9).
 
@@ -47,9 +47,9 @@ It supports informed judgement. **It is not an automatic "judge of truth"** (bri
 |---|---|---|
 | Backend / verification core | **Python 3.12 + FastAPI**, uvicorn | Best ecosystem for retrieval and LLMs. |
 | Python tooling | **uv** (deps, lockfile, running), **ruff** (lint + format), pytest | `uv run ruff check . && uv run ruff format --check . && uv run pytest` must pass. Commit `uv.lock`. Never use pip directly. |
-| Storage | **SQLite** (one file): corpus, chunks, checks log, cases | Zero-ops, so the jury runs it with one command. |
+| Storage | **SQLite** (one file): source documents, chunks, checks log, cases | Zero-ops, so the jury runs it with one command. |
 | Lexical search | SQLite **FTS5** (BM25) | Polish inflection: index lowercased + simple stemming (see §6.4). |
-| Vector search | Local multilingual embedding model (e.g. `BAAI/bge-m3` or `intfloat/multilingual-e5-base`) + in-memory numpy matrix, persisted to disk | The corpus is small (hundreds to thousands of chunks), so we don't need a vector DB. **Check license and size before choosing.** |
+| Vector search | Local multilingual embedding model (e.g. `BAAI/bge-m3` or `intfloat/multilingual-e5-base`) + in-memory numpy matrix, persisted to disk | The source collection is small (hundreds to thousands of chunks), so we don't need a vector DB. **Check license and size before choosing.** |
 | Hybrid ranking | Reciprocal Rank Fusion (BM25 + vector) → optional cross-encoder rerank | Simple and strong. |
 | LLM | Pluggable `LLMProvider`: **`openrouter`** (default: `google/gemini-3.8-flash` for the ≤ 30 s latency target; `mistralai/mistral-large-4-0` is the EU-vendor option; structured outputs; provider data collection denied), `mistral` (direct, EU), `openai`, `anthropic`, `ollama` (self-hosted, e.g. the Polish **Bielik** model) | One key gives access to many models for the hackathon. OpenRouter itself is a US intermediary, so that's disclosed in `/health` and the UI. The direct `mistral` and self-hosted `ollama` options remove the non-EEA hop (brief §3 premium). |
 | URL fetching | `httpx` + `trafilatura` (main-text extraction) | Respect robots.txt and paywalls: **never bypass protections**. |
@@ -91,7 +91,7 @@ Every external dependency (LLM, embeddings if remote, Discord) sits **behind an 
 └──────────────────────────────────────────────────────────────────────────────────┘
        │                         │                               │
 ┌──────▼──────┐   ┌──────────────▼─────────────┐   ┌─────────────▼─────────────┐
-│ Corpus      │   │ Checks log / cases (SQLite)│   │ Provider adapters         │
+│ Search index│   │ Checks log / cases (SQLite)│   │ Provider adapters         │
 │ SQLite+FTS5 │   │ retention + delete session │   │ LLM · embeddings · OCR    │
 │ + vectors   │   └────────────────────────────┘   └───────────────────────────┘
 └──────▲──────┘
@@ -105,7 +105,7 @@ Every external dependency (LLM, embeddings if remote, Discord) sits **behind an 
 4. **Verdict strength is computed from explicit premises**, never from LLM self-confidence: source quality tier, freshness, quote-claim agreement, and the number of **independent** confirming publishers (see §7.3).
 5. **Abstaining is a first-class outcome**, reached by rules (§7.3). We'd rather say "we don't know" than invent an answer.
 6. **Technical statuses ≠ verdicts.** Errors, a missing key, rate limits, an unclear question or out-of-scope input get their own statuses and UI (brief §2, §5; scenario J).
-7. **Determinism for consistency:** temperature 0, a fixed corpus version, and caching keyed by `hash(normalized_input, corpus_version, model_id)`.
+7. **Determinism for consistency:** temperature 0, a fixed source collection version, and caching keyed by `hash(normalized_input, corpus_version, model_id)`.
 8. **Swappable models and providers** through config only (brief §5 "Architektura").
 
 ---
@@ -148,7 +148,7 @@ Every external dependency (LLM, embeddings if remote, Discord) sits **behind an 
 │   │   ├─ store/{db.py,models.py,migrations/}
 │   │   ├─ cases/               # moderator loop (premium)
 │   │   └─ prompts/*.md         # versioned prompts, no secrets
-│   ├─ src/prawdowid/ingest/    # sources.yaml → corpus build CLI (`python -m prawdowid.ingest`)
+│   ├─ src/prawdowid/ingest/    # sources.yaml → search index build CLI (`python -m prawdowid.ingest`)
 │   ├─ eval/
 │   │   ├─ cases.jsonl          # ≥ 30 own cases covering scenarios A–J
 │   │   ├─ run_eval.py          # computes every required metric, writes TEST_RESULTS.md
@@ -170,7 +170,7 @@ Every external dependency (LLM, embeddings if remote, Discord) sits **behind an 
 
 ---
 
-## 6. Sources & corpus
+## 6. Source collection
 
 ### 6.1 Requirements (brief §5 "Źródła")
 - **≥ 100 documents/records, ≥ 10 domains, ≥ 2 source types.** Primary/official **and** credible secondary sources.
@@ -282,7 +282,7 @@ A missing API key, a rate limit, an LLM/OCR/fetch failure or a timeout → `stat
 - The judge and extractor have **no tools** and can't fetch URLs or change config. Strict JSON schema output, validated with pydantic.
 - `injection.py`: heuristic + pattern detection on inputs and chunks (e.g. "ignore previous instructions", "zignoruj zasady", role-play headers, hidden text) → **log an `injection_attempt` event**. The answer continues normally, with an optional user notice.
 - Output checks: the answer may only cite chunk ids that were provided. Unknown ids → fail → abstain.
-- Eval covers injections in the user input, in a fetched URL page, and inside corpus documents.
+- Eval covers injections in the user input, on a fetched page, and in the source collection.
 
 ### 7.6 Channel adapter contract
 ```python
@@ -298,7 +298,7 @@ class ChannelAdapter(Protocol):
   - **System Share menu ("Udostępnij → Prawdowid"):** Android `ACTION_SEND` intent filters for `text/plain` and `image/*`; iOS Share Extension accepting text, URLs and images. A shared URL → `input.type = "url"`; shared plain text that is only a URL → `url`, otherwise `text`; a shared image → `image` (premium OCR path; resized/compressed on-device to fit the 5 MB limit).
   - **Text-selection context menu ("Sprawdź w Prawdowid"):** Android `ACTION_PROCESS_TEXT`, so a user can highlight a sentence in any app (browser, Messenger, Instagram comments) and check it directly. iOS has no third-party equivalent; there the Share menu covers it.
   - Shared content opens a **confirmation screen** first (shows exactly what will be sent; the user can edit or cancel) and is never sent automatically. Then it shows a progress state and the result, with a "Pokaż w przeglądarce" link to the full web result.
-  - No verification logic, no LLM keys and no corpus on the device. `session_id` is a random id in secure storage, with a "Usuń moje dane" action calling `DELETE /v1/sessions/{id}`. The local history keeps only `check_id`s plus a short label.
+  - No verification logic, no LLM keys and no source collection on the device. `session_id` is a random id in secure storage, with a "Usuń moje dane" action calling `DELETE /v1/sessions/{id}`. The local history keeps only `check_id`s plus a short label.
   - Accessibility: system font scaling, screen-reader labels, WCAG AA contrast, plain-Polish copy (same strings as web where possible).
 
 ---
@@ -320,13 +320,13 @@ class ChannelAdapter(Protocol):
 - **Security:** input validation and size limits (text ≤ 10k characters, image ≤ 5 MB), URL allowlist of schemes (http/https only), SSRF protection (block private IPs), rate limiting per session/IP/Discord user, secrets only via env, **no keys or personal data in the repo or demo materials**.
 - **Event log:** `check_started/finished`, `abstained`, `technical_error`, `injection_attempt`, `retrieval_error`, `case_created`.
 - **Metrics** (`/metrics` + admin dashboard, premium): latency p50/p95, model usage (tokens), retrieval errors, abstention rate, estimated cost per answer.
-- **Transparency** (shown in the UI footer and README): which model and provider, where data is processed, corpus version, "AI-assisted; check the sources yourself".
+- **Transparency** (shown in the UI footer and README): which model and provider, where data is processed, source collection version, "AI-assisted; check the sources yourself".
 
 ---
 
 ## 9. Premium features (only after the gate passes)
 Priority order (cost/benefit for the score):
-1. **Screenshot / photo input** (scenario F): local Tesseract OCR → extract text + dates → the normal pipeline. Show the OCR text to the user and disclose limits ("odczyt może zawierać błędy"). Optional pHash match against images in the corpus/incident DB. **Never claim full reverse image search** without a working API.
+1. **Screenshot / photo input** (scenario F): local Tesseract OCR → extract text + dates → the normal pipeline. Show the OCR text to the user and disclose limits ("odczyt może zawierać błędy"). Optional pHash match against images in the source collection or incident database. **Never claim full reverse image search** without a working API.
 2. **Evidence chain view:** claim → supporting / refuting / context evidence, as a visual list in the web UI.
 3. **Information loop** (brief §2 says the system *should* notify a user designated by the admin about high-risk and recurring unanswered questions, so build at least a minimal version early): an unresolved check creates a moderator case. The admin configures the recipient (e.g. `MODERATOR_DISCORD_WEBHOOK_URL` or a moderators' Discord channel). "Przekazano" (handed over) is shown only after delivery to that recipient is confirmed. Similar questions are grouped (embedding similarity ≥ threshold + same claim cluster) into **one case** with a counter. An alert fires on N repeats. The UI clearly distinguishes "zalecamy przekazanie" (we recommend handing it over) from "przekazano moderatorowi" (handed to a moderator), and **never claims a handoff that didn't happen** (scenario H).
 4. **Export** CSV/JSON of checks/cases; a note on mapping to DISARM / OpenCTI fields.
@@ -340,7 +340,7 @@ Priority order (cost/benefit for the score):
 ## 10. Evaluation (brief §6)
 - `eval/cases.jsonl`: **≥ 30 own cases**, at least 3 per scenario A–J (simple fact, missing context, conflict, no evidence, attack, multimodal, consistency, info loop, URL/incident, API limit). Each case has `input`, `expected_verdict | expected_status`, `expected_citation_urls`, and `notes`.
 - The jury brings its own reference set (≥ 30 cases, brief §6). `run_eval.py --cases <file>` must accept it as-is (same JSONL/CSV shape, documented in `TEST_RESULTS.md`).
-- `run_eval.py` computes every metric in §2 and writes `docs/TEST_RESULTS.md` + `eval/results.json` (reproducible: fixed corpus version, temperature 0, recorded model ids).
+- `run_eval.py` computes every metric in §2 and writes `docs/TEST_RESULTS.md` + `eval/results.json` (reproducible: fixed source collection version, temperature 0, recorded model ids).
 - Citation correctness = automatic quote verification + a **manual sample of 20** marked in `eval/manual_review.csv`.
 - `channel_consistency.py` sends the same cases through the web API, the Discord adapter (test harness), the demo adapter and the mobile app's share-intent → `CheckRequest` mapping (unit-tested in `mobile/` against the same cases), and compares verdicts and citation sets.
 - Scenario J runs with `LLM_PROVIDER=failing` (a mock that raises errors).
@@ -399,22 +399,22 @@ Plus a **public hosted demo URL**, an invite link for the Discord bot, and a dow
 ---
 
 ## 13. Roadmap (post-hackathon, DO NOT IMPLEMENT now)
-- Follow the brief's pilot path (§9): result reproduction → 4–6-week closed-corpus pilot with an expert queue → red-teaming → limited public launch → new channels/languages only after regression validation.
+- Follow the brief's pilot path (§9): result reproduction → 4–6-week pilot with a fixed source collection with an expert queue → red-teaming → limited public launch → new channels/languages only after regression validation.
 - WhatsApp Business / Messenger / SMS channels (they need accounts the organizer doesn't provide).
 - **Mobile app, passive mode** (the earlier Android companion concept): an accessibility-service channel that reads posts in Instagram etc. and suggests checks. Share-to-check and the text-selection menu are **already in scope** (§7.6); only the passive reading is roadmap.
 - SynthID watermark checks for images (the Google Content Detection API is partner-only as of Nov 2026), as a **context notice only**, never a verdict.
-- Postgres + pgvector for a large corpus, scheduled source updates, human approval mode for published answers.
+- Postgres + pgvector for a large source collection, scheduled source updates, human approval mode for published answers.
 
 ## 14. Rules for agents
 - **The brief wins.** Re-read the relevant brief section before implementing a feature.
 - **Never present LLM output as fact without a verified citation.** If the citation verifier fails, abstain.
-- **Never invent sources, URLs, titles, dates or quotes**, including in tests, fixtures and demo data. Use real corpus documents.
+- **Never invent sources, URLs, titles, dates or quotes**, including in tests, fixtures and demo data. Use real documents from the source collection.
 - **Never decide a verdict from the domain, author, channel, popularity, share counts, sanctions status or the model's own label alone.**
 - Channels contain **no verification logic**. They call the core API only.
 - Technical failures produce a technical status, **never a verdict**.
 - Never bypass paywalls, logins, robots.txt or anti-bot protections.
 - Never hard-code eval answers or special-case test inputs.
-- Python: uv only; ruff check + format + pytest must pass before every commit. Never commit secrets, `.env`, personal data, or a corpus that breaks licenses.
+- Python: uv only; ruff check + format + pytest must pass before every commit. Never commit secrets, `.env`, personal data, or source material in breach of its license.
 - Every external provider needs a mock; the eval and tests must run offline with mocks.
 - User-facing text is **Polish, plain language** (aim for B1 level), short sentences.
 - UI in every channel uses the tokens and rules in [`docs/DESIGN.md`](DESIGN.md). No hard-coded colours or fonts; screens and components are up to you.

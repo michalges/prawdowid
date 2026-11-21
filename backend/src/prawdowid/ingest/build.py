@@ -60,7 +60,7 @@ async def build_corpus(
         ).fetchone()
         if existing_model and existing_model[0] != embedder.model_id:
             raise RuntimeError(
-                f"Corpus was embedded with {existing_model[0]}, current provider is "
+                f"Search index embedding model: {existing_model[0]}. Current model: "
                 f"{embedder.model_id}. Delete {settings.corpus_path} and rebuild."
             )
         for source in selected:

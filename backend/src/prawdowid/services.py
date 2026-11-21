@@ -83,7 +83,8 @@ class Services:
 def get_corpus(settings: Settings) -> LoadedCorpus | None:
     if not settings.corpus_path.exists():
         logger.warning(
-            "Corpus %s not found; checks will return technical_error", settings.corpus_path
+            "Source collection %s not found; checks will return technical_error",
+            settings.corpus_path,
         )
         return None
     return LoadedCorpus.load(CorpusStore(settings.corpus_path))
@@ -122,7 +123,7 @@ def get_services(settings: Settings, overrides: ServiceOverrides | None = None) 
     corpus = chosen.corpus if chosen.corpus is not None else get_corpus(settings)
     if corpus and corpus.embedding_model_id and corpus.embedding_model_id != embedder.model_id:
         logger.error(
-            "Corpus embedded with %s but EMBEDDING_PROVIDER gives %s; vector search disabled",
+            "Vector search disabled. Index embedding model: %s. Current model: %s.",
             corpus.embedding_model_id,
             embedder.model_id,
         )

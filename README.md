@@ -38,7 +38,7 @@ curl -s localhost:8080/v1/checks -H 'content-type: application/json' -d '{
 }' | python -m json.tool
 ```
 
-`--allow-unverified` builds a local demo corpus from sources whose reuse terms haven't been formally verified yet
+`--allow-unverified` builds a local demo source collection from sources whose reuse terms haven't been formally verified yet
 (see `docs/SOURCES.md` §3, §5).
 
 ## API
@@ -49,7 +49,7 @@ curl -s localhost:8080/v1/checks -H 'content-type: application/json' -d '{
 | `GET /v1/checks/{id}` | A stored result |
 | `DELETE /v1/sessions/{id}` | Delete a session's data |
 | `GET /v1/sources` | The auditable source catalog with document counts |
-| `GET /health` | Components, model, corpus version, where data is processed |
+| `GET /health` | Components, model, source collection version, where data is processed |
 | `GET /metrics`, `GET /v1/cases`, `GET /v1/export` | Admin (`Authorization: Bearer $ADMIN_TOKEN`) |
 
 Every result separates **source material** (citations: title, publisher, date, link, verified quote) from **Prawdowid's

@@ -19,7 +19,7 @@ import sys
 
 with sqlite3.connect(sys.argv[1]) as db:
     if not db.execute("SELECT 1 FROM chunks LIMIT 1").fetchone():
-        raise SystemExit("Corpus bootstrap fetched no indexable documents.")
+        raise SystemExit("Source collection setup fetched no indexable documents.")
 ' "$snapshot"
 
     mv -- "$snapshot" "$CORPUS_PATH"

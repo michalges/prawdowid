@@ -17,7 +17,7 @@ White-first and calm, with one confident red (the Polish flag's crimson) for ide
 ## 2. Rules that matter (from CONCEPT)
 
 1. **Red means "act", never "false".** `brand-600` is for the logo, links, focus rings and the **one primary action per screen** (usually "Sprawdź"). Never colour a verdict, an error or a warning with brand red.
-2. **Sources and interpretation never mix (CONCEPT §7.2).** "Co mówią źródła" and "Interpretacja Prawdowida" must be visibly separate. The typographic rule that enforces it everywhere: **verbatim quotes use the `serif` family (`quote` style); everything Prawdowid writes uses `sans`.** Metadata (domains, dates, tiers, corpus version, model) uses `mono` (`meta` style).
+2. **Sources and interpretation never mix (CONCEPT §7.2).** "Co mówią źródła" and "Interpretacja Prawdowida" must be visibly separate. The typographic rule that enforces it everywhere: **verbatim quotes use the `serif` family (`quote` style); everything Prawdowid writes uses `sans`.** Metadata (domains, dates, tiers, source collection version, model) uses `mono` (`meta` style).
 3. **Verdicts are label + icon + colour, never colour alone.** Each verdict has a `fg`/`bg` pair and needs a distinct icon shape so it survives greyscale and colour blindness.
 4. **Abstaining is a result, not an error.** `brak_wystarczajacych_dowodow` uses calm slate. Never style it as disabled, faded or failed.
 5. **Technical statuses are not verdicts (CONCEPT §7.4).** `technical_error`, `rate_limited`, `needs_clarification`, `out_of_scope` use the `system` blue pair, replace the result instead of sitting beside a verdict, and never show a verdict colour.

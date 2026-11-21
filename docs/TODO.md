@@ -11,19 +11,19 @@ What's missing or incomplete, kept current while working. Order follows CONCEPT 
 - [x] Use OpenRouter for the demo. Keep existing provider adapters available for future configuration changes.
 - [ ] Document the deployed OpenRouter model, data-processing location and outage behaviour
 - [ ] Re-check the OpenRouter price table (`providers/llm/__init__.py`) before reporting costs
-- [ ] Choose the production embedding model (`sentence_transformers` provider exists; default is the offline `hashing` one); check its license (transferable to MSZ, Regulamin §4) and size, then rebuild the corpus
+- [ ] Choose the production embedding model (`sentence_transformers` provider exists; default is the offline `hashing` one); check its license (transferable to MSZ, Regulamin §4) and size, then rebuild the search index
 
-### A2. Corpus & ingest
+### A2. Source collection & ingestion
 - [x] `python -m prawdowid.ingest {check,build,stats}`: polite fetch (robots.txt, per-host delay, SSRF guard), trafilatura, chunking, FTS5 + vectors, `corpus_version`, idempotent rebuilds, excluded sources removed
 - [x] Listing crawler skips menus/nav and prefers article-like links
 - [~] Per-source verification (`docs/SOURCES.md` §5). Found so far (2026-11-21):
   - [x] Verified the seven hostname additions and documented exclusions in `docs/SOURCES.md`
   - `gov_ostrzezenia`, `msz_podrozujacy`: client-side rendered, so they're pointers only
   - `rcb_raport_dobowy`: the report is the page itself, so it's `page` mode
-  - [ ] Review the legacy seed source licence flags before distributing a prebuilt corpus
+  - [ ] Review the legacy seed source licence flags before distributing a prebuilt source collection
 - [ ] MSZ travel advisories: find the per-country advisory URLs (or an official feed) and ingest them. This is high value, since the organizer is MSZ.
 - [ ] RCB daily report: keep daily snapshots (today each build replaces yesterday's text)
-- [x] Ingest a static set of Demagog fact-check excerpts so the corpus has ≥ 2 source types without API keys
+- [x] Ingest a static set of Demagog fact-check excerpts so the source collection has ≥ 2 source types without API keys
 - [x] Add economics and EU policy sources from GUS, Eurostat and the European Commission
 - [ ] Find crawlable, extractable official legal and open-data pages (see the skipped sources in `docs/SOURCES.md`)
 - [ ] Get the organizer's incident DB (JSON/CSV) → `backend/data/incidents/` (loader ready)
@@ -68,7 +68,7 @@ What's missing or incomplete, kept current while working. Order follows CONCEPT 
 
 ## Track C: quality
 - [x] `eval/run_eval.py` (all brief §6 metrics, `--cases` for the jury's set, `--base-url` for a deployment, manual-review sample) → `docs/TEST_RESULTS.md`
-- [x] Expand `eval/cases.jsonl` to ≥ 30 cases with corpus-backed partly true, outdated and conflicting-source examples
+- [x] Expand `eval/cases.jsonl` to ≥ 30 cases with source-backed partly true, outdated and conflicting-source examples
 - [ ] Expand scenario coverage to ≥ 3 cases per scenario A–J
 - [ ] Fill in the manual citation review (`eval/manual_review.tsv`, 20 rows)
 
@@ -77,7 +77,7 @@ What's missing or incomplete, kept current while working. Order follows CONCEPT 
 - [x] Discord bot: its own Dockerfile + `.env.example` in `channels/discord_bot/`
 - [x] `README.md` with the jury quick start
 - [ ] `docs/ARCHITECTURE.md` (incl. model licenses), `docs/RISKS.md`, `docs/COSTS.md`
-- [x] Coolify Compose deployment, first-start corpus bootstrap and persistent storage
+- [x] Coolify Compose deployment, source collection setup on first start and persistent storage
 - [ ] Deploy on Coolify, then publish the demo URL + Discord invite link
 - [ ] Description ≤ 4,000 characters, PDF deck ≤ 12 slides, video ≤ 3 min
 

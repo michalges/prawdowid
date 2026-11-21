@@ -72,7 +72,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(prog="prawdowid.ingest")
     commands = parser.add_subparsers(dest="command", required=True)
     commands.add_parser("check", help="Validate data/sources.yaml and show what would be ingested")
-    build = commands.add_parser("build", help="Fetch sources and (re)build the corpus")
+    build = commands.add_parser("build", help="Fetch sources and (re)build the search index")
     build.add_argument("--only", help="Comma-separated source ids")
     build.add_argument("--max-docs", type=int, help="Max documents per source")
     build.add_argument(
@@ -80,7 +80,7 @@ def main() -> None:
         action="store_true",
         help="Also ingest sources whose license is not verified yet (local demo builds only)",
     )
-    commands.add_parser("stats", help="Show corpus statistics vs the brief minimum")
+    commands.add_parser("stats", help="Show source collection statistics vs the brief minimum")
     arguments = parser.parse_args()
     handlers = {"check": run_check, "build": run_build, "stats": run_stats}
     sys.exit(handlers[arguments.command](arguments))

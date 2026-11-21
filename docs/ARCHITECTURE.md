@@ -11,7 +11,7 @@ channels (web · Discord · demo chat · mobile)  ──POST /v1/checks──▶
   api/          checks, sessions, sources, health, admin            │
   core/         normalize → pii → injection → claims → retrieval → judge → citations → strength → render
   providers/    llm (openrouter, mistral, openai, anthropic, ollama, mock, failing) · embeddings · ocr · factcheck · notify
-  corpus/       SQLite corpus: documents, chunks, FTS5, vectors          ◀── ingest/ (sources.yaml → crawl → chunk → embed)
+  corpus/       SQLite search index: documents, chunks, FTS5, vectors          ◀── ingest/ (sources.yaml → crawl → chunk → embed)
   store/        SQLite app DB: check log, events, cases
   cases/        information loop (grouping, alerts)
   channels/     shared chat renderer + ChannelAdapter protocol
@@ -31,7 +31,7 @@ channels (web · Discord · demo chat · mobile)  ──POST /v1/checks──▶
 10. **Strength.** Computed from independent publishers, best tier, freshness and quote agreement, never from the model's confidence. Archival citations are flagged and lower the strength.
 11. **Context notices.** Incident-DB match and source status. These never change the verdict.
 12. **Cases.** Every unresolved factual claim creates a case or updates a similar one (embedding similarity ≥ 0.85). High-risk claims, and claims after N repeats, trigger the moderator webhook. The status becomes `przekazano_moderatorowi` only after a 2xx response.
-13. **Persist.** The check log stores the masked input, statuses, verdicts, citation URLs, the full result, latency, tokens, cost, model and corpus version. Events go to the event log.
+13. **Persist.** The check log stores the masked input, statuses, verdicts, citation URLs, the full result, latency, tokens, cost, model and source collection version. Events go to the event log.
 
 ## Models and providers
 
@@ -51,7 +51,7 @@ If `sentence_transformers` is enabled, record the chosen model's license here be
 
 ## Main limits
 
-- The corpus covers safety, transport and government communications. Other topics are expected to abstain.
+- The source collection covers safety, transport and government communications. Other topics are expected to abstain.
 - The `hashing` embeddings are lexical-ish. Paraphrases with no shared words may be missed until a neural model is enabled.
 - Client-side-rendered sources (gov.pl warnings, MSZ travel advisories) are pointers only.
 - The rate limiter and cache live in process memory, so the API is single-instance until they move to a shared store.
