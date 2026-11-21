@@ -11,7 +11,7 @@ What's missing or incomplete, kept current while working. Order follows CONCEPT 
 - [ ] Live-test `anthropic`, `mistral` direct and `ollama` providers against real endpoints (only OpenRouter was tested live; the others are covered by mocked-HTTP tests)
 - [ ] Re-check the OpenRouter price table (`providers/llm/__init__.py`) before reporting costs
 - [ ] Choose the production embedding model (`sentence_transformers` provider exists; default is the offline `hashing` one); check its license (transferable to MSZ, Regulamin §4) and size, then rebuild the corpus
-- [ ] Decide whether OpenRouter (US intermediary) is acceptable for the final demo, or switch to direct `mistral` (EU) / `ollama`
+- [ ] Decide whether OpenRouter (US intermediary) is acceptable for the final demo: `OPENROUTER_EU_ROUTING=true` keeps processing in the EU but needs a Business plan (current key gets 403); alternatives are direct `mistral` (EU) or `ollama`
 
 ### A2. Corpus & ingest
 - [x] `python -m prawdowid.ingest {check,build,stats}`: polite fetch (robots.txt, per-host delay, SSRF guard), trafilatura, chunking, FTS5 + vectors, `corpus_version`, idempotent rebuilds, excluded sources removed
