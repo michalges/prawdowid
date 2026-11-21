@@ -50,7 +50,7 @@ What's missing or incomplete, kept current while working. Order follows CONCEPT 
 - [x] PII: mask person names "when obvious" (CONCEPT §4 step 2)
 - [x] Injection detection (input + sources), events, user notice
 - [x] Check log, `GET /v1/checks/{id}`, `DELETE /v1/sessions/{id}`, retention purge on startup
-- [ ] Periodic retention purge (currently only at startup)
+- [x] Periodic retention purge in the API lifespan, including moderator cases and event logs
 - [x] Rate limiting (session + client IP), SSRF guard, size limits, result cache, metrics, admin export
 - [ ] SSRF: DNS rebinding window between our check and httpx's own resolution (pin the resolved IP)
 - [ ] Rate limiter and cache are in-memory per process; move them to SQLite/Redis before running several workers

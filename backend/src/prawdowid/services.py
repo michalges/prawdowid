@@ -118,7 +118,6 @@ def get_notifier(settings: Settings) -> Notifier:
 def get_services(settings: Settings, overrides: ServiceOverrides | None = None) -> Services:
     chosen = overrides or ServiceOverrides()
     database = chosen.database or AppDatabase(settings.db_path)
-    database.purge_older_than(settings.retention_days)
     embedder = chosen.embedder or get_embedding_provider(settings)
     corpus = chosen.corpus if chosen.corpus is not None else get_corpus(settings)
     if corpus and corpus.embedding_model_id and corpus.embedding_model_id != embedder.model_id:

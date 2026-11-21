@@ -261,6 +261,23 @@ def test_check_log_can_be_read_and_session_deleted(make_client) -> None:
     assert after.status_code == 404
 
 
+def test_delete_session_removes_case_seed_and_keeps_another_sessions_check(make_client) -> None:
+    client = make_client()
+    first = client.post("/v1/checks", json=get_text_request(UNKNOWN_CLAIM)).json()
+    second = client.post(
+        "/v1/checks", json=get_text_request(UNKNOWN_CLAIM, session_id="test-session-2")
+    ).json()
+    assert first["case"]["case_id"] == second["case"]["case_id"]
+
+    deleted = client.delete("/v1/sessions/test-session-1").json()["deleted"]
+
+    assert deleted["cases"] == 1
+    assert deleted["case_links"] == 2
+    assert client.get(f"/v1/checks/{first['check_id']}").status_code == 404
+    assert client.get(f"/v1/checks/{second['check_id']}").status_code == 200
+    assert client.get("/v1/cases", headers=ADMIN_HEADERS).json() == []
+
+
 def test_pii_is_masked_before_llm_and_in_log(make_client) -> None:
     llm = MockLLMProvider(responder=get_scripted_responder())
     client = make_client(llm=llm)

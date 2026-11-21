@@ -175,20 +175,32 @@ class AppDatabase:
             events = connection.execute(
                 "DELETE FROM events WHERE session_id = ?", (session_id,)
             ).rowcount
-            links = connection.execute(
-                "DELETE FROM case_checks WHERE session_id = ?", (session_id,)
+            before = connection.total_changes
+            # A case keeps the first report's text and embedding, including after grouping.
+            cases = connection.execute(
+                "DELETE FROM cases WHERE case_id IN ("
+                " SELECT first_report.case_id FROM case_checks AS first_report"
+                " WHERE first_report.session_id = ? AND first_report.rowid = ("
+                "  SELECT rowid FROM case_checks AS report"
+                "  WHERE report.case_id = first_report.case_id ORDER BY rowid LIMIT 1"
+                " )"
+                ")",
+                (session_id,),
             ).rowcount
-        return {"checks": checks, "events": events, "case_links": links}
+            connection.execute("DELETE FROM case_checks WHERE session_id = ?", (session_id,))
+            links = connection.total_changes - before - cases
+        return {"checks": checks, "events": events, "case_links": links, "cases": cases}
 
     def purge_older_than(self, days: int) -> int:
         cutoff = (get_now() - timedelta(days=days)).isoformat()
         with self._transaction() as connection:
-            removed = connection.execute(
-                "DELETE FROM checks WHERE created_at < ?", (cutoff,)
-            ).rowcount
+            before = connection.total_changes
+            connection.execute("DELETE FROM checks WHERE created_at < ?", (cutoff,))
             connection.execute("DELETE FROM events WHERE created_at < ?", (cutoff,))
             connection.execute("DELETE FROM case_checks WHERE created_at < ?", (cutoff,))
-        return removed
+            # New reports can update a case without replacing the original claim text.
+            connection.execute("DELETE FROM cases WHERE created_at < ?", (cutoff,))
+            return connection.total_changes - before
 
     def get_open_cases(self) -> list[StoredCase]:
         with self._lock:

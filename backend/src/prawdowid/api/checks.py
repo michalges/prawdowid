@@ -35,4 +35,6 @@ async def delete_session(
 ) -> SessionDeletion:
     deleted = services.database.delete_session(session_id)
     services.pipeline.cache.clear()
+    if services.pipeline.rate_limiter:
+        services.pipeline.rate_limiter.forget_session(session_id)
     return SessionDeletion(session_id=session_id, deleted=deleted)

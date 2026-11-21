@@ -1,13 +1,49 @@
+import asyncio
 import logging
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager, suppress
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from prawdowid.api import admin, checks, health, sources
 from prawdowid.config import Settings, get_settings
-from prawdowid.services import ServiceOverrides, get_services
+from prawdowid.core.guards import SECONDS_PER_MINUTE
+from prawdowid.services import ServiceOverrides, Services, get_services
 
 logger = logging.getLogger(__name__)
+
+
+def run_retention_purge(services: Services) -> None:
+    try:
+        removed = services.database.purge_older_than(services.settings.retention_days)
+        if removed:
+            services.pipeline.cache.clear()
+        if services.pipeline.rate_limiter:
+            services.pipeline.rate_limiter.purge_expired()
+        logger.info("Retention purge removed %d rows", removed)
+    except Exception:
+        logger.exception("Retention purge failed")
+
+
+async def purge_periodically(services: Services) -> None:
+    interval = services.settings.retention_purge_interval_minutes * SECONDS_PER_MINUTE
+    while True:
+        await asyncio.sleep(interval)
+        run_retention_purge(services)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    services = app.state.services
+    run_retention_purge(services)
+    purge_task = asyncio.create_task(purge_periodically(services), name="retention-purge")
+    try:
+        yield
+    finally:
+        purge_task.cancel()
+        with suppress(asyncio.CancelledError):
+            await purge_task
 
 
 def create_app(
@@ -21,6 +57,7 @@ def create_app(
             "All channels (web, Discord, demo chat, mobile) use POST /v1/checks."
         ),
         version="0.1.0",
+        lifespan=lifespan,
     )
     app.state.services = get_services(resolved_settings, overrides)
     app.add_middleware(

@@ -2,7 +2,7 @@ from enum import StrEnum
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import SecretStr
+from pydantic import PositiveInt, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BACKEND_ROOT = Path(__file__).resolve().parents[2]
@@ -59,6 +59,7 @@ class Settings(BaseSettings):
     source_status_path: Path = DATA_DIR / "source_status.yaml"
 
     retention_days: int = 30
+    retention_purge_interval_minutes: PositiveInt = 60
     max_claims: int = 5
     retrieval_top_k: int = 6
     retrieval_min_relevance: float = 0.30

@@ -309,7 +309,14 @@ class ChannelAdapter(Protocol):
 - **PII masking** before the LLM call **and** before storage. The Polish name heuristic
   uses self-introductions, honorifics, personal relationships, greetings and signatures
   as cues. Public titles, institutions and names outside these cues remain available to check.
-- **Retention:** checks auto-delete after **30 days** (configurable), with `DELETE /v1/sessions/{id}`.
+- **Retention:** the API purges data at startup and every **60 minutes**
+  (`RETENTION_PURGE_INTERVAL_MINUTES`). Checks, events, session links, and moderator cases
+  expire after **30 days** (`RETENTION_DAYS`). A case's original text and embedding expire
+  from first storage, even when newer reports are grouped into it. Metrics are computed
+  from retained rows. The purge logs row totals and clears cached results when rows expire.
+  It also prunes session and IP rate-limit keys after the 24-hour rate-limit window.
+  `DELETE /v1/sessions/{id}` removes the session's checks, events, and report links, including
+  a grouped case if its initial report belongs to that session.
 - **Security:** input validation and size limits (text ≤ 10k characters, image ≤ 5 MB), URL allowlist of schemes (http/https only), SSRF protection (block private IPs), rate limiting per session/IP/Discord user, secrets only via env, **no keys or personal data in the repo or demo materials**.
 - **Event log:** `check_started/finished`, `abstained`, `technical_error`, `injection_attempt`, `retrieval_error`, `case_created`.
 - **Metrics** (`/metrics` + admin dashboard, premium): latency p50/p95, model usage (tokens), retrieval errors, abstention rate, estimated cost per answer.

@@ -31,6 +31,15 @@ class RateLimiter:
             self._hits[key].append(now)
         return True
 
+    def purge_expired(self) -> None:
+        cutoff = time.monotonic() - SECONDS_PER_DAY
+        expired = [key for key, hits in self._hits.items() if not hits or hits[-1] < cutoff]
+        for key in expired:
+            del self._hits[key]
+
+    def forget_session(self, session_id: str) -> None:
+        self._hits.pop(f"session:{session_id}", None)
+
 
 def get_cache_key(input_type: str, content: str, corpus_version: str | None, model_id: str) -> str:
     material = "\x1f".join(
