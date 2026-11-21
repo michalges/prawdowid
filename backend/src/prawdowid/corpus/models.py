@@ -26,7 +26,7 @@ class StoreMode(StrEnum):
 
 
 class SourceEntry(BaseModel):
-    """One row of data/sources.yaml (CONCEPT §6.3, docs/SOURCES.md)."""
+    """One row of backend/data/sources.yaml (CONCEPT §6.3, docs/SOURCES.md)."""
 
     model_config = ConfigDict(extra="forbid")
 

@@ -1,6 +1,6 @@
 # SOURCES.md: Prawdowid source catalog & rules
 
-The machine-readable catalog is [`data/sources.yaml`](../data/sources.yaml) (schema: CONCEPT §6.3). It is also served at `GET /v1/sources`.
+The machine-readable catalog is [`backend/data/sources.yaml`](../data/sources.yaml) (schema: CONCEPT §6.3). It is also served at `GET /v1/sources`.
 It is seeded from the **organizer's example list** (MSZ challenge Discord). The organizer says these are examples and we don't have to implement all of them.
 
 ## 1. Coverage at a glance
@@ -87,4 +87,4 @@ It is seeded from the **organizer's example list** (MSZ challenge Discord). The 
 | `GOOGLE_FACTCHECK_API_KEY` | Google Fact Check Tools API | Optional; it degrades gracefully |
 | `EUVSDISINFO_TOKEN` | EUvsDisinfo download (if the endpoint requires it) | Optional; context only |
 
-Both go in `.env` (never committed). `.env.example` documents them without values.
+Both go in `backend/.env` (never committed). `backend/.env.example` documents them without values.

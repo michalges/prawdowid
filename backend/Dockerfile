@@ -1,3 +1,4 @@
+# Build from backend/:  docker build -t prawdowid-api backend
 FROM python:3.12-slim
 
 RUN apt-get update \
@@ -5,20 +6,22 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=ghcr.io/astral-sh/uv:0.10.11 /uv /usr/local/bin/uv
 
-WORKDIR /app/backend
-COPY backend/pyproject.toml backend/uv.lock ./
+WORKDIR /app
+COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev --no-install-project
-COPY backend/src ./src
+COPY src ./src
 RUN uv sync --frozen --no-dev
+COPY data/sources.yaml data/source_status.yaml ./data/
+COPY data/incidents ./data/incidents
 
-COPY data/sources.yaml /app/data/sources.yaml
 ENV DB_PATH=/app/data/prawdowid.sqlite \
     CORPUS_PATH=/app/data/corpus.sqlite \
     SOURCES_PATH=/app/data/sources.yaml \
     INCIDENTS_DIR=/app/data/incidents \
     SOURCE_STATUS_PATH=/app/data/source_status.yaml \
-    WEB_DIST_PATH=/app/web/dist \
-    PATH="/app/backend/.venv/bin:$PATH"
+    PATH="/app/.venv/bin:$PATH"
 
+VOLUME ["/app/data"]
 EXPOSE 8000
+# Build the corpus once: docker run --env-file .env -v prawdowid-data:/app/data prawdowid-api python -m prawdowid.ingest build --allow-unverified --max-docs 15
 CMD ["uvicorn", "prawdowid.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000"]

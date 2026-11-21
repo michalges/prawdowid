@@ -21,7 +21,7 @@ from prawdowid.providers.llm.mock import MockLLMProvider
 from prawdowid.schemas import QualityTier, SourceType
 from prawdowid.services import ServiceOverrides
 
-REPO_ROOT = Path(__file__).resolve().parents[2]
+BACKEND_ROOT = Path(__file__).resolve().parents[1]
 
 TEST_DOCUMENTS = [
     CorpusDocument(
@@ -168,10 +168,9 @@ def settings(tmp_path: Path) -> Settings:
         llm_provider=LLMProviderName.MOCK,
         db_path=tmp_path / "app.sqlite",
         corpus_path=tmp_path / "corpus.sqlite",
-        sources_path=REPO_ROOT / "data" / "sources.yaml",
+        sources_path=BACKEND_ROOT / "data" / "sources.yaml",
         incidents_dir=tmp_path / "incidents",
         source_status_path=tmp_path / "source_status.yaml",
-        web_dist_path=tmp_path / "no-web",
         retrieval_min_relevance=0.2,
         admin_token="test-admin-token",
         rate_limit_per_minute=1000,

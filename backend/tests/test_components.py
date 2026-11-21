@@ -27,7 +27,7 @@ from prawdowid.schemas import (
     SourceType,
     Verdict,
 )
-from tests.conftest import REPO_ROOT
+from tests.conftest import BACKEND_ROOT
 
 ARTICLE_HTML = """<html><head><title>Komunikat testowy</title>
 <meta property="article:published_time" content="2026-11-19T10:00:00+01:00"></head>
@@ -260,7 +260,7 @@ def test_fetcher_rejects_oversized_and_binary_responses() -> None:
 
 
 def test_real_source_catalog_is_valid() -> None:
-    sources = load_sources(REPO_ROOT / "data" / "sources.yaml")
+    sources = load_sources(BACKEND_ROOT / "data" / "sources.yaml")
 
     assert len(sources) >= 30
     assert len({source.domain for source in sources if source.is_ingestable}) >= 10

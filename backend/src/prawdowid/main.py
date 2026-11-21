@@ -2,7 +2,6 @@ import logging
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 
 from prawdowid.api import admin, checks, health, sources
 from prawdowid.config import Settings, get_settings
@@ -34,10 +33,6 @@ def create_app(
     app.include_router(checks.router)
     app.include_router(sources.router)
     app.include_router(admin.router)
-    if resolved_settings.web_dist_path.exists():
-        app.mount(
-            "/", StaticFiles(directory=resolved_settings.web_dist_path, html=True), name="web"
-        )
     return app
 
 

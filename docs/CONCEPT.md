@@ -2,7 +2,7 @@
 
 > Hackathon project for the **MSZ "PRAWDOWID" challenge**: fast, easy, source-based verification of information.
 > This file is the source of truth for every agent working on the repo. Read it fully before writing code.
-> The authoritative brief is the organizer's PDF ("MSZ – Pełna treść zadania konkursowego") and the contest rules ("MSZ – Regulamin zadania konkursowego"). Keep them locally in `docs/`. **They are git-ignored and never committed, because they contain personal names.** Don't copy names from them into the repo. Sources: [`docs/SOURCES.md`](SOURCES.md) + `data/sources.yaml`. If this doc and the brief disagree, **the brief wins**: flag the conflict.
+> The authoritative brief is the organizer's PDF ("MSZ – Pełna treść zadania konkursowego") and the contest rules ("MSZ – Regulamin zadania konkursowego"). Keep them locally in `docs/`. **They are git-ignored and never committed, because they contain personal names.** Don't copy names from them into the repo. Sources: [`docs/SOURCES.md`](SOURCES.md) + `backend/data/sources.yaml`. If this doc and the brief disagree, **the brief wins**: flag the conflict.
 
 ---
 
@@ -58,7 +58,7 @@ It supports informed judgement. **It is not an automatic "judge of truth"** (bri
 | Mobile app | **React Native (Expo, TypeScript, Expo Router)** + `expo-share-intent` (dev build / prebuild, not Expo Go) | Meets users where the content is: share a post, link, text or screenshot from Instagram, Facebook, X, the browser or the gallery straight into Prawdowid, without copy-pasting. One codebase for Android + iOS. |
 | Demo adapter | `adapters/demo_chat`: a simulated messenger (HTTP + small chat UI) | A fallback for the gate condition, and a template for WhatsApp/Messenger later. |
 | OCR (premium) | **Tesseract** with `pol` traineddata (local) | No external API, no data retention. Disclose its limits. |
-| Packaging | **Docker Compose** (`api`, `discord-bot`); web is built into `api` | `docker compose up` + `.env` = running system. |
+| Packaging | **One Dockerfile + `.env.example` per app** (`backend/`, `web/`, later `channels/discord_bot/`), each deployed separately | Apps scale and ship independently. The web app talks to the API over its public URL (`VITE_API_URL`). |
 | Hosting (public demo) | An EU VPS / PaaS (e.g. Hetzner, OVH, Scaleway) | Transparent data location (brief §3, §5). |
 
 Every external dependency (LLM, embeddings if remote, Discord) sits **behind an interface with a mock or offline implementation**, so the evaluation and tests run without keys and failures are shown as technical errors, never as verdicts (§7.4).
@@ -165,8 +165,7 @@ Every external dependency (LLM, embeddings if remote, Discord) sits **behind an 
 ├─ data/
 │   ├─ sources.yaml             # OPEN source catalog (§6)
 │   └─ corpus.sqlite            # built artifact (git-ignored; build script + prebuilt release asset)
-├─ docker-compose.yml
-└─ .env.example                 # every key documented, no real values
+└─ (each app has its own Dockerfile and .env.example; nothing app-specific in the root)
 ```
 
 ---
@@ -175,7 +174,7 @@ Every external dependency (LLM, embeddings if remote, Discord) sits **behind an 
 
 ### 6.1 Requirements (brief §5 "Źródła")
 - **≥ 100 documents/records, ≥ 10 domains, ≥ 2 source types.** Primary/official **and** credible secondary sources.
-- The source list must be **auditable**: `data/sources.yaml` + `GET /v1/sources` + `docs/SOURCES.md`.
+- The source list must be **auditable**: `backend/data/sources.yaml` + `GET /v1/sources` + `docs/SOURCES.md`.
 - Store **`published_at` and `retrieved_at`** for every document (brief "Aktualność").
 
 ### 6.2 Source types and candidates (verify the license and terms of each before ingesting)
@@ -344,8 +343,7 @@ Priority order (cost/benefit for the score):
 
 **Jury quick start (must work as written):**
 ```bash
-cp .env.example .env          # set LLM key (or LLM_PROVIDER=ollama), DISCORD_TOKEN optional
-docker compose up --build     # builds corpus from release asset or runs ingest
+# see README.md: backend/ and web/ are built and deployed separately, each with its own Dockerfile + .env
 # web:   http://localhost:8000
 # demo chat adapter: http://localhost:8000/demo-chat
 ```
@@ -385,7 +383,7 @@ Plus a **public hosted demo URL**, an invite link for the Discord bot, and a dow
 9. Channel-consistency test, scenario J test, manual citation sample.
 
 **Track D: delivery**
-10. Docker Compose, `.env.example`, public deploy, docs (§11), slides, video.
+10. Per-app Dockerfiles and `.env.example`, public deploy, docs (§11), slides, video.
 
 **Then premium**, in §9 order.
 

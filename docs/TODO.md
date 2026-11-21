@@ -25,8 +25,8 @@ What's missing or incomplete, kept current while working. Order follows CONCEPT 
 - [ ] RCB daily report: keep daily snapshots (today each build replaces yesterday's text)
 - [ ] Ingest a static set of fact-check articles (Demagog, AFP Sprawdzam) so the corpus has ≥ 2 source types without API keys (see the stats below)
 - [ ] Add sources outside safety/transport: ISAP, EUR-Lex, GUS, dane.gov.pl, europa.eu
-- [ ] Get the organizer's incident DB (JSON/CSV) → `data/incidents/` (loader ready)
-- [ ] EUvsDisinfo export per the organizer's PDF → `data/incidents/`
+- [ ] Get the organizer's incident DB (JSON/CSV) → `backend/data/incidents/` (loader ready)
+- [ ] EUvsDisinfo export per the organizer's PDF → `backend/data/incidents/`
 - [ ] Reach the brief minimum (`ingest stats` prints it): ≥ 100 docs, ≥ 10 domains, ≥ 2 types
 - [ ] Prebuilt `corpus.sqlite` as a release asset, so the jury doesn't need to crawl
 
@@ -42,7 +42,7 @@ What's missing or incomplete, kept current while working. Order follows CONCEPT 
 - [x] Incident matching + source-status notices (context only)
 - [x] Prompts versioned in `prompts/*.md`
 - [ ] Iterate on the prompts and thresholds against real eval runs
-- [ ] `data/source_status.yaml` has no verified entries yet (each needs an official legal reference)
+- [ ] `backend/data/source_status.yaml` has no verified entries yet (each needs an official legal reference)
 
 ### A5. Safety, privacy, ops
 - [x] PII masking before the LLM and before storage (emails, phones, PESEL, IBAN/account numbers, cards, ID numbers)
@@ -70,8 +70,8 @@ What's missing or incomplete, kept current while working. Order follows CONCEPT 
 - [ ] Fill in the manual citation review (`eval/manual_review.tsv`, 20 rows)
 
 ## Track D: delivery
-- [x] `backend/Dockerfile` (with Tesseract `pol`), `docker-compose.yml` (`api`, `ingest` profile), `.env.example`
-- [ ] Discord bot service in compose
+- [x] Per-app deploys: `backend/Dockerfile` (with Tesseract `pol`) + `backend/.env.example`; `web/Dockerfile` + `web/.env.example`
+- [ ] Discord bot: its own Dockerfile + `.env.example` in `channels/discord_bot/`
 - [ ] `README.md` with the jury quick start
 - [ ] `docs/ARCHITECTURE.md` (incl. model licenses), `docs/RISKS.md`, `docs/COSTS.md`
 - [ ] Public EU-hosted demo URL + Discord invite link

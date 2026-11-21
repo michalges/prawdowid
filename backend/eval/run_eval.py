@@ -25,10 +25,10 @@ from pathlib import Path
 import httpx
 from fastapi.testclient import TestClient
 
-from prawdowid.config import REPO_ROOT, LLMProviderName, get_settings
+from prawdowid.config import BACKEND_ROOT, REPO_ROOT, LLMProviderName, get_settings
 from prawdowid.main import create_app
-from prawdowid.services import ServiceOverrides
 from prawdowid.providers.llm.mock import FailingLLMProvider
+from prawdowid.services import ServiceOverrides
 
 EVAL_DIR = Path(__file__).resolve().parent
 CHANNELS = ("web", "discord", "demo_chat", "mobile")
@@ -79,7 +79,7 @@ def load_cases(path: Path) -> list[dict]:
 def get_request_input(case: dict) -> dict:
     case_input = dict(case["input"])
     if case_input.get("type") == "image" and "image_path" in case_input:
-        image_path = REPO_ROOT / "backend" / case_input.pop("image_path")
+        image_path = BACKEND_ROOT / case_input.pop("image_path")
         case_input["image_b64"] = base64.b64encode(image_path.read_bytes()).decode()
     return case_input
 
@@ -104,19 +104,24 @@ class Runner:
             assert self.local_client is not None  # noqa: S101
             response = self.local_client.post("/v1/checks", json=payload)
         elapsed = time.perf_counter() - started
-        body = response.json() if response.headers.get("content-type", "").startswith("application/json") else None
+        body = (
+            response.json()
+            if response.headers.get("content-type", "").startswith("application/json")
+            else None
+        )
         return response.status_code, body, elapsed
 
     def run_case(self, case: dict) -> CaseRun:
         session_id = f"eval-case-{case['id']}".replace(" ", "-")
         try:
             status_code, body, elapsed = self.post(case, "web", session_id)
-        except Exception as error:  # noqa: BLE001 - an eval run must record, not crash
+        except Exception as error:
             return CaseRun(case, 0, 0.0, None, error=repr(error))
         run = CaseRun(case, status_code, elapsed, body)
         if case.get("check_consistency") and body:
             run.consistency = all(
-                get_substance(self.post(case, channel, f"{session_id}-{channel}")[1]) == get_substance(body)
+                get_substance(self.post(case, channel, f"{session_id}-{channel}")[1])
+                == get_substance(body)
                 for channel in CHANNELS[1:]
             )
         return run
@@ -140,8 +145,16 @@ def get_macro_f1(pairs: list[tuple[str, str | None]]) -> float | None:
         true_positive = sum(1 for e, p in pairs if e == label and p == label)
         false_positive = sum(1 for e, p in pairs if e != label and p == label)
         false_negative = sum(1 for e, p in pairs if e == label and p != label)
-        precision = true_positive / (true_positive + false_positive) if true_positive + false_positive else 0.0
-        recall = true_positive / (true_positive + false_negative) if true_positive + false_negative else 0.0
+        precision = (
+            true_positive / (true_positive + false_positive)
+            if true_positive + false_positive
+            else 0.0
+        )
+        recall = (
+            true_positive / (true_positive + false_negative)
+            if true_positive + false_negative
+            else 0.0
+        )
         scores.append(2 * precision * recall / (precision + recall) if precision + recall else 0.0)
     return round(sum(scores) / len(scores), 3)
 
@@ -163,15 +176,31 @@ def get_metrics(runs: list[CaseRun]) -> Metrics:
     metrics = Metrics()
     verdict_runs = [run for run in runs if run.case.get("expected_verdict")]
     pairs = [(run.case["expected_verdict"], run.primary_verdict) for run in verdict_runs]
-    abstain_runs = [run for run in verdict_runs if run.case["expected_verdict"] == "brak_wystarczajacych_dowodow"]
+    abstain_runs = [
+        run
+        for run in verdict_runs
+        if run.case["expected_verdict"] == "brak_wystarczajacych_dowodow"
+    ]
     attack_runs = [run for run in runs if run.case.get("scenario") == "E"]
     status_runs = [run for run in runs if run.case.get("expected_status")]
     consistency_runs = [run for run in runs if run.consistency is not None]
-    latencies = [run.latency_s for run in runs if run.body and run.case.get("input", {}).get("type") in ("text", "url")]
+    latencies = [
+        run.latency_s
+        for run in runs
+        if run.body and run.case.get("input", {}).get("type") in ("text", "url")
+    ]
     costs = [run.body.get("est_cost_usd", 0.0) for run in runs if run.body]
-    citations = [c for run in runs for claim in (run.body or {}).get("claims", []) for c in claim["citations"]]
+    citations = [
+        c
+        for run in runs
+        for claim in (run.body or {}).get("claims", [])
+        for c in claim["citations"]
+    ]
     expected_urls_hit = [
-        bool(set(run.case["expected_citation_urls"]) & {c["url"] for claim in (run.body or {}).get("claims", []) for c in claim["citations"]})
+        bool(
+            set(run.case["expected_citation_urls"])
+            & {c["url"] for claim in (run.body or {}).get("claims", []) for c in claim["citations"]}
+        )
         for run in runs
         if run.case.get("expected_citation_urls")
     ]
@@ -185,11 +214,19 @@ def get_metrics(runs: list[CaseRun]) -> Metrics:
         "citation_coverage": get_citation_coverage(runs),
         "citation_correctness_auto": 1.0 if citations else None,
         "expected_source_cited": get_share(expected_urls_hit),
-        "abstention_correct": get_share([run.primary_verdict == "brak_wystarczajacych_dowodow" for run in abstain_runs]),
-        "injection_resisted": get_share(
-            [run.primary_verdict == run.case.get("expected_verdict") or (run.body or {}).get("status") == run.case.get("expected_status") for run in attack_runs]
+        "abstention_correct": get_share(
+            [run.primary_verdict == "brak_wystarczajacych_dowodow" for run in abstain_runs]
         ),
-        "status_correct": get_share([(run.body or {}).get("status") == run.case["expected_status"] for run in status_runs]),
+        "injection_resisted": get_share(
+            [
+                run.primary_verdict == run.case.get("expected_verdict")
+                or (run.body or {}).get("status") == run.case.get("expected_status")
+                for run in attack_runs
+            ]
+        ),
+        "status_correct": get_share(
+            [(run.body or {}).get("status") == run.case["expected_status"] for run in status_runs]
+        ),
         "median_latency_s": round(statistics.median(latencies), 2) if latencies else None,
         "cost_usd_total": round(sum(costs), 6),
         "cost_usd_per_100_checks": round(sum(costs) / len(costs) * 100, 4) if costs else None,
@@ -221,7 +258,9 @@ def write_report(runs: list[CaseRun], metrics: Metrics, cases_path: Path) -> Non
     model_info = first_body.get("model_info", {})
     results = {
         "generated_at": datetime.now(UTC).isoformat(),
-        "cases_file": str(cases_path.relative_to(REPO_ROOT)) if cases_path.is_relative_to(REPO_ROOT) else str(cases_path),
+        "cases_file": str(cases_path.relative_to(REPO_ROOT))
+        if cases_path.is_relative_to(REPO_ROOT)
+        else str(cases_path),
         "llm": model_info.get("llm"),
         "corpus_version": model_info.get("corpus_version"),
         "embedding_provider": settings.embedding_provider.value,
@@ -242,7 +281,9 @@ def write_report(runs: list[CaseRun], metrics: Metrics, cases_path: Path) -> Non
             for run in runs
         ],
     }
-    (EVAL_DIR / "results.json").write_text(json.dumps(results, indent=2, ensure_ascii=False), "utf-8")
+    (EVAL_DIR / "results.json").write_text(
+        json.dumps(results, indent=2, ensure_ascii=False), "utf-8"
+    )
     targets = {
         "verdict_macro_f1": "≥ 0.75",
         "citation_coverage": "≥ 0.95",
@@ -264,11 +305,11 @@ def write_report(runs: list[CaseRun], metrics: Metrics, cases_path: Path) -> Non
     )
     report = f"""# TEST_RESULTS
 
-Generated by `backend/eval/run_eval.py` on {results['generated_at']}.
+Generated by `backend/eval/run_eval.py` on {results["generated_at"]}.
 
-- Cases: `{results['cases_file']}` ({metrics.values['cases']})
-- LLM: `{results['llm']}` · corpus version: `{results['corpus_version']}` · embeddings: `{results['embedding_provider']}`
-- Reproduce: `cd backend && uv run python eval/run_eval.py --cases {results['cases_file']}`
+- Cases: `{results["cases_file"]}` ({metrics.values["cases"]})
+- LLM: `{results["llm"]}` · corpus version: `{results["corpus_version"]}` · embeddings: `{results["embedding_provider"]}`
+- Reproduce: `cd backend && uv run python eval/run_eval.py --cases {results["cases_file"]}`
 
 ## Metrics (brief §6)
 
@@ -304,7 +345,10 @@ def main() -> None:
     for case in load_cases(arguments.cases):
         run = runner.run_case(case)
         runs.append(run)
-        print(f"{case['id']:6} expected={case.get('expected_verdict') or case.get('expected_status')} got={run.verdicts or (run.body or {}).get('status')} {run.latency_s:.1f}s", flush=True)
+        print(
+            f"{case['id']:6} expected={case.get('expected_verdict') or case.get('expected_status')} got={run.verdicts or (run.body or {}).get('status')} {run.latency_s:.1f}s",
+            flush=True,
+        )
     metrics = get_metrics(runs)
     write_manual_review_sample(runs, EVAL_DIR / "manual_review.tsv")
     write_report(runs, metrics, arguments.cases.resolve())

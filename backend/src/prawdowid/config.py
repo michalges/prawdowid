@@ -5,7 +5,9 @@ from pathlib import Path
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
+BACKEND_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = BACKEND_ROOT.parent
+DATA_DIR = BACKEND_ROOT / "data"
 
 
 class LLMProviderName(StrEnum):
@@ -30,7 +32,7 @@ class OCRProviderName(StrEnum):
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=(REPO_ROOT / ".env", ".env"), env_file_encoding="utf-8", extra="ignore"
+        env_file=(BACKEND_ROOT / ".env", ".env"), env_file_encoding="utf-8", extra="ignore"
     )
 
     llm_provider: LLMProviderName = LLMProviderName.OPENROUTER
@@ -49,12 +51,11 @@ class Settings(BaseSettings):
     ocr_provider: OCRProviderName = OCRProviderName.TESSERACT
     ocr_languages: str = "pol+eng"
 
-    db_path: Path = REPO_ROOT / "data" / "prawdowid.sqlite"
-    corpus_path: Path = REPO_ROOT / "data" / "corpus.sqlite"
-    sources_path: Path = REPO_ROOT / "data" / "sources.yaml"
-    incidents_dir: Path = REPO_ROOT / "data" / "incidents"
-    source_status_path: Path = REPO_ROOT / "data" / "source_status.yaml"
-    web_dist_path: Path = REPO_ROOT / "web" / "dist"
+    db_path: Path = DATA_DIR / "prawdowid.sqlite"
+    corpus_path: Path = DATA_DIR / "corpus.sqlite"
+    sources_path: Path = DATA_DIR / "sources.yaml"
+    incidents_dir: Path = DATA_DIR / "incidents"
+    source_status_path: Path = DATA_DIR / "source_status.yaml"
 
     retention_days: int = 30
     max_claims: int = 5
