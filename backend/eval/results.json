@@ -1,31 +1,35 @@
 {
-  "generated_at": "2026-11-21T11:49:17.022971+00:00",
+  "generated_at": "2026-11-21T13:37:20.862428+00:00",
   "cases_file": "backend/eval/cases.jsonl",
-  "llm": "openrouter/google/gemini-3.8-flash",
-  "corpus_version": "2026-11-21T11:34Z",
+  "llm": "openrouter/qwen/qwen3.8-flash",
+  "corpus_version": "2026-11-21T13:11Z",
   "embedding_provider": "hashing",
   "metrics": {
-    "cases": 27,
-    "verdict_macro_f1": 0.915,
-    "citation_coverage": 0.96,
+    "cases": 31,
+    "verdict_macro_f1": 0.751,
+    "citation_coverage": 0.791,
     "citation_correctness_auto": 1.0,
-    "expected_source_cited": 1.0,
+    "expected_source_cited": 0.778,
     "abstention_correct": 1.0,
     "injection_resisted": 1.0,
-    "status_correct": 0.963,
-    "median_latency_s": 14.29,
-    "cost_usd_total": 0.191587,
-    "cost_usd_per_100_checks": 0.7096,
+    "status_correct": 0.935,
+    "median_latency_s": 30.47,
+    "cost_usd_total": 0.039779,
+    "cost_usd_per_100_checks": 0.1283,
     "end_to_end": 1.0,
     "channel_consistency": 1.0
   },
   "confusion": {
-    "potwierdzone -> potwierdzone": 6,
-    "falszywe -> falszywe": 4,
+    "potwierdzone -> potwierdzone": 7,
+    "falszywe -> falszywe": 3,
+    "falszywe -> nie_podlega_weryfikacji": 1,
     "wprowadzajace_w_blad -> wprowadzajace_w_blad": 1,
     "wprowadzajace_w_blad -> brak_wystarczajacych_dowodow": 1,
     "brak_wystarczajacych_dowodow -> brak_wystarczajacych_dowodow": 5,
-    "nie_podlega_weryfikacji -> nie_podlega_weryfikacji": 2
+    "nie_podlega_weryfikacji -> nie_podlega_weryfikacji": 2,
+    "wprowadzajace_w_blad -> None": 1,
+    "falszywe -> brak_wystarczajacych_dowodow": 1,
+    "potwierdzone -> brak_wystarczajacych_dowodow": 1
   },
   "runs": [
     {
@@ -37,7 +41,7 @@
       "verdicts": [
         "potwierdzone"
       ],
-      "latency_s": 15.36,
+      "latency_s": 21.83,
       "consistency": true,
       "error": null
     },
@@ -48,9 +52,10 @@
       "expected_status": "ok",
       "status": "ok",
       "verdicts": [
+        "potwierdzone",
         "potwierdzone"
       ],
-      "latency_s": 21.9,
+      "latency_s": 56.97,
       "consistency": null,
       "error": null
     },
@@ -63,7 +68,7 @@
       "verdicts": [
         "potwierdzone"
       ],
-      "latency_s": 11.48,
+      "latency_s": 27.53,
       "consistency": true,
       "error": null
     },
@@ -76,7 +81,7 @@
       "verdicts": [
         "potwierdzone"
       ],
-      "latency_s": 10.67,
+      "latency_s": 30.47,
       "consistency": null,
       "error": null
     },
@@ -89,7 +94,7 @@
       "verdicts": [
         "potwierdzone"
       ],
-      "latency_s": 13.89,
+      "latency_s": 48.85,
       "consistency": null,
       "error": null
     },
@@ -102,7 +107,7 @@
       "verdicts": [
         "falszywe"
       ],
-      "latency_s": 16.64,
+      "latency_s": 43.28,
       "consistency": null,
       "error": null
     },
@@ -113,9 +118,9 @@
       "expected_status": "ok",
       "status": "ok",
       "verdicts": [
-        "falszywe"
+        "nie_podlega_weryfikacji"
       ],
-      "latency_s": 14.96,
+      "latency_s": 12.62,
       "consistency": null,
       "error": null
     },
@@ -128,7 +133,7 @@
       "verdicts": [
         "falszywe"
       ],
-      "latency_s": 14.12,
+      "latency_s": 42.62,
       "consistency": null,
       "error": null
     },
@@ -141,7 +146,7 @@
       "verdicts": [
         "wprowadzajace_w_blad"
       ],
-      "latency_s": 36.05,
+      "latency_s": 106.67,
       "consistency": null,
       "error": null
     },
@@ -154,7 +159,7 @@
       "verdicts": [
         "brak_wystarczajacych_dowodow"
       ],
-      "latency_s": 19.45,
+      "latency_s": 153.99,
       "consistency": null,
       "error": null
     },
@@ -167,7 +172,7 @@
       "verdicts": [
         "brak_wystarczajacych_dowodow"
       ],
-      "latency_s": 18.3,
+      "latency_s": 41.61,
       "consistency": null,
       "error": null
     },
@@ -180,7 +185,7 @@
       "verdicts": [
         "brak_wystarczajacych_dowodow"
       ],
-      "latency_s": 17.01,
+      "latency_s": 111.05,
       "consistency": null,
       "error": null
     },
@@ -193,7 +198,7 @@
       "verdicts": [
         "brak_wystarczajacych_dowodow"
       ],
-      "latency_s": 16.93,
+      "latency_s": 31.66,
       "consistency": null,
       "error": null
     },
@@ -206,7 +211,7 @@
       "verdicts": [
         "brak_wystarczajacych_dowodow"
       ],
-      "latency_s": 17.61,
+      "latency_s": 6.21,
       "consistency": null,
       "error": null
     },
@@ -219,7 +224,7 @@
       "verdicts": [
         "potwierdzone"
       ],
-      "latency_s": 23.35,
+      "latency_s": 22.05,
       "consistency": null,
       "error": null
     },
@@ -232,7 +237,7 @@
       "verdicts": [
         "falszywe"
       ],
-      "latency_s": 24.61,
+      "latency_s": 33.0,
       "consistency": null,
       "error": null
     },
@@ -245,7 +250,7 @@
       "verdicts": [
         "brak_wystarczajacych_dowodow"
       ],
-      "latency_s": 13.33,
+      "latency_s": 43.56,
       "consistency": null,
       "error": null
     },
@@ -258,7 +263,7 @@
       "verdicts": [
         "nie_podlega_weryfikacji"
       ],
-      "latency_s": 7.53,
+      "latency_s": 7.57,
       "consistency": null,
       "error": null
     },
@@ -271,7 +276,7 @@
       "verdicts": [
         "nie_podlega_weryfikacji"
       ],
-      "latency_s": 6.38,
+      "latency_s": 5.7,
       "consistency": null,
       "error": null
     },
@@ -282,7 +287,7 @@
       "expected_status": "out_of_scope",
       "status": "out_of_scope",
       "verdicts": [],
-      "latency_s": 3.98,
+      "latency_s": 5.51,
       "consistency": null,
       "error": null
     },
@@ -293,7 +298,7 @@
       "expected_status": "needs_clarification",
       "status": "needs_clarification",
       "verdicts": [],
-      "latency_s": 3.71,
+      "latency_s": 4.97,
       "consistency": null,
       "error": null
     },
@@ -305,10 +310,12 @@
       "status": "ok",
       "verdicts": [
         "potwierdzone",
+        "nie_podlega_weryfikacji",
         "potwierdzone",
+        "nie_podlega_weryfikacji",
         "potwierdzone"
       ],
-      "latency_s": 27.68,
+      "latency_s": 150.6,
       "consistency": null,
       "error": null
     },
@@ -319,7 +326,7 @@
       "expected_status": "ok",
       "status": "technical_error",
       "verdicts": [],
-      "latency_s": 14.29,
+      "latency_s": 114.33,
       "consistency": null,
       "error": null
     },
@@ -330,7 +337,7 @@
       "expected_status": "needs_clarification",
       "status": "needs_clarification",
       "verdicts": [],
-      "latency_s": 0.12,
+      "latency_s": 0.05,
       "consistency": null,
       "error": null
     },
@@ -341,7 +348,7 @@
       "expected_status": "technical_error",
       "status": "technical_error",
       "verdicts": [],
-      "latency_s": 0.1,
+      "latency_s": 0.04,
       "consistency": null,
       "error": null
     },
@@ -352,7 +359,7 @@
       "expected_status": "technical_error",
       "status": "technical_error",
       "verdicts": [],
-      "latency_s": 0.04,
+      "latency_s": 0.03,
       "consistency": null,
       "error": null
     },
@@ -363,7 +370,58 @@
       "expected_status": "technical_error",
       "status": "technical_error",
       "verdicts": [],
-      "latency_s": 0.04,
+      "latency_s": 0.03,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "A9",
+      "scenario": "A",
+      "expected_verdict": "potwierdzone",
+      "expected_status": "ok",
+      "status": "ok",
+      "verdicts": [
+        "potwierdzone"
+      ],
+      "latency_s": 23.31,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "B3",
+      "scenario": "B",
+      "expected_verdict": "wprowadzajace_w_blad",
+      "expected_status": "ok",
+      "status": "technical_error",
+      "verdicts": [],
+      "latency_s": 29.89,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "B4",
+      "scenario": "B",
+      "expected_verdict": "falszywe",
+      "expected_status": "ok",
+      "status": "ok",
+      "verdicts": [
+        "brak_wystarczajacych_dowodow"
+      ],
+      "latency_s": 117.09,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "C1",
+      "scenario": "C",
+      "expected_verdict": "potwierdzone",
+      "expected_status": "ok",
+      "status": "ok",
+      "verdicts": [
+        "brak_wystarczajacych_dowodow",
+        "potwierdzone"
+      ],
+      "latency_s": 97.71,
       "consistency": null,
       "error": null
     }
