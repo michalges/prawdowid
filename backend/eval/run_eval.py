@@ -108,7 +108,7 @@ class Runner:
         return response.status_code, body, elapsed
 
     def run_case(self, case: dict) -> CaseRun:
-        session_id = f"eval-{case['id']}".replace(" ", "-")
+        session_id = f"eval-case-{case['id']}".replace(" ", "-")
         try:
             status_code, body, elapsed = self.post(case, "web", session_id)
         except Exception as error:  # noqa: BLE001 - an eval run must record, not crash
