@@ -80,6 +80,7 @@ class Settings(BaseSettings):
 
     google_factcheck_api_key: SecretStr | None = None
     factcheck_publisher_allowlist: str = "Demagog,AFP Sprawdzam,AFP,Konkret24,OKO.press,FakeHunter"
+    euvsdisinfo_token: SecretStr | None = None
 
     moderator_discord_webhook_url: SecretStr | None = None
     case_similarity_threshold: float = 0.85

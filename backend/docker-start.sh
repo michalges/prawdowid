@@ -27,6 +27,10 @@ with sqlite3.connect(sys.argv[1]) as db:
     trap - EXIT HUP INT TERM
 }
 
+if [ "$1" = uvicorn ] && [ -n "${EUVSDISINFO_TOKEN:-}" ] && [ ! -s "$INCIDENTS_DIR/euvsdisinfo_cases.jsonl" ]; then
+    python -m prawdowid.ingest incidents || echo "EUvsDisinfo export failed; starting without incident matches." >&2
+fi
+
 if [ "$1" = uvicorn ] && [ "${CORPUS_AUTO_BUILD:-false}" = true ] && [ ! -s "$CORPUS_PATH" ]; then
     build_corpus
 fi

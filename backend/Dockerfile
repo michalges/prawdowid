@@ -20,7 +20,7 @@ RUN mkdir /app/state
 ENV DB_PATH=/app/state/prawdowid.sqlite \
     CORPUS_PATH=/app/state/corpus.sqlite \
     SOURCES_PATH=/app/data/sources.yaml \
-    INCIDENTS_DIR=/app/data/incidents \
+    INCIDENTS_DIR=/app/state/incidents \
     SOURCE_STATUS_PATH=/app/data/source_status.yaml \
     PATH="/app/.venv/bin:$PATH"
 

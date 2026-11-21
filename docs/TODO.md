@@ -27,7 +27,7 @@ What's missing or incomplete, kept current while working. Order follows CONCEPT 
 - [x] Add economics and EU policy sources from GUS, Eurostat and the European Commission
 - [ ] Find crawlable, extractable official legal and open-data pages (see the skipped sources in `docs/SOURCES.md`)
 - [ ] Get the organizer's incident DB (JSON/CSV) → `backend/data/incidents/` (loader ready)
-- [ ] EUvsDisinfo export per the organizer's PDF → `backend/data/incidents/`
+- [x] EUvsDisinfo export per the organizer's PDF → `python -m prawdowid.ingest incidents` (cases only; articles not imported; needs a live token test)
 - [x] Reach the brief minimum (`ingest stats` prints it): ≥ 100 docs, ≥ 10 domains, ≥ 2 types
 - [ ] Prebuilt `corpus.sqlite` as a release asset, so the jury doesn't need to crawl
 

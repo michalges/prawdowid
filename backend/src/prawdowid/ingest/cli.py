@@ -1,4 +1,4 @@
-"""`uv run python -m prawdowid.ingest {build,stats,check}`"""
+"""`uv run python -m prawdowid.ingest {build,incidents,stats,check}`"""
 
 import argparse
 import asyncio
@@ -10,6 +10,7 @@ from dataclasses import asdict
 from prawdowid.config import get_settings
 from prawdowid.corpus.store import CorpusStore, LoadedCorpus
 from prawdowid.ingest.build import build_corpus, get_skip_reason
+from prawdowid.ingest.euvsdisinfo import EuvsdisinfoClient, export_cases
 from prawdowid.ingest.sources import load_sources
 
 BRIEF_MIN_DOCUMENTS = 100
@@ -41,6 +42,18 @@ def run_build(arguments: argparse.Namespace) -> int:
     )
     print(json.dumps(asdict(report), indent=2, ensure_ascii=False))
     return run_stats(arguments)
+
+
+def run_incidents(arguments: argparse.Namespace) -> int:
+    settings = get_settings()
+    if settings.euvsdisinfo_token is None:
+        print("EUVSDISINFO_TOKEN is not set", file=sys.stderr)
+        return 1
+    client = EuvsdisinfoClient(settings.euvsdisinfo_token.get_secret_value())
+    path = settings.incidents_dir / "euvsdisinfo_cases.jsonl"
+    count = asyncio.run(export_cases(client, path, arguments.max_cases))
+    print(f"Wrote {count} EUvsDisinfo cases to {path}")
+    return 0
 
 
 def run_stats(_arguments: argparse.Namespace) -> int:
@@ -80,7 +93,16 @@ def main() -> None:
         action="store_true",
         help="Also ingest sources whose license is not verified yet (local demo builds only)",
     )
+    incidents = commands.add_parser(
+        "incidents", help="Export EUvsDisinfo cases into the incident DB (needs EUVSDISINFO_TOKEN)"
+    )
+    incidents.add_argument("--max-cases", type=int, help="Stop after this many cases")
     commands.add_parser("stats", help="Show source collection statistics vs the brief minimum")
     arguments = parser.parse_args()
-    handlers = {"check": run_check, "build": run_build, "stats": run_stats}
+    handlers = {
+        "check": run_check,
+        "build": run_build,
+        "incidents": run_incidents,
+        "stats": run_stats,
+    }
     sys.exit(handlers[arguments.command](arguments))
