@@ -60,7 +60,8 @@ What's missing or incomplete, kept current while working. Order follows CONCEPT 
 - [ ] Web UI (React + Vite + TS + Tailwind) → built into `web/dist`, served by FastAPI at `/` (also needs the `/wynik/{id}` route used in chat links). Use `docs/DESIGN.md` + `docs/design/tokens.css`
 - [ ] Discord embeds: take colours from `discord.*` from `docs/design/tokens.json`
 - [ ] Web: replace the flag-tile wordmark in `Layout.tsx` and `public/favicon.svg` with the logo from `docs/design/logo/` (`docs/DESIGN.md` §9)
-- [ ] Mobile/Discord: app icon, splash and bot avatar from `docs/design/logo/prawdowid-app-icon.svg`
+- [ ] Mobile: app icon and splash from `docs/design/logo/prawdowid-app-icon.svg`
+- [ ] Discord: upload `docs/design/logo/discord/avatar-1024.png` and `banner-1360x480.png` in the Developer Portal (manual step)
 - [x] Discord bot (`channels/discord_bot`): `/sprawdz` (text/link/image), `/usun_moje_dane`, DMs, @mentions, embeds with token colours, pseudonymous session ids
 - [ ] Discord bot: live test with a real token; consistency harness run through the bot
 - [ ] Demo chat adapter (`/demo-chat`)

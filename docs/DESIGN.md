@@ -109,6 +109,7 @@ The mark is **"Oko na krzyżu"**: an eye at the centre of the four directions, a
 |---|---|
 | [`design/logo/prawdowid-mark.svg`](design/logo/prawdowid-mark.svg) | The mark on white or light surfaces: header, about page, Discord bot avatar on light, docs. Next to the wordmark "Prawdowid" (IBM Plex Sans Bold, `ink`), mark height ≈ 1.4× the cap height, gap `space-2`. |
 | [`design/logo/prawdowid-app-icon.svg`](design/logo/prawdowid-app-icon.svg) | The mark reversed on a `brand-600` rounded tile: favicon, Expo app icon/splash, PWA icons, Discord bot avatar. |
+| [`design/logo/discord/`](design/logo/discord/) | Discord bot: `avatar-1024.png` / `avatar-512.png` (full-bleed red square, mark sized for Discord's circle crop; source `avatar.svg`) and `banner-1360x480.png` (profile banner, 680×240 @2x). Upload in the Discord Developer Portal. |
 
 Rules:
 - Use the files as they are: don't recolour, stretch, rotate, outline or add effects. Colours are `brand-600` `#d4213d`, `ink` `#16181d` and white.
