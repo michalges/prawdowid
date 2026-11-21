@@ -103,4 +103,16 @@ Calm, precise, humble. Explain, don't scold ("Źródła urzędowe tego nie potwi
 
 ## 9. Logo
 
-None yet. Use the wordmark "Prawdowid" in IBM Plex Sans Bold, `ink`, optionally with a small white-over-red flag mark. Don't invent other logo artwork.
+The mark is **"Oko na krzyżu"**: an eye at the centre of the four directions, a nod to Światowid, who sees in every direction (many sources, one answer). The red ray points up; the pupil is red.
+
+| File | Use |
+|---|---|
+| [`design/logo/prawdowid-mark.svg`](design/logo/prawdowid-mark.svg) | The mark on white or light surfaces: header, about page, Discord bot avatar on light, docs. Next to the wordmark "Prawdowid" (IBM Plex Sans Bold, `ink`), mark height ≈ 1.4× the cap height, gap `space-2`. |
+| [`design/logo/prawdowid-app-icon.svg`](design/logo/prawdowid-app-icon.svg) | The mark reversed on a `brand-600` rounded tile: favicon, Expo app icon/splash, PWA icons, Discord bot avatar. |
+
+Rules:
+- Use the files as they are: don't recolour, stretch, rotate, outline or add effects. Colours are `brand-600` `#d4213d`, `ink` `#16181d` and white.
+- Clear space around the mark ≥ ¼ of its width. Minimum size 16px (the app icon is the favicon).
+- In React, inline the SVG (or import it as a component) so it stays crisp; give it `aria-hidden` when the wordmark text is next to it, otherwise `aria-label="Prawdowid"`.
+- For raster formats (Expo `icon.png` 1024px, Android adaptive icon, `apple-touch-icon` 180px), export from the SVG; don't redraw.
+- Don't invent other logo artwork.

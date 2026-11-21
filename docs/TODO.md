@@ -59,7 +59,8 @@ What's missing or incomplete, kept current while working. Order follows CONCEPT 
 - [x] Shared chat renderer + `ChannelAdapter` protocol (`channels/chat.py`)
 - [ ] Web UI (React + Vite + TS + Tailwind) → built into `web/dist`, served by FastAPI at `/` (also needs the `/wynik/{id}` route used in chat links). Use `docs/DESIGN.md` + `docs/design/tokens.css`
 - [ ] Discord embeds: take colours from `discord.*` from `docs/design/tokens.json`
-- [ ] Design: no logo yet (wordmark only, see `docs/DESIGN.md` §9)
+- [ ] Web: replace the flag-tile wordmark in `Layout.tsx` and `public/favicon.svg` with the logo from `docs/design/logo/` (`docs/DESIGN.md` §9)
+- [ ] Mobile/Discord: app icon, splash and bot avatar from `docs/design/logo/prawdowid-app-icon.svg`
 - [x] Discord bot (`channels/discord_bot`): `/sprawdz` (text/link/image), `/usun_moje_dane`, DMs, @mentions, embeds with token colours, pseudonymous session ids
 - [ ] Discord bot: live test with a real token; consistency harness run through the bot
 - [ ] Demo chat adapter (`/demo-chat`)
