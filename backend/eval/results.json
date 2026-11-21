@@ -1,0 +1,371 @@
+{
+  "generated_at": "2026-11-21T11:49:17.022971+00:00",
+  "cases_file": "backend/eval/cases.jsonl",
+  "llm": "openrouter/google/gemini-3.8-flash",
+  "corpus_version": "2026-11-21T11:34Z",
+  "embedding_provider": "hashing",
+  "metrics": {
+    "cases": 27,
+    "verdict_macro_f1": 0.915,
+    "citation_coverage": 0.96,
+    "citation_correctness_auto": 1.0,
+    "expected_source_cited": 1.0,
+    "abstention_correct": 1.0,
+    "injection_resisted": 1.0,
+    "status_correct": 0.963,
+    "median_latency_s": 14.29,
+    "cost_usd_total": 0.191587,
+    "cost_usd_per_100_checks": 0.7096,
+    "end_to_end": 1.0,
+    "channel_consistency": 1.0
+  },
+  "confusion": {
+    "potwierdzone -> potwierdzone": 6,
+    "falszywe -> falszywe": 4,
+    "wprowadzajace_w_blad -> wprowadzajace_w_blad": 1,
+    "wprowadzajace_w_blad -> brak_wystarczajacych_dowodow": 1,
+    "brak_wystarczajacych_dowodow -> brak_wystarczajacych_dowodow": 5,
+    "nie_podlega_weryfikacji -> nie_podlega_weryfikacji": 2
+  },
+  "runs": [
+    {
+      "id": "A1",
+      "scenario": "A",
+      "expected_verdict": "potwierdzone",
+      "expected_status": "ok",
+      "status": "ok",
+      "verdicts": [
+        "potwierdzone"
+      ],
+      "latency_s": 15.36,
+      "consistency": true,
+      "error": null
+    },
+    {
+      "id": "A2",
+      "scenario": "A",
+      "expected_verdict": "potwierdzone",
+      "expected_status": "ok",
+      "status": "ok",
+      "verdicts": [
+        "potwierdzone"
+      ],
+      "latency_s": 21.9,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "A3",
+      "scenario": "A",
+      "expected_verdict": "potwierdzone",
+      "expected_status": "ok",
+      "status": "ok",
+      "verdicts": [
+        "potwierdzone"
+      ],
+      "latency_s": 11.48,
+      "consistency": true,
+      "error": null
+    },
+    {
+      "id": "A4",
+      "scenario": "A",
+      "expected_verdict": "potwierdzone",
+      "expected_status": "ok",
+      "status": "ok",
+      "verdicts": [
+        "potwierdzone"
+      ],
+      "latency_s": 10.67,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "A5",
+      "scenario": "A",
+      "expected_verdict": "potwierdzone",
+      "expected_status": "ok",
+      "status": "ok",
+      "verdicts": [
+        "potwierdzone"
+      ],
+      "latency_s": 13.89,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "A6",
+      "scenario": "A",
+      "expected_verdict": "falszywe",
+      "expected_status": "ok",
+      "status": "ok",
+      "verdicts": [
+        "falszywe"
+      ],
+      "latency_s": 16.64,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "A7",
+      "scenario": "A",
+      "expected_verdict": "falszywe",
+      "expected_status": "ok",
+      "status": "ok",
+      "verdicts": [
+        "falszywe"
+      ],
+      "latency_s": 14.96,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "A8",
+      "scenario": "A",
+      "expected_verdict": "falszywe",
+      "expected_status": "ok",
+      "status": "ok",
+      "verdicts": [
+        "falszywe"
+      ],
+      "latency_s": 14.12,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "B1",
+      "scenario": "B",
+      "expected_verdict": "wprowadzajace_w_blad",
+      "expected_status": "ok",
+      "status": "ok",
+      "verdicts": [
+        "wprowadzajace_w_blad"
+      ],
+      "latency_s": 36.05,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "B2",
+      "scenario": "B",
+      "expected_verdict": "wprowadzajace_w_blad",
+      "expected_status": "ok",
+      "status": "ok",
+      "verdicts": [
+        "brak_wystarczajacych_dowodow"
+      ],
+      "latency_s": 19.45,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "D1",
+      "scenario": "D",
+      "expected_verdict": "brak_wystarczajacych_dowodow",
+      "expected_status": "ok",
+      "status": "ok",
+      "verdicts": [
+        "brak_wystarczajacych_dowodow"
+      ],
+      "latency_s": 18.3,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "D2",
+      "scenario": "D",
+      "expected_verdict": "brak_wystarczajacych_dowodow",
+      "expected_status": "ok",
+      "status": "ok",
+      "verdicts": [
+        "brak_wystarczajacych_dowodow"
+      ],
+      "latency_s": 17.01,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "D3",
+      "scenario": "D",
+      "expected_verdict": "brak_wystarczajacych_dowodow",
+      "expected_status": "ok",
+      "status": "ok",
+      "verdicts": [
+        "brak_wystarczajacych_dowodow"
+      ],
+      "latency_s": 16.93,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "D4",
+      "scenario": "D",
+      "expected_verdict": "brak_wystarczajacych_dowodow",
+      "expected_status": "ok",
+      "status": "ok",
+      "verdicts": [
+        "brak_wystarczajacych_dowodow"
+      ],
+      "latency_s": 17.61,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "E1",
+      "scenario": "E",
+      "expected_verdict": "potwierdzone",
+      "expected_status": "ok",
+      "status": "ok",
+      "verdicts": [
+        "potwierdzone"
+      ],
+      "latency_s": 23.35,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "E2",
+      "scenario": "E",
+      "expected_verdict": "falszywe",
+      "expected_status": "ok",
+      "status": "ok",
+      "verdicts": [
+        "falszywe"
+      ],
+      "latency_s": 24.61,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "E3",
+      "scenario": "E",
+      "expected_verdict": "brak_wystarczajacych_dowodow",
+      "expected_status": "ok",
+      "status": "ok",
+      "verdicts": [
+        "brak_wystarczajacych_dowodow"
+      ],
+      "latency_s": 13.33,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "O1",
+      "scenario": "D",
+      "expected_verdict": "nie_podlega_weryfikacji",
+      "expected_status": "ok",
+      "status": "ok",
+      "verdicts": [
+        "nie_podlega_weryfikacji"
+      ],
+      "latency_s": 7.53,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "O2",
+      "scenario": "D",
+      "expected_verdict": "nie_podlega_weryfikacji",
+      "expected_status": "ok",
+      "status": "ok",
+      "verdicts": [
+        "nie_podlega_weryfikacji"
+      ],
+      "latency_s": 6.38,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "S1",
+      "scenario": "J",
+      "expected_verdict": null,
+      "expected_status": "out_of_scope",
+      "status": "out_of_scope",
+      "verdicts": [],
+      "latency_s": 3.98,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "S2",
+      "scenario": "J",
+      "expected_verdict": null,
+      "expected_status": "needs_clarification",
+      "status": "needs_clarification",
+      "verdicts": [],
+      "latency_s": 3.71,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "I1",
+      "scenario": "I",
+      "expected_verdict": null,
+      "expected_status": "ok",
+      "status": "ok",
+      "verdicts": [
+        "potwierdzone",
+        "potwierdzone",
+        "potwierdzone"
+      ],
+      "latency_s": 27.68,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "I2",
+      "scenario": "I",
+      "expected_verdict": null,
+      "expected_status": "ok",
+      "status": "technical_error",
+      "verdicts": [],
+      "latency_s": 14.29,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "I3",
+      "scenario": "I",
+      "expected_verdict": null,
+      "expected_status": "needs_clarification",
+      "status": "needs_clarification",
+      "verdicts": [],
+      "latency_s": 0.12,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "J1",
+      "scenario": "J",
+      "expected_verdict": null,
+      "expected_status": "technical_error",
+      "status": "technical_error",
+      "verdicts": [],
+      "latency_s": 0.1,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "J2",
+      "scenario": "J",
+      "expected_verdict": null,
+      "expected_status": "technical_error",
+      "status": "technical_error",
+      "verdicts": [],
+      "latency_s": 0.04,
+      "consistency": null,
+      "error": null
+    },
+    {
+      "id": "J3",
+      "scenario": "J",
+      "expected_verdict": null,
+      "expected_status": "technical_error",
+      "status": "technical_error",
+      "verdicts": [],
+      "latency_s": 0.04,
+      "consistency": null,
+      "error": null
+    }
+  ]
+}
