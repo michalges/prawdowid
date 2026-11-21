@@ -8,10 +8,10 @@ What's missing or incomplete, kept current while working. Order follows CONCEPT 
 - [x] uv project, ruff, pytest, FastAPI app factory, `GET /health` (shows components + data-processing note)
 - [x] API contract models (`schemas.py`), including the `mobile` channel, `case`, `extracted_text_pl`, `input_notices_pl`
 - [x] LLM providers: `openrouter` (default `google/gemini-3.8-flash`; EU option `mistralai/mistral-large-4-0` is ~4× slower), JSON-schema output, `data_collection: deny`), `mistral`, `openai`, `anthropic` (SDK, optional extra), `ollama`, `mock` (offline, never decides), `failing`
-- [ ] Live-test `anthropic`, `mistral` direct and `ollama` providers against real endpoints (only OpenRouter was tested live; the others are covered by mocked-HTTP tests)
+- [x] Use OpenRouter for the demo. Keep existing provider adapters available for future configuration changes.
+- [ ] Document the deployed OpenRouter model, data-processing location and outage behaviour
 - [ ] Re-check the OpenRouter price table (`providers/llm/__init__.py`) before reporting costs
 - [ ] Choose the production embedding model (`sentence_transformers` provider exists; default is the offline `hashing` one); check its license (transferable to MSZ, Regulamin §4) and size, then rebuild the corpus
-- [ ] Decide whether OpenRouter (US intermediary) is acceptable for the final demo: `OPENROUTER_EU_ROUTING=true` keeps processing in the EU but needs a Business plan (current key gets 403); alternatives are direct `mistral` (EU) or `ollama`
 
 ### A2. Corpus & ingest
 - [x] `python -m prawdowid.ingest {check,build,stats}`: polite fetch (robots.txt, per-host delay, SSRF guard), trafilatura, chunking, FTS5 + vectors, `corpus_version`, idempotent rebuilds, excluded sources removed
@@ -58,15 +58,13 @@ What's missing or incomplete, kept current while working. Order follows CONCEPT 
 
 ## Track B: channels
 - [x] Shared chat renderer + `ChannelAdapter` protocol (`channels/chat.py`)
-- [ ] Web UI (React + Vite + TS + Tailwind) → built into `web/dist`, served by FastAPI at `/` (also needs the `/wynik/{id}` route used in chat links). Use `docs/DESIGN.md` + `docs/design/tokens.css`
+- [x] Web UI (React + Vite + TS + Tailwind), served by nginx with same-origin API proxy and `/wynik/{id}` result routes
 - [ ] Discord embeds: take colours from `discord.*` from `docs/design/tokens.json`
 - [ ] Web: replace the flag-tile wordmark in `Layout.tsx` and `public/favicon.svg` with the logo from `docs/design/logo/` (`docs/DESIGN.md` §9)
-- [ ] Mobile: app icon and splash from `docs/design/logo/prawdowid-app-icon.svg`
 - [ ] Discord: upload `docs/design/logo/discord/avatar-1024.png` and `banner-1360x480.png` in the Developer Portal (manual step)
 - [x] Discord bot (`channels/discord_bot`): `/sprawdz` (text/link/image), `/usun_moje_dane`, DMs, @mentions, embeds with token colours, pseudonymous session ids
 - [ ] Discord bot: live test with a real token; consistency harness run through the bot
 - [ ] Demo chat adapter (`/demo-chat`)
-- [ ] Mobile app (Expo)
 
 ## Track C: quality
 - [x] `eval/run_eval.py` (all brief §6 metrics, `--cases` for the jury's set, `--base-url` for a deployment, manual-review sample) → `docs/TEST_RESULTS.md`
@@ -77,9 +75,10 @@ What's missing or incomplete, kept current while working. Order follows CONCEPT 
 ## Track D: delivery
 - [x] Per-app deploys: `backend/Dockerfile` (with Tesseract `pol`) + `backend/.env.example`; `web/Dockerfile` + `web/.env.example`
 - [x] Discord bot: its own Dockerfile + `.env.example` in `channels/discord_bot/`
-- [ ] `README.md` with the jury quick start
+- [x] `README.md` with the jury quick start
 - [ ] `docs/ARCHITECTURE.md` (incl. model licenses), `docs/RISKS.md`, `docs/COSTS.md`
-- [ ] Public EU-hosted demo URL + Discord invite link
+- [x] Coolify Compose deployment, first-start corpus bootstrap and persistent storage
+- [ ] Deploy on Coolify, then publish the demo URL + Discord invite link
 - [ ] Description ≤ 4,000 characters, PDF deck ≤ 12 slides, video ≤ 3 min
 
 ## Premium (after the gate passes; CONCEPT §9 order)
@@ -92,7 +91,6 @@ What's missing or incomplete, kept current while working. Order follows CONCEPT 
 - [ ] Multilingual retrieval check (EN sources, PL answer)
 - [ ] Audio/video transcription (faster-whisper)
 - [ ] Controlled archiving (default off)
-- [ ] Self-hosted `ollama` mode documented and tested
 
 ## Open questions
 - [ ] The organizer's full source list URL (brief §7) and incident DB: watch the Discord

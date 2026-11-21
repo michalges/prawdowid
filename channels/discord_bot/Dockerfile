@@ -1,5 +1,6 @@
 # Build from channels/discord_bot/:  docker build -t prawdowid-discord channels/discord_bot
-FROM python:3.12-slim
+ARG PYTHON_IMAGE=python:3.12-slim
+FROM ${PYTHON_IMAGE}
 COPY --from=ghcr.io/astral-sh/uv:0.10.11 /uv /usr/local/bin/uv
 WORKDIR /app
 COPY pyproject.toml uv.lock ./

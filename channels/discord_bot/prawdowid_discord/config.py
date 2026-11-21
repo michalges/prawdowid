@@ -8,7 +8,7 @@ APP_ROOT = Path(__file__).resolve().parents[1]
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=(APP_ROOT / ".env", ".env"), extra="ignore")
+    model_config = SettingsConfigDict(env_file=(APP_ROOT / ".env", ".env"), extra="ignore", env_ignore_empty=True)
 
     discord_token: SecretStr
     prawdowid_api_url: str = "http://localhost:8000"

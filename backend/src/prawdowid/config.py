@@ -32,7 +32,10 @@ class OCRProviderName(StrEnum):
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
-        env_file=(BACKEND_ROOT / ".env", ".env"), env_file_encoding="utf-8", extra="ignore"
+        env_file=(BACKEND_ROOT / ".env", ".env"),
+        env_file_encoding="utf-8",
+        extra="ignore",
+        env_ignore_empty=True,
     )
 
     llm_provider: LLMProviderName = LLMProviderName.OPENROUTER

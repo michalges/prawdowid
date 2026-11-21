@@ -1,5 +1,6 @@
 # Build from backend/:  docker build -t prawdowid-api backend
-FROM python:3.12-slim
+ARG PYTHON_IMAGE=python:3.12-slim
+FROM ${PYTHON_IMAGE}
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-pol \
@@ -13,15 +14,17 @@ COPY src ./src
 RUN uv sync --frozen --no-dev
 COPY data/sources.yaml data/source_status.yaml ./data/
 COPY data/incidents ./data/incidents
+COPY docker-start.sh ./
+RUN mkdir /app/state
 
-ENV DB_PATH=/app/data/prawdowid.sqlite \
-    CORPUS_PATH=/app/data/corpus.sqlite \
+ENV DB_PATH=/app/state/prawdowid.sqlite \
+    CORPUS_PATH=/app/state/corpus.sqlite \
     SOURCES_PATH=/app/data/sources.yaml \
     INCIDENTS_DIR=/app/data/incidents \
     SOURCE_STATUS_PATH=/app/data/source_status.yaml \
     PATH="/app/.venv/bin:$PATH"
 
-VOLUME ["/app/data"]
+VOLUME ["/app/state"]
 EXPOSE 8000
-# Build the corpus once: docker run --env-file .env -v prawdowid-data:/app/data prawdowid-api python -m prawdowid.ingest build --allow-unverified --max-docs 15
+ENTRYPOINT ["/bin/sh", "/app/docker-start.sh"]
 CMD ["uvicorn", "prawdowid.main:create_app", "--factory", "--host", "0.0.0.0", "--port", "8000"]

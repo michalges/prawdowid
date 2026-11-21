@@ -11,10 +11,14 @@ open work: [`docs/TODO.md`](docs/TODO.md) · test results: [`docs/TEST_RESULTS.m
 ## Quick start (jury)
 
 ```bash
-cp .env.example .env              # set OPENROUTER_API_KEY (or LLM_PROVIDER=ollama for self-hosting)
-docker compose --profile ingest run --rm ingest   # build the demo corpus from the source catalog (~5 min)
-docker compose up --build api     # http://localhost:8000/docs (OpenAPI), /health, /v1/sources
+cp .env.example .env
+# Set OPENROUTER_API_KEY in .env.
+docker compose up -d --build api
+docker compose run --rm --build -p 127.0.0.1:8080:8080 web
 ```
+
+Open `http://localhost:8080`. You can include the Discord bot locally with
+`docker compose --profile discord up -d --build discord`.
 
 Without Docker (Python 3.12 + [uv](https://docs.astral.sh/uv/)):
 
@@ -25,10 +29,10 @@ uv run python -m prawdowid.ingest build --allow-unverified --max-docs 15
 uv run prawdowid                  # serves on :8000
 ```
 
-Try a check:
+Try a check through the Compose web service (use port 8000 with the Python-only setup).
 
 ```bash
-curl -s localhost:8000/v1/checks -H 'content-type: application/json' -d '{
+curl -s localhost:8080/v1/checks -H 'content-type: application/json' -d '{
   "channel": "web", "session_id": "demo-session-1",
   "input": {"type": "text", "text": "Rada Ministrów przyjęła 10 listopada 2026 projekt ustawy o systemie ETIAS."}
 }' | python -m json.tool
