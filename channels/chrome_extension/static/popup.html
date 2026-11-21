@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <title>Prawdowid</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="popup">
+    <header class="header">
+      <img src="icons/mark.svg" alt="" width="24" height="24" />
+      <span class="wordmark">Prawdowid</span>
+      <a href="#" id="open-options" class="header-link">Ustawienia</a>
+    </header>
+    <form id="check-form" class="check-form">
+      <label for="check-text" class="label">Wklej tekst lub link do sprawdzenia</label>
+      <textarea
+        id="check-text"
+        rows="3"
+        maxlength="10000"
+        placeholder="np. „Od stycznia ETIAS obowiązuje Polaków…”"
+      ></textarea>
+      <button type="submit" id="check-submit" class="button-primary">Sprawdź</button>
+      <div class="secondary-actions">
+        <button type="button" id="check-page" class="button-secondary">Sprawdź stronę</button>
+        <button type="button" id="check-screenshot" class="button-secondary">Zrzut ekranu</button>
+      </div>
+      <p class="hint">Możesz też zaznaczyć tekst na stronie i wybrać „Sprawdź…” z menu prawego przycisku.</p>
+    </form>
+    <section id="result" class="result" aria-live="polite"></section>
+    <footer class="transparency">
+      Wspierane przez AI: zawsze zajrzyj do źródeł. Prawdowid nie jest „sędzią prawdy”.
+    </footer>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <title>Prawdowid: ustawienia</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="options">
+    <header class="header">
+      <img src="icons/mark.svg" alt="" width="28" height="28" />
+      <span class="wordmark">Prawdowid: ustawienia</span>
+    </header>
+    <section class="section">
+      <h2>Serwer</h2>
+      <form id="server-form" class="check-form">
+        <label for="server-url" class="label">Adres serwisu Prawdowid (ten sam, co strona WWW)</label>
+        <input id="server-url" type="url" required placeholder="https://prawdowid.example" />
+        <button type="submit" class="button-primary">Zapisz</button>
+        <p id="server-status" class="hint" aria-live="polite"></p>
+      </form>
+    </section>
+    <section class="section">
+      <h2>Twoje dane</h2>
+      <p>
+        Zaznaczony tekst, link lub zrzut ekranu trafia na serwer Prawdowida tylko po Twoim kliknięciu. Dane osobowe są
+        maskowane przed analizą, a sprawdzenia są usuwane po 30 dniach.
+      </p>
+      <button type="button" id="delete-data" class="button-secondary">Usuń moje dane</button>
+      <p id="delete-status" class="hint" aria-live="polite"></p>
+    </section>
+    <script type="module" src="options.js"></script>
+  </body>
+</html>

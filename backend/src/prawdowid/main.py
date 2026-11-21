@@ -54,7 +54,7 @@ def create_app(
         title="Prawdowid API",
         description=(
             "Source-based verification of claims with citations and honest abstention. "
-            "All channels (web, Discord, demo chat, mobile) use POST /v1/checks."
+            "All channels (web, Discord, demo chat, mobile, browser extension) use POST /v1/checks."
         ),
         version="0.1.0",
         lifespan=lifespan,

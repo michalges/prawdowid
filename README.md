@@ -18,7 +18,8 @@ docker compose run --rm --build -p 127.0.0.1:8080:8080 web
 ```
 
 Open `http://localhost:8080`. You can include the Discord bot locally with
-`docker compose --profile discord up -d --build discord`.
+`docker compose --profile discord up -d --build discord`. A Chrome extension lives in
+[`channels/chrome_extension`](channels/chrome_extension/README.md).
 
 Without Docker (Python 3.12 + [uv](https://docs.astral.sh/uv/)):
 

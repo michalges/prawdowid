@@ -1,6 +1,6 @@
 /** Mirrors backend/src/prawdowid/schemas.py (CONCEPT §7.1). */
 
-export type Channel = 'web' | 'discord' | 'demo_chat' | 'mobile'
+export type Channel = 'web' | 'discord' | 'demo_chat' | 'mobile' | 'browser_extension'
 
 export type CheckInput =
   | { type: 'text'; text: string }

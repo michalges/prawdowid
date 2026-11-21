@@ -65,6 +65,9 @@ What's missing or incomplete, kept current while working. Order follows CONCEPT 
 - [x] Discord bot (`channels/discord_bot`): `/sprawdz` (text/link/image), `/usun_moje_dane`, DMs, @mentions, embeds with token colours, pseudonymous session ids
 - [ ] Discord bot: live test with a real token; consistency harness run through the bot
 - [ ] Demo chat adapter (`/demo-chat`)
+- [x] Chrome extension (`channels/chrome_extension`, MV3): popup (text/link/current page/visible-tab screenshot), context menu on selection/link/page, results with quotes + link to `/wynik/{id}`, server setting, "Usuń moje dane"; API channel `browser_extension`
+- [ ] Chrome extension: set the default server to the deployed demo URL once it exists, then publish to the Chrome Web Store (listing, privacy disclosures)
+- [ ] Chrome extension: check images via the context menu (needs per-image host permission)
 
 ## Track C: quality
 - [x] `eval/run_eval.py` (all brief §6 metrics, `--cases` for the jury's set, `--base-url` for a deployment, manual-review sample) → `docs/TEST_RESULTS.md`

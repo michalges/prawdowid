@@ -1,0 +1,310 @@
+/* Values from docs/design/tokens.css; rules in docs/DESIGN.md. */
+:root {
+  --brand-600: #d4213d;
+  --brand-700: #b01a33;
+  --surface: #ffffff;
+  --surface-subtle: #f6f6f8;
+  --border: #e3e4e8;
+  --border-control: #858b97;
+  --ink: #16181d;
+  --ink-muted: #4d5360;
+  --ink-subtle: #6b7180;
+  --system: #1f5fae;
+  --system-bg: #eaf2fb;
+  --warning: #8a5300;
+  --warning-bg: #fdf2d8;
+  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 16px;
+  font: 14px/20px var(--font-sans);
+  color: var(--ink);
+  background: var(--surface);
+}
+
+body.popup {
+  width: 400px;
+}
+
+body.options {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 32px 16px;
+  font-size: 16px;
+  line-height: 24px;
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: var(--brand-600);
+}
+
+a:focus-visible,
+button:focus-visible,
+textarea:focus-visible,
+input:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--brand-600);
+  outline-offset: 2px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.wordmark {
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.header-link {
+  margin-left: auto;
+  font-size: 13px;
+}
+
+.check-form {
+  display: grid;
+  gap: 8px;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+
+textarea,
+input {
+  width: 100%;
+  padding: 8px 12px;
+  font: inherit;
+  color: var(--ink);
+  border: 1px solid var(--border-control);
+  border-radius: 8px;
+  resize: vertical;
+}
+
+button {
+  font: inherit;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+.button-primary {
+  color: #ffffff;
+  background: var(--brand-600);
+  border: 1px solid var(--brand-600);
+}
+
+.button-primary:hover:not(:disabled) {
+  background: var(--brand-700);
+}
+
+.button-secondary {
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--border-control);
+}
+
+.button-secondary:hover:not(:disabled) {
+  background: var(--surface-subtle);
+}
+
+.secondary-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.hint,
+.meta,
+.limitation {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ink-subtle);
+}
+
+.section {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.section h2 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.result {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.result:empty {
+  display: none;
+}
+
+.checked-label {
+  font-size: 13px;
+  color: var(--ink-subtle);
+  overflow-wrap: anywhere;
+}
+
+.notice {
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.notice-system {
+  color: var(--system);
+  background: var(--system-bg);
+}
+
+.notice-warning {
+  color: var(--warning);
+  background: var(--warning-bg);
+}
+
+.extracted summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.extracted p {
+  margin-top: 8px;
+  white-space: pre-wrap;
+  color: var(--ink-muted);
+}
+
+.claim {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--verdict-fg);
+  border-radius: 8px;
+}
+
+.verdict-potwierdzone {
+  --verdict-fg: #0b6e4f;
+  --verdict-bg: #e7f4ee;
+}
+
+.verdict-falszywe {
+  --verdict-fg: #8a1538;
+  --verdict-bg: #fbe9ee;
+}
+
+.verdict-wprowadzajace_w_blad {
+  --verdict-fg: #8a5300;
+  --verdict-bg: #fdf2d8;
+}
+
+.verdict-brak_wystarczajacych_dowodow {
+  --verdict-fg: #475467;
+  --verdict-bg: #eef0f3;
+}
+
+.verdict-nie_podlega_weryfikacji {
+  --verdict-fg: #4a4594;
+  --verdict-bg: #eeedf8;
+}
+
+.verdict-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-self: start;
+  padding: 2px 10px 2px 4px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--verdict-fg);
+  background: var(--verdict-bg);
+  border-radius: 999px;
+}
+
+.verdict-symbol {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  font-size: 12px;
+  color: #ffffff;
+  background: var(--verdict-fg);
+  border-radius: 50%;
+}
+
+.verdict-wprowadzajace_w_blad .verdict-symbol {
+  border-radius: 3px;
+}
+
+.verdict-brak_wystarczajacych_dowodow .verdict-symbol {
+  color: var(--verdict-fg);
+  background: transparent;
+  border: 2px dashed var(--verdict-fg);
+}
+
+.verdict-nie_podlega_weryfikacji .verdict-symbol {
+  border-radius: 50% 50% 50% 0;
+}
+
+.claim-text {
+  font-weight: 600;
+}
+
+.citations {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.citations blockquote {
+  margin: 0 0 2px;
+  padding-left: 8px;
+  font-family: var(--font-serif);
+  border-left: 2px solid var(--border);
+}
+
+.meta a {
+  overflow-wrap: anywhere;
+}
+
+.full-result {
+  font-weight: 600;
+}
+
+.result:has(.full-result) + .transparency {
+  display: none;
+}
+
+.transparency {
+  margin-top: 16px;
+  padding-top: 8px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ink-subtle);
+  border-top: 1px solid var(--border);
+}

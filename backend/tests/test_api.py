@@ -242,7 +242,7 @@ def test_channels_return_the_same_substantive_result(make_client) -> None:
             for claim in result["claims"]
         ]
 
-    substances = [get_substance(channel) for channel in ("web", "discord", "demo_chat", "mobile")]
+    substances = [get_substance(channel) for channel in ("web", "discord", "demo_chat", "mobile", "browser_extension")]
 
     assert all(substance == substances[0] for substance in substances)
 

@@ -17,6 +17,7 @@ class Channel(StrEnum):
     DISCORD = "discord"
     DEMO_CHAT = "demo_chat"
     MOBILE = "mobile"
+    BROWSER_EXTENSION = "browser_extension"
 
 
 class InputType(StrEnum):
