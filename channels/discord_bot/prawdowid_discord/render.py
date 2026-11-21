@@ -98,8 +98,8 @@ def get_claim_embed(claim: dict, index: int, total: int) -> discord.Embed:
     return embed
 
 
-def get_summary_embed(result: dict, web_base_url: str) -> discord.Embed:
-    embed = discord.Embed(colour=discord.Colour(COLOURS["brand"]))
+def add_summary_fields(embed: discord.Embed, result: dict, web_base_url: str) -> None:
+    """Appends the check-level info to the last claim card, so a reply is one box."""
     for notice in result.get("input_notices_pl", []):
         embed.add_field(name="Zignorowaliśmy polecenia w treści", value=notice, inline=False)
     if result.get("extracted_text_pl"):
@@ -116,13 +116,12 @@ def get_summary_embed(result: dict, web_base_url: str) -> discord.Embed:
             else "📥 Zalecamy przekazanie moderatorowi"
         )
         embed.add_field(name=title, value=case["message_pl"], inline=False)
-    limitations = "\n".join(f"• {item}" for item in result.get("limitations_pl", [])[:3])
-    if limitations:
-        embed.add_field(name="Ograniczenia", value=get_truncated(limitations, EMBED_FIELD_LIMIT), inline=False)
-    embed.description = f"[Pełny wynik w przeglądarce]({web_base_url.rstrip('/')}/wynik/{result['check_id']})"
-    model = result.get("model_info", {})
-    embed.set_footer(text=f"{model.get('llm')} · korpus {model.get('corpus_version') or 'brak'}")
-    return embed
+    link = f"{web_base_url.rstrip('/')}/wynik/{result['check_id']}"
+    embed.add_field(
+        name="\u200b",
+        value=f"[Pełny wynik w przeglądarce]({link}) · Prawdowid nie jest „sędzią prawdy”, zajrzyj do źródeł.",
+        inline=False,
+    )
 
 
 def get_status_embed(title: str, message: str) -> discord.Embed:
@@ -140,7 +139,10 @@ def get_result_embeds(result: dict, web_base_url: str) -> list[list[discord.Embe
         return [[get_status_embed(title, result.get("status_message_pl") or NOT_A_VERDICT_PL)]]
     claims = result["claims"]
     embeds = [get_claim_embed(claim, i, len(claims)) for i, claim in enumerate(claims)]
-    embeds.append(get_summary_embed(result, web_base_url))
+    link = f"{web_base_url.rstrip('/')}/wynik/{result['check_id']}"
+    for embed in embeds:
+        embed.url = link
+    add_summary_fields(embeds[-1], result, web_base_url)
     return [embeds[i : i + EMBEDS_PER_MESSAGE] for i in range(0, len(embeds), EMBEDS_PER_MESSAGE)]
 
 

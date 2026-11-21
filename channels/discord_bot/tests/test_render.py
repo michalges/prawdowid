@@ -56,7 +56,8 @@ def test_claim_embed_separates_sources_and_interpretation() -> None:
     assert claim_embed.colour.value == COLOURS["potwierdzone"]
     assert "🧭 Interpretacja Prawdowida" in names and "📚 Co mówią źródła" in names
     assert "19 111" in claim_embed.fields[names.index("📚 Co mówią źródła")].value
-    assert "/wynik/e5a72c6a" in messages[0][-1].description
+    assert len(messages[0]) == 1
+    assert "/wynik/e5a72c6a" in claim_embed.url
 
 
 def test_technical_status_never_shows_verdict_colour() -> None:
@@ -77,7 +78,7 @@ def test_many_claims_are_split_into_messages_of_ten_embeds() -> None:
 
     messages = get_result_embeds(result, "http://web.test")
 
-    assert [len(message) for message in messages] == [10, 3]
+    assert [len(message) for message in messages] == [10, 2]
 
 
 def test_input_mapping_and_pseudonymous_session() -> None:
