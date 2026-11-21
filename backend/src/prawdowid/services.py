@@ -22,7 +22,7 @@ from prawdowid.providers.factcheck import (
     FactCheckProvider,
     GoogleFactCheckProvider,
 )
-from prawdowid.providers.llm import get_llm_provider
+from prawdowid.providers.llm import OPENROUTER_DEFAULT_MODEL, get_llm_provider
 from prawdowid.providers.llm.base import LLMProvider
 from prawdowid.providers.notify import DisabledNotifier, DiscordWebhookNotifier, Notifier
 from prawdowid.providers.ocr import DisabledOCRProvider, OCRProvider, TesseractOCRProvider
@@ -66,8 +66,9 @@ class Services:
         elif provider is LLMProviderName.MISTRAL:
             where = "model językowy: Mistral AI (UE)"
         elif provider is LLMProviderName.OPENROUTER:
+            model = self.settings.llm_model or OPENROUTER_DEFAULT_MODEL
             where = (
-                f"model językowy {self.settings.llm_model or 'Mistral'} przez pośrednika "
+                f"model językowy {model} przez pośrednika "
                 "OpenRouter (USA), z wyłączonym zbieraniem danych przez dostawców"
             )
         else:
