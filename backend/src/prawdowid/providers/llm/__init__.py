@@ -19,6 +19,7 @@ DEFAULT_MODELS = {
 }
 KNOWN_PRICES_PER_MTOK_USD = {
     "openrouter/google/gemini-3.8-flash": (0.825, 4.125),
+    "openrouter/qwen/qwen3.8-flash": (0.15, 0.47),
     "openrouter/mistralai/mistral-large-4-0": (0.7, 2.1),
 }
 """(input, output) USD per million tokens, checked on openrouter.ai/api/v1/models on 2026-11-21.
