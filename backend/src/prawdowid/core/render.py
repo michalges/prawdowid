@@ -68,6 +68,13 @@ def get_citations(
     return citations, numbers, has_archival
 
 
+def get_sentence_with_markers(text: str, markers: str) -> str:
+    """Puts citation markers before the final punctuation: "Tekst [1][2]." """
+    body = text.rstrip()
+    ending = body[-1] if body and body[-1] in ".!?" else "."
+    return f"{body.rstrip('.!?').rstrip()} {markers}{ending}"
+
+
 def get_explanation(verified: VerifiedJudgement, numbers: dict[str, int], verdict: Verdict) -> str:
     sentences: list[str] = []
     for sentence in verified.sentences:
@@ -75,7 +82,7 @@ def get_explanation(verified: VerifiedJudgement, numbers: dict[str, int], verdic
             f"[{numbers[eid]}]" for eid in dict.fromkeys(sentence.evidence_ids) if eid in numbers
         )
         text = sentence.text.strip()
-        sentences.append(f"{text.rstrip('.')}. {markers}".strip() if markers else text)
+        sentences.append(get_sentence_with_markers(text, markers) if markers else text)
     return " ".join(sentences) or DEFAULT_EXPLANATIONS.get(verdict, "")
 
 
