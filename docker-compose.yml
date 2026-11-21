@@ -1,0 +1,21 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    env_file: .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+
+  ingest:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    env_file: .env
+    volumes:
+      - ./data:/app/data
+    command: ["python", "-m", "prawdowid.ingest", "build", "--allow-unverified", "--max-docs", "15"]
+    profiles: ["ingest"]
