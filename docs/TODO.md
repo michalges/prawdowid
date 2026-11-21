@@ -60,7 +60,8 @@ What's missing or incomplete, kept current while working. Order follows CONCEPT 
 - [ ] Web UI (React + Vite + TS + Tailwind) → built into `web/dist`, served by FastAPI at `/` (also needs the `/wynik/{id}` route used in chat links). Use `docs/DESIGN.md` + `docs/design/tokens.css`
 - [ ] Discord embeds: take colours from `discord.*` from `docs/design/tokens.json`
 - [ ] Design: no logo yet (wordmark only, see `docs/DESIGN.md` §9)
-- [ ] Discord bot (`/sprawdz`, DMs, mentions) using `channels/chat.py`
+- [x] Discord bot (`channels/discord_bot`): `/sprawdz` (text/link/image), `/usun_moje_dane`, DMs, @mentions, embeds with token colours, pseudonymous session ids
+- [ ] Discord bot: live test with a real token; consistency harness run through the bot
 - [ ] Demo chat adapter (`/demo-chat`)
 - [ ] Mobile app (Expo)
 
@@ -71,7 +72,7 @@ What's missing or incomplete, kept current while working. Order follows CONCEPT 
 
 ## Track D: delivery
 - [x] Per-app deploys: `backend/Dockerfile` (with Tesseract `pol`) + `backend/.env.example`; `web/Dockerfile` + `web/.env.example`
-- [ ] Discord bot: its own Dockerfile + `.env.example` in `channels/discord_bot/`
+- [x] Discord bot: its own Dockerfile + `.env.example` in `channels/discord_bot/`
 - [ ] `README.md` with the jury quick start
 - [ ] `docs/ARCHITECTURE.md` (incl. model licenses), `docs/RISKS.md`, `docs/COSTS.md`
 - [ ] Public EU-hosted demo URL + Discord invite link
