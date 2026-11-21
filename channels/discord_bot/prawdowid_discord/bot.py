@@ -31,6 +31,8 @@ class PrawdowidBot(discord.Client):
 
     def _register_commands(self) -> None:
         @self.tree.command(name="sprawdz", description="Sprawdź informację w oficjalnych źródłach")
+        @app_commands.allowed_installs(guilds=True, users=True)
+        @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
         @app_commands.describe(tresc="Treść albo link do sprawdzenia", obraz="Zrzut ekranu (opcjonalnie)")
         async def check_command(
             interaction: discord.Interaction, tresc: str | None = None, obraz: discord.Attachment | None = None
@@ -44,6 +46,8 @@ class PrawdowidBot(discord.Client):
                 await interaction.followup.send(embeds=embeds)
 
         @self.tree.command(name="usun_moje_dane", description="Usuń swoje sprawdzenia z serwera Prawdowida")
+        @app_commands.allowed_installs(guilds=True, users=True)
+        @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
         async def delete_command(interaction: discord.Interaction) -> None:
             await interaction.response.defer(ephemeral=True, thinking=True)
             try:
@@ -53,14 +57,33 @@ class PrawdowidBot(discord.Client):
                 text = "Nie udało się teraz usunąć danych. Spróbuj ponownie za chwilę."
             await interaction.followup.send(text, ephemeral=True)
 
+        @self.tree.context_menu(name="Sprawdź w Prawdowid")
+        @app_commands.allowed_installs(guilds=True, users=True)
+        @app_commands.allowed_contexts(guilds=True, dms=True, private_channels=True)
+        async def check_message(interaction: discord.Interaction, message: discord.Message) -> None:
+            """Right-click any message → Apps → Sprawdź w Prawdowid. The reply is visible only to the
+            person who asked, so it works in any server or DM without adding the bot there."""
+            await interaction.response.defer(ephemeral=True, thinking=True)
+            image_attachment = next(
+                (a for a in message.attachments if (a.content_type or "").startswith("image/")), None
+            )
+            image = await self._get_image(image_attachment) if image_attachment else None
+            if not (message.content.strip() or image):
+                await interaction.followup.send(
+                    embed=get_status_embed("Brak treści", "Ta wiadomość nie zawiera tekstu ani obrazu do sprawdzenia."),
+                    ephemeral=True,
+                )
+                return
+            for embeds in await self._get_reply(interaction.user.id, message.content, image):
+                await interaction.followup.send(embeds=embeds, ephemeral=True)
+
     async def setup_hook(self) -> None:
         guild_id = self.settings.discord_guild_id
         if guild_id:
             guild = discord.Object(id=guild_id)
             self.tree.copy_global_to(guild=guild)
             await self.tree.sync(guild=guild)
-        else:
-            await self.tree.sync()
+        await self.tree.sync()  # global: needed for user installs (can take a while to appear)
 
     async def on_ready(self) -> None:
         logger.info("Prawdowid bot ready as %s", self.user)
