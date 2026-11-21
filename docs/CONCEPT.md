@@ -2,7 +2,7 @@
 
 > Hackathon project for the **MSZ "PRAWDOWID" challenge**: fast, easy, source-based verification of information.
 > This file is the source of truth for every agent working on the repo. Read it fully before writing code.
-> The authoritative brief is the organizer's PDF: [`docs/MSZ - Pełna treść zadania konkursowego.pdf`](MSZ%20-%20Pe%C5%82na%20tre%C5%9B%C4%87%20zadania%20konkursowego.pdf). The contest rules are in [`docs/MSZ - Regulamin zadania konkursowego.pdf`](MSZ%20-%20Regulamin%20zadania%20konkursowego.pdf). Sources: [`docs/SOURCES.md`](SOURCES.md) + `data/sources.yaml`. If this doc and the brief disagree, **the brief wins**: flag the conflict.
+> The authoritative brief is the organizer's PDF ("MSZ – Pełna treść zadania konkursowego") and the contest rules ("MSZ – Regulamin zadania konkursowego"). Keep them locally in `docs/`. **They are git-ignored and never committed, because they contain personal names.** Don't copy names from them into the repo. Sources: [`docs/SOURCES.md`](SOURCES.md) + `data/sources.yaml`. If this doc and the brief disagree, **the brief wins**: flag the conflict.
 
 ---
 
@@ -51,7 +51,7 @@ It supports informed judgement. **It is not an automatic "judge of truth"** (bri
 | Lexical search | SQLite **FTS5** (BM25) | Polish inflection: index lowercased + simple stemming (see §6.4). |
 | Vector search | Local multilingual embedding model (e.g. `BAAI/bge-m3` or `intfloat/multilingual-e5-base`) + in-memory numpy matrix, persisted to disk | The corpus is small (hundreds to thousands of chunks), so we don't need a vector DB. **Check license and size before choosing.** |
 | Hybrid ranking | Reciprocal Rank Fusion (BM25 + vector) → optional cross-encoder rerank | Simple and strong. |
-| LLM | Pluggable `LLMProvider`: **`mistral`** (EU, default), `openai`, `anthropic`, `ollama` (self-hosted, e.g. the Polish **Bielik** model) | The brief rewards limiting non-EEA dependencies and allowing self-hosting (§3 premium). Verify current model names and pricing. |
+| LLM | Pluggable `LLMProvider`: **`openrouter`** (default: `google/gemini-3.8-flash` for the ≤ 30 s latency target; `mistralai/mistral-large-4-0` is the EU-vendor option; structured outputs; provider data collection denied), `mistral` (direct, EU), `openai`, `anthropic`, `ollama` (self-hosted, e.g. the Polish **Bielik** model) | One key gives access to many models for the hackathon. OpenRouter itself is a US intermediary, so that's disclosed in `/health` and the UI. The direct `mistral` and self-hosted `ollama` options remove the non-EEA hop (brief §3 premium). |
 | URL fetching | `httpx` + `trafilatura` (main-text extraction) | Respect robots.txt and paywalls: **never bypass protections**. |
 | Web UI | **React + Vite + TypeScript**, Tailwind | Responsive, accessible (WCAG AA contrast), served as static files by FastAPI. |
 | Second channel | **Discord bot** (`discord.py`) | Allowed by the brief, the organizers run their channel there, and the jury can test it immediately. |
@@ -146,7 +146,7 @@ Every external dependency (LLM, embeddings if remote, Discord) sits **behind an 
 │   │   ├─ store/{db.py,models.py,migrations/}
 │   │   ├─ cases/               # moderator loop (premium)
 │   │   └─ prompts/*.md         # versioned prompts, no secrets
-│   ├─ ingest/                  # sources.yaml → corpus build CLI
+│   ├─ src/prawdowid/ingest/    # sources.yaml → corpus build CLI (`python -m prawdowid.ingest`)
 │   ├─ eval/
 │   │   ├─ cases.jsonl          # ≥ 30 own cases covering scenarios A–J
 │   │   ├─ run_eval.py          # computes every required metric, writes TEST_RESULTS.md
@@ -203,7 +203,7 @@ Every external dependency (LLM, embeddings if remote, Discord) sits **behind an 
 ```
 Qualification, update and exclusion rules are written in `docs/SOURCES.md`. `quality_tier` feeds the strength score but **never decides a verdict alone**.
 
-### 6.4 Ingest pipeline (`uv run python -m ingest build`)
+### 6.4 Ingest pipeline (`uv run python -m prawdowid.ingest build`)
 fetch (polite, robots.txt, rate-limited) → extract main text (trafilatura) → split into chunks of ~800–1,200 characters with overlap, keeping headings → record metadata (title, publisher, url, published_at, retrieved_at, language, type, tier, license) → index FTS5 (lowercase, diacritics both kept and folded) → embed → write `corpus_version`.
 - Respect `store_mode`. For `excerpt_only`, keep the needed fragments plus the link, not full text.
 - **No full-content archiving** without a legal basis, license, retention, access control and a deletion procedure (brief "Ograniczenia").
@@ -244,7 +244,10 @@ fetch (polite, robots.txt, rate-limited) → extract main text (trafilatura) →
       "context_notices": [ { "kind": "incident_match" | "source_status" | "archival_material", "text_pl": "…" } ]
     }
   ],
+  "extracted_text_pl": "OCR transcript for image input (masked), else null",
+  "input_notices_pl": ["e.g. instructions to the system were found in the input and ignored"],
   "limitations_pl": ["…"],
+  "case": { "case_id": "uuid", "status": "zalecamy_przekazanie" | "przekazano_moderatorowi", "similar_reports": 2, "message_pl": "…" } | null,
   "model_info": { "llm": "provider/model", "corpus_version": "2026-11-21T10:00Z" },
   "latency_ms": 8400,
   "est_cost_usd": 0.004

@@ -1,0 +1,92 @@
+# TODO
+
+What's missing or incomplete, kept current while working. Order follows CONCEPT §12. `[~]` = partially done.
+
+## Track A: core
+
+### A1. Skeleton
+- [x] uv project, ruff, pytest, FastAPI app factory, `GET /health` (shows components + data-processing note)
+- [x] API contract models (`schemas.py`), including the `mobile` channel, `case`, `extracted_text_pl`, `input_notices_pl`
+- [x] LLM providers: `openrouter` (default `google/gemini-3.8-flash`; EU option `mistralai/mistral-large-4-0` is ~4× slower), JSON-schema output, `data_collection: deny`), `mistral`, `openai`, `anthropic` (SDK, optional extra), `ollama`, `mock` (offline, never decides), `failing`
+- [ ] Live-test `anthropic`, `mistral` direct and `ollama` providers against real endpoints (only OpenRouter was tested live; the others are covered by mocked-HTTP tests)
+- [ ] Re-check the OpenRouter price table (`providers/llm/__init__.py`) before reporting costs
+- [ ] Choose the production embedding model (`sentence_transformers` provider exists; default is the offline `hashing` one); check its license (transferable to MSZ, Regulamin §4) and size, then rebuild the corpus
+- [ ] Decide whether OpenRouter (US intermediary) is acceptable for the final demo, or switch to direct `mistral` (EU) / `ollama`
+
+### A2. Corpus & ingest
+- [x] `python -m prawdowid.ingest {check,build,stats}`: polite fetch (robots.txt, per-host delay, SSRF guard), trafilatura, chunking, FTS5 + vectors, `corpus_version`, idempotent rebuilds, excluded sources removed
+- [x] Listing crawler skips menus/nav and prefers article-like links
+- [~] Per-source verification (`docs/SOURCES.md` §5). Found so far (2026-11-21):
+  - `cert_komunikaty`: robots.txt disallows `/komunikaty/`, so it's excluded
+  - `gov_ostrzezenia`, `msz_podrozujacy`: client-side rendered, so they're pointers only
+  - `rcb_raport_dobowy`: the report is the page itself, so it's `page` mode
+  - The other 30+ entries are still `license_verified: false`, and demo builds need `--allow-unverified`
+- [ ] MSZ travel advisories: find the per-country advisory URLs (or an official feed) and ingest them. This is high value, since the organizer is MSZ.
+- [ ] RCB daily report: keep daily snapshots (today each build replaces yesterday's text)
+- [ ] Ingest a static set of fact-check articles (Demagog, AFP Sprawdzam) so the corpus has ≥ 2 source types without API keys (see the stats below)
+- [ ] Add sources outside safety/transport: ISAP, EUR-Lex, GUS, dane.gov.pl, europa.eu
+- [ ] Get the organizer's incident DB (JSON/CSV) → `data/incidents/` (loader ready)
+- [ ] EUvsDisinfo export per the organizer's PDF → `data/incidents/`
+- [ ] Reach the brief minimum (`ingest stats` prints it): ≥ 100 docs, ≥ 10 domains, ≥ 2 types
+- [ ] Prebuilt `corpus.sqlite` as a release asset, so the jury doesn't need to crawl
+
+### A3. Retrieval
+- [x] Hybrid FTS5 BM25 + vectors + RRF, absolute relevance score, threshold gate, Polish prefix stemming + diacritics folding
+- [x] Google Fact Check provider (+ recorded-response provider for tests), IFCN/EFCSN allowlist → tier B
+- [ ] Record real Google Fact Check responses for offline tests (needs `GOOGLE_FACTCHECK_API_KEY`)
+- [ ] Optional cross-encoder rerank
+- [ ] Tune `RETRIEVAL_MIN_RELEVANCE` on the eval set
+
+### A4. Verification
+- [x] Claim extraction, judge (evidence-only, per-call random delimiters), deterministic citation verifier, re-judge after failed quotes, abstention gates, strength factors, archival notice, render
+- [x] Incident matching + source-status notices (context only)
+- [x] Prompts versioned in `prompts/*.md`
+- [ ] Iterate on the prompts and thresholds against real eval runs
+- [ ] `data/source_status.yaml` has no verified entries yet (each needs an official legal reference)
+
+### A5. Safety, privacy, ops
+- [x] PII masking before the LLM and before storage (emails, phones, PESEL, IBAN/account numbers, cards, ID numbers)
+- [ ] PII: mask person names "when obvious" (CONCEPT §4 step 2) — not implemented
+- [x] Injection detection (input + sources), events, user notice
+- [x] Check log, `GET /v1/checks/{id}`, `DELETE /v1/sessions/{id}`, retention purge on startup
+- [ ] Periodic retention purge (currently only at startup)
+- [x] Rate limiting (session + client IP), SSRF guard, size limits, result cache, metrics, admin export
+- [ ] SSRF: DNS rebinding window between our check and httpx's own resolution (pin the resolved IP)
+- [ ] Rate limiter and cache are in-memory per process; move them to SQLite/Redis before running several workers
+- [x] Moderator cases: grouping, counter, Discord webhook alert, "przekazano" only after confirmed delivery
+
+## Track B: channels
+- [x] Shared chat renderer + `ChannelAdapter` protocol (`channels/chat.py`)
+- [ ] Web UI (React + Vite + TS + Tailwind) → built into `web/dist`, served by FastAPI at `/` (also needs the `/wynik/{id}` route used in chat links)
+- [ ] Discord bot (`/sprawdz`, DMs, mentions) using `channels/chat.py`
+- [ ] Demo chat adapter (`/demo-chat`)
+- [ ] Mobile app (Expo)
+
+## Track C: quality
+- [x] `eval/run_eval.py` (all brief §6 metrics, `--cases` for the jury's set, `--base-url` for a deployment, manual-review sample) → `docs/TEST_RESULTS.md`
+- [~] `eval/cases.jsonl`: seeded from real corpus documents. Needs ≥ 30 cases, ≥ 3 per scenario A–J (B, C, F, H, I need more real material)
+- [ ] Fill in the manual citation review (`eval/manual_review.tsv`, 20 rows)
+
+## Track D: delivery
+- [x] `backend/Dockerfile` (with Tesseract `pol`), `docker-compose.yml` (`api`, `ingest` profile), `.env.example`
+- [ ] Discord bot service in compose
+- [ ] `README.md` with the jury quick start
+- [ ] `docs/ARCHITECTURE.md` (incl. model licenses), `docs/RISKS.md`, `docs/COSTS.md`
+- [ ] Public EU-hosted demo URL + Discord invite link
+- [ ] Description ≤ 4,000 characters, PDF deck ≤ 12 slides, video ≤ 3 min
+
+## Premium (after the gate passes; CONCEPT §9 order)
+- [x] OCR screenshots (Tesseract `pol`, transcript shown, limits disclosed)
+- [ ] pHash image matching
+- [ ] Evidence chain view (web UI)
+- [x] Information loop backend (cases, dedupe, counter, alerts)
+- [x] CSV/JSON export
+- [ ] DISARM/OpenCTI mapping note
+- [ ] Multilingual retrieval check (EN sources, PL answer)
+- [ ] Audio/video transcription (faster-whisper)
+- [ ] Controlled archiving (default off)
+- [ ] Self-hosted `ollama` mode documented and tested
+
+## Open questions
+- [ ] The organizer's full source list URL (brief §7) and incident DB: watch the Discord
+- [x] Organizer PDFs contain personal names: removed from git history, kept locally, git-ignored
