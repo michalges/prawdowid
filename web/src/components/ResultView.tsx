@@ -76,7 +76,9 @@ export function ResultView({ result }: { result: CheckResult }) {
   return (
     <div className="flex flex-col gap-6">
       <output className="flex flex-col gap-3">
-        <h2 className="text-title font-semibold text-ink">Sprawdziliśmy {getClaimCountLabel(result.claims.length)}</h2>
+        <h2 className="text-heading font-semibold text-ink">
+          Sprawdziliśmy {getClaimCountLabel(result.claims.length)}
+        </h2>
         <ul className="flex flex-wrap gap-2" aria-label="Podsumowanie wyników">
           {result.claims.map((claim) => (
             <li key={claim.claim_id}>

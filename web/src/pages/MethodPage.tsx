@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
 
 import type { Verdict } from '../api/types'
+import { TransparencyNote } from '../components/TransparencyNote'
 import { VerdictBadge } from '../components/VerdictBadge'
 import { VERDICT_STYLES } from '../lib/verdicts'
 
@@ -17,7 +18,7 @@ const STEPS = [
 
 export function MethodPage() {
   return (
-    <div className="flex max-w-3xl flex-col gap-10">
+    <div className="flex flex-col py-8 gap-10">
       <section className="flex flex-col gap-3">
         <h1 className="text-title font-semibold text-ink">Jak to działa</h1>
         <p className="text-body text-ink-muted">
@@ -76,6 +77,7 @@ export function MethodPage() {
           <li>Nie omijamy płatnych ani zablokowanych stron.</li>
           <li>Nie zapisujemy obrazów: zostaje tylko odczytany, zamaskowany tekst.</li>
         </ul>
+        <TransparencyNote isDetailed />
         <Link to="/zrodla" className="w-fit font-medium text-brand-700 underline underline-offset-2">
           Zobacz katalog źródeł
         </Link>

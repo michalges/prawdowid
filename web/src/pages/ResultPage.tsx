@@ -6,7 +6,7 @@ import type { CachedResult } from '../lib/resultCache'
 
 export function ResultPage({ cached }: { cached: CachedResult }) {
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col py-8 gap-6">
       <Link
         to="/"
         className="inline-flex min-h-11 w-fit items-center gap-2 rounded-md text-body-sm font-medium text-brand-700"

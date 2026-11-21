@@ -206,7 +206,7 @@ export function ClaimCard({ claim, index, total }: { claim: ClaimResult; index: 
           <p className="text-body-sm text-ink-muted">{VERDICT_STYLES[claim.verdict].description}</p>
         </div>
       </header>
-      <div className="grid gap-6 p-4 sm:p-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+      <div className="grid gap-6 p-4 sm:p-6 ">
         <InterpretationBlock claim={claim} />
         <SourcesBlock claim={claim} />
       </div>

@@ -64,7 +64,7 @@ function SourceRow({ source }: { source: SourceInfo }) {
 
 export function SourcesPage({ catalog }: { catalog: SourceCatalog }) {
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col py-8 gap-8">
       <div className="flex max-w-3xl flex-col gap-2">
         <h1 className="text-title font-semibold text-ink">Katalog źródeł</h1>
         <p className="text-body text-ink-muted">
