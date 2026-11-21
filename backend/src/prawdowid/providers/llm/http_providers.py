@@ -17,7 +17,7 @@ from prawdowid.providers.llm.base import (
     get_user_message,
 )
 
-MAX_OUTPUT_TOKENS = 4000
+MAX_OUTPUT_TOKENS = 12000
 
 
 def raise_for_status(response: httpx.Response) -> None:

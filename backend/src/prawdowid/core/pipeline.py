@@ -290,7 +290,16 @@ class VerificationPipeline:
         submitted_page: DataBlock | None = None,
     ) -> ClaimOutcome:
         notices = self._get_context_notices(claim, normalized)
+        logger.info(
+            "claim %s: kind=%s high_risk=%s query=%r text=%r",
+            claim_id,
+            claim.kind,
+            claim.high_risk,
+            claim.search_query,
+            claim.text,
+        )
         if claim.kind != "fact":
+            logger.info("claim %s: not a fact → %s", claim_id, Verdict.NOT_VERIFIABLE.value)
             return self._get_unjudged_outcome(
                 claim_id, claim, Verdict.NOT_VERIFIABLE, notices, today
             )
@@ -310,6 +319,15 @@ class VerificationPipeline:
                     session_id=session_id,
                 )
 
+        for item in evidence:
+            logger.info(
+                "claim %s: evidence %s tier=%s relevance=%.3f %s",
+                claim_id,
+                item.evidence_id,
+                item.quality_tier.value,
+                item.relevance,
+                item.url,
+            )
         source_injections = 0
         for item in evidence:
             if get_injection_findings(item.text, item.evidence_id):
@@ -320,6 +338,7 @@ class VerificationPipeline:
                     session_id=session_id,
                 )
         if not evidence:
+            logger.info("claim %s: rejected, no evidence retrieved", claim_id)
             self.database.log_event("abstained", {"reason": "no_evidence"}, session_id=session_id)
             outcome = self._get_unjudged_outcome(
                 claim_id, claim, Verdict.INSUFFICIENT_EVIDENCE, notices, today
@@ -330,7 +349,8 @@ class VerificationPipeline:
         usage = LLMUsage()
         try:
             verified, usage = await self._get_verified(claim, evidence, today, submitted_page)
-        except LLMOutputError:
+        except LLMOutputError as error:
+            logger.info("claim %s: rejected, judge output invalid twice: %s", claim_id, error)
             self.database.log_event(
                 "abstained", {"reason": "judge_schema_failed"}, session_id=session_id
             )
@@ -341,6 +361,18 @@ class VerificationPipeline:
             return outcome
 
         decision = get_gate_decision(verified, evidence)
+        logger.info(
+            "claim %s: judge proposed=%s accepted_quotes=%d rejected_quotes=%d "
+            "dropped_sentences=%d conflicts=%d → final=%s%s",
+            claim_id,
+            verified.judgement.verdict.value,
+            len(verified.quotes),
+            len(verified.rejected_quotes),
+            verified.dropped_sentences,
+            len(verified.judgement.conflicts),
+            decision.verdict.value,
+            f" (gate: {'; '.join(decision.reasons_pl)})" if decision.was_downgraded else "",
+        )
         if decision.verdict is Verdict.INSUFFICIENT_EVIDENCE:
             self.database.log_event(
                 "abstained",
@@ -380,6 +412,9 @@ class VerificationPipeline:
             quote.evidence_id for quote in verified.rejected_quotes
         } - verified.cited_evidence_ids
         remaining = [item for item in evidence if item.evidence_id not in failed_ids]
+        logger.info(
+            "judge retry: dropping evidence %s after rejected quotes", sorted(failed_ids) or "none"
+        )
         if not remaining:
             return verified, usage
         judgement, retry_usage = await get_judgement(

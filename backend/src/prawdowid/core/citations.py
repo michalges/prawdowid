@@ -1,5 +1,6 @@
 """Deterministic citation verification: code, not the model, decides whether a quote is real."""
 
+import logging
 from dataclasses import dataclass, field
 
 from rapidfuzz import fuzz
@@ -11,6 +12,9 @@ from prawdowid.schemas import Verdict
 
 MIN_QUOTE_CHARS = 15
 UNCERTAINTY_VERDICTS = frozenset({Verdict.INSUFFICIENT_EVIDENCE, Verdict.NOT_VERIFIABLE})
+
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -53,6 +57,7 @@ def get_verified_judgement(
     for quote in judgement.quotes:
         item = evidence_by_id.get(quote.evidence_id)
         if item is None:
+            logger.info("quote rejected: unknown evidence id %s", quote.evidence_id)
             result.unknown_evidence_ids.add(quote.evidence_id)
             result.rejected_quotes.append(quote)
             continue
@@ -60,6 +65,14 @@ def get_verified_judgement(
         if similarity >= min_similarity:
             result.quotes.append(VerifiedQuote(item, quote.quote.strip(), quote.stance, similarity))
         else:
+            logger.info(
+                "quote rejected: evidence=%s similarity=%.0f<%.0f url=%s quote=%r",
+                quote.evidence_id,
+                similarity,
+                min_similarity,
+                item.url,
+                quote.quote[:160],
+            )
             result.rejected_quotes.append(quote)
     valid_ids = result.cited_evidence_ids
     for sentence in judgement.explanation:
