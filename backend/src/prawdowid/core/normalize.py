@@ -156,6 +156,7 @@ class InputNormalizer:
         result.ocr_text = text
         result.limitations_pl.append(
             "Tekst odczytaliśmy z obrazu automatycznie (OCR). Odczyt może zawierać błędy. "
-            "Nie analizujemy, czy sam obraz został przerobiony."
+            "Nie analizujemy, czy sam obraz został przerobiony. "
+            "Data widoczna na obrazie nie potwierdza daty publikacji."
         )
         return result

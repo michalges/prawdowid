@@ -32,3 +32,24 @@ uv run python eval/run_eval.py --cases /path/to/jury.jsonl --output-dir /tmp/pra
 The runner exits with status 1 when a case fails and writes `results.json`, `TEST_RESULTS.md`, and `manual_review.tsv` even when assertions fail. The TSV is for a person to judge whether quoted passages substantively support each claim. Without `--output-dir`, the runner updates the checked-in report locations. In-process runs use temporary databases. By default the runner executes one case at a time for latency measurements. Set `--jobs 8` for a concurrent run. With `--base-url`, ordinary cases use the deployment and controlled source, incident, information-loop and outage cases still run locally.
 
 Use one JSON object per line with `id`, `scenario`, `input`, `expected_status`, and optionally `expected_verdict` and `expected_citation_urls`. Inputs accept `{"type":"text","text":"…"}`, `{"type":"url","url":"https://…"}`, and `{"type":"image","image_path":"eval/fixtures/euro.png"}`. Image paths are relative to `backend/`. See `cases.jsonl` for scenario-specific assertions and fixtures.
+
+## Participant smoke tests
+
+`jury_cases.jsonl` turns the supplied participant examples into a separate smoke test. It uses a
+synthetic PAP screenshot, controlled HTML for the source-instruction case, and a simulated Google
+HTTP 403 for the outage case. The positive lookup can use both the corpus and Google ClaimReview
+when `GOOGLE_FACTCHECK_API_KEY` is configured. The channel check compares verdicts and publication
+URLs. It allows different excerpts from the same publication.
+
+From `backend/`, refresh the Demagog articles and build the strike sources in a local demo corpus
+before running the examples. CGIL and Sky TG24 reuse terms still need verification for the production corpus.
+The strike question uses 20 November 2026 explicitly because CGIL published a report of the
+demonstrations that day.
+
+```sh
+uv run python -m prawdowid.ingest build --only demagog_reviews
+uv run python -m prawdowid.ingest build --only cgil_liguria_strike,sky_tg24_italy_strike --allow-unverified
+LLM_PROVIDER=openrouter LLM_MODEL=google/gemini-3.8-flash LLM_TIMEOUT_S=60 \
+  uv run python eval/run_eval.py --cases eval/jury_cases.jsonl --jobs 3 \
+    --output-dir /tmp/prawdowid-jury-gemini
+```

@@ -75,7 +75,7 @@ OFFLINE_LIMITATION_PL = (
     "Działa tryb demonstracyjny bez modelu językowego: system nie porównuje treści dowodów "
     "i nie wydaje werdyktów."
 )
-FACTCHECK_LIMITATION_PL = "Baza weryfikatorów faktów była niedostępna podczas tego sprawdzenia."
+FACTCHECK_LIMITATION_PL = "Nie udało się sprawdzić indeksu Google z powodu błędu dostępu."
 MAX_POINTERS = 2
 
 
@@ -180,7 +180,10 @@ class VerificationPipeline:
             self.database.log_event("pii_masked", masked.masked_counts, session_id=session_id)
             input_notices.append(PII_NOTICE_PL)
 
-        cache_key = get_cache_key(input_type, masked.text, self.corpus_version, self.llm.model_id)
+        submitted_page = self._get_submitted_page(normalized)
+        content_blocks = self._get_content_blocks(normalized, masked.text)
+        cache_content = "\x1f".join(block.content for block in content_blocks)
+        cache_key = get_cache_key(input_type, cache_content, self.corpus_version, self.llm.model_id)
         cached = self.cache.get(cache_key)
         if cached is not None:
             self.database.log_event("cache_hit", {}, session_id=session_id)
@@ -202,7 +205,7 @@ class VerificationPipeline:
         today = get_today()
         extraction, usage = await get_extracted_claims(
             self.llm,
-            self._get_content_blocks(normalized, masked.text),
+            content_blocks,
             self.settings.max_claims,
             today,
         )
@@ -215,7 +218,9 @@ class VerificationPipeline:
 
         outcomes = await asyncio.gather(
             *[
-                self._check_claim(retriever, f"c{i + 1}", claim, normalized, today, session_id)
+                self._check_claim(
+                    retriever, f"c{i + 1}", claim, normalized, today, session_id, submitted_page
+                )
                 for i, claim in enumerate(extraction.claims)
             ]
         )
@@ -235,7 +240,7 @@ class VerificationPipeline:
             latency_ms=get_elapsed_ms(started_at),
             est_cost_usd=self._get_cost(usage),
         )
-        if case is None:
+        if case is None and not any(outcome.factcheck_failed for outcome in outcomes):
             self.cache.set(cache_key, result)
         return result, usage, masked.text, input_type
 
@@ -259,6 +264,16 @@ class VerificationPipeline:
             )
         return blocks
 
+    def _get_submitted_page(self, normalized: NormalizedInput) -> DataBlock | None:
+        if not normalized.fetched_title:
+            return None
+        title = get_masked_text(normalized.fetched_title).text
+        published = normalized.fetched_published_at
+        return DataBlock(
+            label="submitted_page",
+            content=f"odczytany tytuł: {title}\ndata publikacji na stronie: {published or 'brak'}",
+        )
+
     async def _check_claim(
         self,
         retriever: HybridRetriever,
@@ -267,6 +282,7 @@ class VerificationPipeline:
         normalized: NormalizedInput,
         today: date,
         session_id: str,
+        submitted_page: DataBlock | None = None,
     ) -> ClaimOutcome:
         notices = self._get_context_notices(claim, normalized)
         if claim.kind != "fact":
@@ -308,14 +324,16 @@ class VerificationPipeline:
 
         usage = LLMUsage()
         try:
-            verified, usage = await self._get_verified(claim, evidence, today)
+            verified, usage = await self._get_verified(claim, evidence, today, submitted_page)
         except LLMOutputError:
             self.database.log_event(
                 "abstained", {"reason": "judge_schema_failed"}, session_id=session_id
             )
-            return self._get_unjudged_outcome(
+            outcome = self._get_unjudged_outcome(
                 claim_id, claim, Verdict.INSUFFICIENT_EVIDENCE, notices, today
             )
+            outcome.factcheck_failed = factcheck_failed
+            return outcome
 
         decision = get_gate_decision(verified, evidence)
         if decision.verdict is Verdict.INSUFFICIENT_EVIDENCE:
@@ -340,10 +358,14 @@ class VerificationPipeline:
         return ClaimOutcome(result, usage, claim, factcheck_failed, source_injections)
 
     async def _get_verified(
-        self, claim: ExtractedClaim, evidence: list[Evidence], today: date
+        self,
+        claim: ExtractedClaim,
+        evidence: list[Evidence],
+        today: date,
+        submitted_page: DataBlock | None = None,
     ) -> tuple[VerifiedJudgement, LLMUsage]:
         """Judge, verify quotes; if some quotes fail, drop those passages and judge once more."""
-        judgement, usage = await get_judgement(self.llm, claim, evidence, today)
+        judgement, usage = await get_judgement(self.llm, claim, evidence, today, submitted_page)
         verified = get_verified_judgement(
             judgement, evidence, self.settings.citation_min_similarity
         )
@@ -355,7 +377,9 @@ class VerificationPipeline:
         remaining = [item for item in evidence if item.evidence_id not in failed_ids]
         if not remaining:
             return verified, usage
-        judgement, retry_usage = await get_judgement(self.llm, claim, remaining, today)
+        judgement, retry_usage = await get_judgement(
+            self.llm, claim, remaining, today, submitted_page
+        )
         return get_verified_judgement(
             judgement, remaining, self.settings.citation_min_similarity
         ), usage + retry_usage
@@ -426,6 +450,12 @@ class VerificationPipeline:
         self, normalized: NormalizedInput, outcomes: list[ClaimOutcome]
     ) -> list[str]:
         limitations = [*BASE_LIMITATIONS_PL, *normalized.limitations_pl]
+        if normalized.fetched_title:
+            title = get_masked_text(normalized.fetched_title).text[:300]
+            observed = f'Tytuł odczytany z przesłanej strony to „{title}”.'
+            if normalized.fetched_published_at:
+                observed += f" Odczytana data publikacji to {normalized.fetched_published_at}."
+            limitations.append(observed)
         if self._is_offline:
             limitations.append(OFFLINE_LIMITATION_PL)
         if any(outcome.factcheck_failed for outcome in outcomes):

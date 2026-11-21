@@ -41,6 +41,7 @@ def get_evidence_block(evidence: Evidence) -> DataBlock:
     published = evidence.published_at.isoformat() if evidence.published_at else "brak daty"
     header = (
         f"tytuł: {evidence.title}\nwydawca: {evidence.publisher}\nopublikowano: {published}\n"
+        f"adres: {evidence.url}\n"
         f"typ źródła: {evidence.source_type.value}, poziom: {evidence.quality_tier.value}"
     )
     return DataBlock(
@@ -49,7 +50,11 @@ def get_evidence_block(evidence: Evidence) -> DataBlock:
 
 
 async def get_judgement(
-    llm: LLMProvider, claim: ExtractedClaim, evidence: list[Evidence], today: date
+    llm: LLMProvider,
+    claim: ExtractedClaim,
+    evidence: list[Evidence],
+    today: date,
+    submitted_page: DataBlock | None = None,
 ) -> tuple[JudgeOutput, LLMUsage]:
     claim_block = DataBlock(
         label="claim",
@@ -57,6 +62,7 @@ async def get_judgement(
     )
     blocks = [
         claim_block,
+        *([submitted_page] if submitted_page else []),
         *[get_evidence_block(item) for item in evidence],
         DataBlock(label="today", content=today.isoformat()),
     ]

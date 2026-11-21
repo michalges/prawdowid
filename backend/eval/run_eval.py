@@ -35,6 +35,7 @@ from pydantic import SecretStr
 from prawdowid.config import BACKEND_ROOT, REPO_ROOT, LLMProviderName, get_settings
 from prawdowid.core.fetch import FetchedPage
 from prawdowid.main import create_app
+from prawdowid.providers.factcheck import GoogleFactCheckProvider
 from prawdowid.providers.llm.base import LLMRateLimitError
 from prawdowid.providers.llm.mock import FailingLLMProvider
 from prawdowid.providers.notify import DisabledNotifier
@@ -58,6 +59,8 @@ class CaseRun:
     consistency: bool | None = None
     failures: list[str] = field(default_factory=list)
     case_loop: bool | None = None
+    discord: dict | None = None
+    repeat: dict | None = None
 
     @property
     def verdicts(self) -> list[str]:
@@ -144,6 +147,15 @@ class Runner:
         if case.get("ocr_unavailable"):
             overrides.ocr = DisabledOCRProvider()
             isolated = True
+        if case.get("factcheck_api_status"):
+            overrides.factcheck = GoogleFactCheckProvider(
+                "eval-placeholder",
+                {"demagog"},
+                transport=httpx.MockTransport(
+                    lambda _: httpx.Response(case["factcheck_api_status"])
+                ),
+            )
+            isolated = True
         if case.get("source_page"):
             overrides.fetcher = FixturePageFetcher(case["source_page"])
             isolated = True
@@ -218,7 +230,7 @@ class Runner:
         self, run: CaseRun, client: httpx.AsyncClient, app: FastAPI | None, session_id: str
     ) -> None:
         case = run.case
-        log_injection = case.get("source_page")
+        log_injection = case.get("source_page") and case.get("expect_injection", True)
         if log_injection:
             before = (await client.get("/metrics", headers=ADMIN_HEADERS)).json()["events"]
         run.status_code, run.body, run.latency_s = await self.post(client, case, session_id)
@@ -228,19 +240,21 @@ class Runner:
             if after.get("injection_attempt", 0) <= before.get("injection_attempt", 0):
                 run.failures.append("source-page injection event was not logged")
         if case.get("check_consistency"):
-            discord = await self.check_discord(app, case)
+            run.discord = discord = await self.check_discord(app, case)
             web = run.body or {}
             run.consistency = (
                 web.get("status") == discord.get("status") == "ok"
                 and all(claim.get("explanation_pl") for claim in discord.get("claims", []))
                 and bool(get_substance(web))
-                and get_substance(web) == get_substance(discord)
+                and get_substance(web, case.get("same_publications", False))
+                == get_substance(discord, case.get("same_publications", False))
             )
             if not run.consistency:
                 run.failures.append("web and Discord returned different verdicts or evidence")
         if case.get("repeat_input"):
             repeat = {**case, "input": case["repeat_input"]}
             status, body, _ = await self.post(client, repeat, f"{session_id}-repeat")
+            run.repeat = body
             first = (run.body or {}).get("case") or {}
             second = (body or {}).get("case") or {}
             run.case_loop = bool(
@@ -269,6 +283,15 @@ def check_expectations(case: dict, status: int, body: dict | None) -> list[str]:
     expected_status = case.get("expected_status", "ok")
     if body.get("status") != expected_status:
         failures.append(f"expected status {expected_status}, got {body.get('status')}")
+        if body.get("status_message_pl"):
+            failures.append(body["status_message_pl"])
+        return failures
+    response_text = " ".join(
+        [body.get("status_message_pl") or "", *body.get("limitations_pl", [])]
+    )
+    for term in case.get("response_contains", []):
+        if not contains(response_text, term):
+            failures.append(f"missing response text {term!r}")
     claims = body.get("claims", [])
     if expected_status != "ok":
         if claims or not body.get("status_message_pl"):
@@ -276,13 +299,30 @@ def check_expectations(case: dict, status: int, body: dict | None) -> list[str]:
         return failures
     claim = claims[0] if claims else {}
     expected_verdict = case.get("expected_verdict")
-    if not claim or (expected_verdict and claim.get("verdict") != expected_verdict):
-        failures.append(f"expected claim/verdict {expected_verdict}, got {claim.get('verdict')}")
+    expected_verdicts = case.get("acceptable_verdicts") or (
+        [expected_verdict] if expected_verdict else []
+    )
+    if not claim or (expected_verdicts and claim.get("verdict") not in expected_verdicts):
+        failures.append(f"expected claim/verdict {expected_verdicts}, got {claim.get('verdict')}")
     citations = claim.get("citations", [])
     quoted = {item["url"] for item in citations if item.get("quote", "").strip()}
     expected_urls = set(case.get("expected_citation_urls", []))
     if expected_urls and not quoted.intersection(expected_urls):
         failures.append("missing a quoted citation from an expected source")
+    if not set(case.get("required_citation_urls", [])) <= quoted:
+        failures.append("missing quoted citations needed for the comparison")
+    claim_text = " ".join(
+        claim.get(field) or "" for field in ("explanation_pl", "missing_context_pl", "unresolved_pl")
+    )
+    for term in case.get("claim_contains", []):
+        if not contains(claim_text, term):
+            failures.append(f"missing claim explanation text {term!r}")
+    for term in case.get("claim_text_contains", []):
+        if not contains(claim.get("text") or "", term):
+            failures.append(f"missing checked claim text {term!r}")
+    alternatives = case.get("claim_contains_any", [])
+    if alternatives and not any(contains(claim_text, term) for term in alternatives):
+        failures.append(f"missing any of the claim explanation texts {alternatives!r}")
     for field_name in case.get("required_claim_fields", []):
         if not claim.get(field_name):
             failures.append(f"missing claim field {field_name}")
@@ -293,7 +333,11 @@ def check_expectations(case: dict, status: int, body: dict | None) -> list[str]:
         "OCR" in text and "przerobiony" in text for text in body.get("limitations_pl", [])
     ):
         failures.append("missing OCR and image-manipulation limitations")
-    if case.get("source_page") and not body.get("input_notices_pl"):
+    if (
+        case.get("source_page")
+        and case.get("expect_injection", True)
+        and not body.get("input_notices_pl")
+    ):
         failures.append("missing source-page injection notice")
     if case.get("incident_fixture") and not any(
         notice.get("kind") == "incident_match" for notice in claim.get("context_notices", [])
@@ -320,11 +364,14 @@ def check_expectations(case: dict, status: int, body: dict | None) -> list[str]:
     return failures
 
 
-def get_substance(body: dict | None) -> list:
+def get_substance(body: dict | None, same_publications: bool = False) -> list:
     if not body:
         return []
     return [
-        (claim["verdict"], sorted({(c["url"], c["quote"]) for c in claim["citations"]}))
+        (
+            claim["verdict"],
+            sorted({(c["url"], "" if same_publications else c["quote"]) for c in claim["citations"]}),
+        )
         for claim in body.get("claims", [])
     ]
 
@@ -480,6 +527,7 @@ def write_report(
                 "expected_verdict": run.case.get("expected_verdict"),
                 "expected_status": run.case.get("expected_status"),
                 "status": (run.body or {}).get("status"),
+                "status_message_pl": (run.body or {}).get("status_message_pl"),
                 "verdicts": run.verdicts,
                 "latency_s": round(run.latency_s, 2),
                 "consistency": run.consistency,
@@ -487,6 +535,9 @@ def write_report(
                 "failures": run.failures,
                 "passed": not run.failures,
                 "case_loop": run.case_loop,
+                "body": run.body,
+                "discord": run.discord,
+                "repeat": run.repeat,
             }
             for run in runs
         ],

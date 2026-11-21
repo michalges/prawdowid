@@ -4,6 +4,7 @@ from datetime import date
 import httpx
 import pytest
 
+from prawdowid.cases.service import is_close_paraphrase
 from prawdowid.channels.chat import get_chat_messages, get_split_messages
 from prawdowid.core.citations import get_quote_similarity, get_verified_judgement
 from prawdowid.core.evidence import Evidence
@@ -28,6 +29,20 @@ from prawdowid.schemas import (
     Verdict,
 )
 from tests.conftest import BACKEND_ROOT
+
+
+def test_case_paraphrase_can_omit_time_but_cannot_change_it_or_reverse_the_claim():
+    claim = (
+        "Od przyszłego tygodnia obowiązuje zakaz wjazdu samochodów "
+        "z silnikiem Diesla do centrum Pcimia."
+    )
+    repeat = (
+        "Władze gminy Pcim wprowadzają zakaz wjazdu samochodów "
+        "z silnikiem diesla do centrum miejscowości."
+    )
+    assert is_close_paraphrase(claim, repeat)
+    assert not is_close_paraphrase(claim, f"Od jutra {repeat}")
+    assert not is_close_paraphrase(claim, repeat.replace("wprowadzają", "znoszą"))
 
 ARTICLE_HTML = """<html><head><title>Komunikat testowy</title>
 <meta property="article:published_time" content="2026-11-19T10:00:00+01:00"></head>

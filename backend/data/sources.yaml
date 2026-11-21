@@ -831,6 +831,11 @@
     - https://demagog.org.pl/wypowiedzi/za-tuska-inflacja-spadla-z-poziomu-18-proc-to-manipulacja/
     - https://demagog.org.pl/wypowiedzi/inflacja-za-pis-i-obecnie-szlapka-manipuluje-danymi/
     - https://demagog.org.pl/fake_news/euro-w-polsce-jeszcze-w-tym-roku-nie-ma-takiej-decyzji/
+    - https://demagog.org.pl/wypowiedzi/donald-tusk-uspokajal-przed-powodzia-depesza-pap-nie-zniknela/
+    - https://demagog.org.pl/wypowiedzi/policja-zaslania-protestujacych-parawanem-wos-udostepnia-stare-nagranie/
+    - https://demagog.org.pl/wypowiedzi/darmowa-komunikacja-jaka-kwote-musialby-dolozyc-wroclaw/
+    - https://demagog.org.pl/wypowiedzi/darmowa-komunikacja-dla-65-latkow-tylko-we-wroclawiu-sprawdzamy/
+    - https://demagog.org.pl/fake_news/w-lipcu-czeka-nas-mobilizacja-falszywa-depesza-pap/
   type: fact_check
   quality_tier: B
   fetch_mode: page
@@ -840,5 +845,43 @@
   license: "Demagog reuse terms, attributed short extracts for noncommercial demo use"
   license_verified: true
   qualification: "IFCN and EFCSN member. Short attributed excerpts only. Terms: https://demagog.org.pl/zasady-udostepniania-tresci/"
+  excluded: false
+  exclusion_reason: null
+
+- id: cgil_liguria_strike
+  name: CGIL Liguria – strajk generalny 20 listopada 2026
+  publisher: CGIL Liguria
+  domain: www.liguria.cgil.it
+  urls:
+    - https://www.liguria.cgil.it/notizie/sciopero-generale-del-20-novembre-quattro-manifestazioni-in-liguria.html
+    - https://www.liguria.cgil.it/notizie/cgil-il-futuro-e-adesso-manifestazioni-e-cortei-in-tutta-la-liguria.html
+  type: official_primary
+  quality_tier: A
+  fetch_mode: page
+  use: evidence
+  store_mode: excerpt_only
+  update: manual
+  license: "Reuse terms not verified"
+  license_verified: false
+  qualification: "Strike organizer's announcement and dated report from Liguria"
+  excluded: false
+  exclusion_reason: null
+
+- id: sky_tg24_italy_strike
+  name: Sky TG24 – strajk generalny we Włoszech
+  publisher: Sky TG24
+  domain: tg24.sky.it
+  urls:
+    - https://tg24.sky.it/cronaca/2026/11/18/sciopero-20-novembre-2026-manifestazioni-cortei-proteste?card=5
+    - https://tg24.sky.it/cronaca/2026/11/20/sciopero-oggi-20-novembre-diretta
+  type: media_reference
+  quality_tier: B
+  fetch_mode: page
+  use: evidence
+  store_mode: excerpt_only
+  update: manual
+  license: "Reuse terms not verified"
+  license_verified: false
+  qualification: "Dated preview and live reporting of the strike"
   excluded: false
   exclusion_reason: null
