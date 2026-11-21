@@ -1,9 +1,6 @@
 @import 'tailwindcss';
 @import './tokens.css';
 
-/* Landing page: red header band (set by CheckPage while the conversation is empty). */
-@custom-variant hero (:where([data-hero]) &);
-
 @layer base {
   html {
     @apply bg-surface font-sans text-body text-ink antialiased;

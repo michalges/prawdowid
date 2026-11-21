@@ -95,12 +95,6 @@ export function CheckPage() {
     savedExchanges = exchanges
   }, [exchanges])
 
-  useEffect(() => {
-    if (!isEmpty) return
-    document.documentElement.setAttribute('data-hero', '')
-    return () => document.documentElement.removeAttribute('data-hero')
-  }, [isEmpty])
-
   function updateExchange(id: number, getNext: (current: Exchange) => Exchange) {
     setExchanges((current) => current.map((exchange) => (exchange.id === id ? getNext(exchange) : exchange)))
   }

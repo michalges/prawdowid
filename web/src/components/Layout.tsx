@@ -14,9 +14,8 @@ const NAV_LINK_CLASS =
 function Wordmark() {
   return (
     <Link to="/" className="flex items-center gap-2 rounded-md" aria-label="Prawdowid, strona główna">
-      <LogoMark className="size-7 hero:hidden" />
-      <LogoMark isReversed className="hidden size-7 hero:block" />
-      <span className="text-heading font-bold tracking-tight text-ink hero:text-ink-inverse">Prawdowid</span>
+      <LogoMark className="size-7" />
+      <span className="text-heading font-bold tracking-tight text-ink">Prawdowid</span>
     </Link>
   )
 }
@@ -31,7 +30,7 @@ export function Layout() {
       >
         Przejdź do treści
       </a>
-      <header className="sticky top-0 z-10 border-b border-border bg-surface/95 backdrop-blur hero:border-brand-700 hero:bg-brand-600 hero:backdrop-blur-none">
+      <header className="sticky top-0 z-10 border-b border-border bg-surface/95 backdrop-blur">
         <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-x-6 px-4">
           <Wordmark />
           <nav aria-label="Główna nawigacja">
@@ -42,11 +41,11 @@ export function Layout() {
                     to={item.to}
                     activeOptions={{ exact: item.to === '/' }}
                     activeProps={{
-                      className: `${NAV_LINK_CLASS} font-semibold text-ink after:bg-brand-600 hero:text-ink-inverse hero:after:bg-ink-inverse`,
+                      className: `${NAV_LINK_CLASS} font-semibold text-ink after:bg-brand-600`,
                       'aria-current': 'page',
                     }}
                     inactiveProps={{
-                      className: `${NAV_LINK_CLASS} text-ink-muted after:bg-transparent hover:text-ink hover:after:bg-border-control hero:text-ink-inverse/80 hero:hover:text-ink-inverse hero:hover:after:bg-ink-inverse/40`,
+                      className: `${NAV_LINK_CLASS} text-ink-muted after:bg-transparent hover:text-ink hover:after:bg-border-control`,
                     }}
                   >
                     {item.label}
