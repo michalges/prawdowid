@@ -124,7 +124,7 @@ export function CheckForm({
           </button>
         </div>
       </div>
-      <p id="tresc-pomoc" className="text-body-sm text-ink-subtle">
+      <p id="tresc-pomoc" className="sr-only">
         Możesz wkleić kilka zdań naraz: rozdzielimy je na osobne twierdzenia. Ctrl+Enter wysyła.
       </p>
       {error && (

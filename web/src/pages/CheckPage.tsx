@@ -1,4 +1,3 @@
-import { BookOpenCheck, CircleDashed, Quote } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
 import { postCheck } from '../api/client'
@@ -18,16 +17,10 @@ const PROGRESS_STEPS = [
 ]
 const STEP_INTERVAL_MS = 4000
 
-const PRINCIPLES = [
-  { Icon: BookOpenCheck, title: 'Tylko jawne źródła', text: 'Każdy wynik prowadzi do konkretnego dokumentu.' },
-  { Icon: Quote, title: 'Cytaty sprawdza program', text: 'Pokazujemy tylko fragmenty, które naprawdę są w źródle.' },
-  { Icon: CircleDashed, title: 'Mówimy, gdy nie wiemy', text: 'Gdy źródeł brakuje, nie zgadujemy.' },
-]
-
 const EXAMPLES = [
-  'Rada Ministrów przyjęła w listopadzie 2026 projekt ustawy o systemie ETIAS.',
-  'Numer Informacji Drogowej GDDKiA to 19 111.',
-  'Od jutra wszystkie pociągi w Polsce będą bezpłatne dla seniorów.',
+  'Rząd przyjął projekt ustawy o ETIAS',
+  'Numer informacji drogowej to 19 111',
+  'Od jutra pociągi są bezpłatne dla seniorów',
 ]
 
 type Exchange =
@@ -53,42 +46,21 @@ function ProgressPanel({ stepIndex }: { stepIndex: number }) {
   )
 }
 
-function EmptyState({ onExample }: { onExample: (text: string) => void }) {
+function ExampleChips({ onExample }: { onExample: (text: string) => void }) {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-8 py-10 text-center">
-      <div className="flex max-w-xl flex-col gap-3">
-        <h1 className="text-title font-semibold text-ink sm:text-display">Sprawdź, zanim przekażesz dalej</h1>
-        <p className="text-body text-ink-muted">
-          Wklej wiadomość, link albo zrzut ekranu. Porównamy każde twierdzenie z oficjalnymi źródłami i pokażemy
-          dosłowne cytaty. Ocenę zostawiamy Tobie.
-        </p>
-      </div>
-      <ul className="grid w-full gap-3 text-left sm:grid-cols-3">
-        {PRINCIPLES.map(({ Icon, title, text }) => (
-          <li key={title} className="flex flex-col gap-1 rounded-lg border border-border p-4">
-            <Icon aria-hidden className="size-5 text-ink" />
-            <span className="text-body-sm font-semibold text-ink">{title}</span>
-            <span className="text-body-sm text-ink-muted">{text}</span>
-          </li>
-        ))}
-      </ul>
-      <div className="flex w-full flex-col gap-2">
-        <p className="text-label tracking-wide text-ink-muted uppercase">Przykłady</p>
-        <ul className="flex flex-col gap-2">
-          {EXAMPLES.map((example) => (
-            <li key={example}>
-              <button
-                type="button"
-                onClick={() => onExample(example)}
-                className="min-h-11 w-full rounded-lg border border-border px-4 py-3 text-left text-body-sm text-ink hover:border-border-control hover:bg-surface-subtle"
-              >
-                {example}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
+    <ul className="flex flex-wrap justify-center gap-2" aria-label="Przykłady">
+      {EXAMPLES.map((example) => (
+        <li key={example}>
+          <button
+            type="button"
+            onClick={() => onExample(example)}
+            className="min-h-11 rounded-pill border border-border px-4 text-body-sm text-ink-muted hover:border-border-control hover:text-ink"
+          >
+            {example}
+          </button>
+        </li>
+      ))}
+    </ul>
   )
 }
 
@@ -150,20 +122,32 @@ export function CheckPage() {
     }
   }
 
+  const composer = <CheckForm isBusy={isBusy} draft={draft} onDraftChange={setDraft} onSubmit={runCheck} />
+
+  if (exchanges.length === 0) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-6 pb-[12vh]">
+        <div className="flex flex-col gap-2 text-center">
+          <h1 className="text-title font-semibold text-ink">Co chcesz sprawdzić?</h1>
+          <p className="text-body text-ink-muted">Porównamy to z oficjalnymi źródłami i pokażemy dosłowne cytaty.</p>
+        </div>
+        <div className="w-full">{composer}</div>
+        <ExampleChips onExample={setDraft} />
+        <TransparencyNote />
+      </div>
+    )
+  }
+
   return (
     <div className="flex flex-1 flex-col">
-      {exchanges.length === 0 ? (
-        <EmptyState onExample={setDraft} />
-      ) : (
-        <ol className="flex flex-col gap-10 py-8" aria-label="Sprawdzenia w tej rozmowie">
-          {exchanges.map((exchange) => (
-            <ExchangeView key={exchange.id} exchange={exchange} />
-          ))}
-        </ol>
-      )}
+      <ol className="flex flex-col gap-10 py-8" aria-label="Sprawdzenia w tej rozmowie">
+        {exchanges.map((exchange) => (
+          <ExchangeView key={exchange.id} exchange={exchange} />
+        ))}
+      </ol>
       <div ref={threadEnd} />
       <div className="sticky bottom-0 -mx-4 mt-auto bg-linear-to-t from-surface from-70% to-transparent px-4 pt-6 pb-4">
-        <CheckForm isBusy={isBusy} draft={draft} onDraftChange={setDraft} onSubmit={runCheck} />
+        {composer}
         <div className="mt-3">
           <TransparencyNote />
         </div>
