@@ -11,7 +11,7 @@ CASES = [
     {
         "id": f"case-{i}",
         "title": f"Title {i}",
-        "claim": f"Claim number {i}",
+        "claim": f"<p>Claim number&nbsp;{i}</p>",
         "fact": "Fact",
         "date": 1626220800,
         "keywords": [{"_id": "k", "title": "coronavirus"}],

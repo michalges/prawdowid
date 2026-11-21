@@ -2,8 +2,10 @@
 incident file for core/incidents.py.
 See docs/How_to_grab_all_Articles_and_Cases_from_disinfo.pdf."""
 
+import html
 import json
 import logging
+import re
 from collections.abc import AsyncIterator
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -11,11 +13,13 @@ from pathlib import Path
 
 import httpx
 
+from prawdowid.core.text import normalize_whitespace
+
 logger = logging.getLogger(__name__)
 
-EUVSDISINFO_MCP_URL = "https://euvsdisinfo-mcp-server.vercel.app/mcp"
+EUVSDISINFO_MCP_URL = "https://mcp.euvsd.info/mcp"
 EUVSDISINFO_LICENSE = "EUvsDisinfo database, EEAS East StratCom Task Force (verify reuse terms)"
-MCP_PROTOCOL_VERSION = "2024-11-05"
+MCP_PROTOCOL_VERSION = "2025-03-26"
 PAGE_SIZE = 100
 
 
@@ -38,6 +42,13 @@ def get_jsonrpc_message(response: httpx.Response) -> dict:
     return json.loads("".join(data_lines))
 
 
+HTML_TAG_PATTERN = re.compile(r"<[^>]+>")
+
+
+def get_plain_text(value: str | None) -> str:
+    return normalize_whitespace(html.unescape(HTML_TAG_PATTERN.sub(" ", value or "")))
+
+
 def get_iso_date(value: object) -> str | None:
     if isinstance(value, int | float):
         return datetime.fromtimestamp(value, UTC).date().isoformat()
@@ -47,8 +58,8 @@ def get_iso_date(value: object) -> str | None:
 
 
 def get_incident_record(case: dict) -> dict | None:
-    claim = (case.get("claim") or "").strip()
-    title = (case.get("title") or "").strip()
+    claim = get_plain_text(case.get("claim"))
+    title = get_plain_text(case.get("title"))
     if not claim and not title:
         return None
     return {
