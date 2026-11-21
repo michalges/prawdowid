@@ -61,11 +61,11 @@ back as statuses, never as verdicts.
 ```bash
 cd backend
 uv run ruff check . && uv run ruff format --check . && uv run pytest
-uv run python eval/run_eval.py    # brief §6 metrics → docs/TEST_RESULTS.md (uses the configured LLM; costs a few cents)
+uv run python eval/run_eval.py --output-dir /tmp/prawdowid-jury
 uv run python eval/run_eval.py --cases path/to/jury_cases.jsonl
 ```
 
-Tests run fully offline with mock providers. Their fixtures use synthetic `example.test` documents.
+Pytest runs offline with mock providers. The [jury evaluation guide](backend/eval/README.md) describes the A–J suite, live prerequisites, and reports.
 
 ## Data & privacy
 
