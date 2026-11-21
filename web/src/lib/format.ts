@@ -28,14 +28,6 @@ export function getHostname(url: string): string {
   }
 }
 
-export function getClaimCountLabel(count: number): string {
-  if (count === 1) return '1 twierdzenie'
-  const lastDigit = count % 10
-  const lastTwo = count % 100
-  const isFew = lastDigit >= 2 && lastDigit <= 4 && (lastTwo < 12 || lastTwo > 14)
-  return `${count} ${isFew ? 'twierdzenia' : 'twierdzeń'}`
-}
-
-export function getShortDateTime(iso: string): string {
-  return new Date(iso).toLocaleString('pl-PL', { dateStyle: 'medium', timeStyle: 'short' })
+export function getShortDateTime(iso: string, dateLocale: string): string {
+  return new Date(iso).toLocaleString(dateLocale, { dateStyle: 'medium', timeStyle: 'short' })
 }

@@ -9,6 +9,6 @@ export const Route = createFileRoute('/wynik/$checkId')({
   component: function ResultRoute() {
     return <ResultPage cached={Route.useLoaderData()} />
   },
-  pendingComponent: () => <RouteLoading text="Wczytujemy wynik…" />,
+  pendingComponent: () => <RouteLoading what="result" />,
   errorComponent: RouteError,
 })

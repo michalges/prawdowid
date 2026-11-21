@@ -11,6 +11,7 @@ export type CheckRequest = {
   channel: Channel
   session_id: string
   input: CheckInput
+  language?: 'pl' | 'en'
 }
 
 export type CheckStatus = 'ok' | 'needs_clarification' | 'out_of_scope' | 'technical_error' | 'rate_limited'

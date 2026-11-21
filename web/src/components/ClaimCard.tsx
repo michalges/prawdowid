@@ -2,7 +2,8 @@ import { ExternalLink, Scale } from 'lucide-react'
 
 import type { Citation, ClaimResult, ContextNotice, Verdict } from '../api/types'
 import { getHostname } from '../lib/format'
-import { SOURCE_TYPE_LABELS, STRENGTH_LABELS, STRENGTH_STEPS, VERDICT_STYLES } from '../lib/verdicts'
+import { useMessages } from '../lib/i18n'
+import { STRENGTH_STEPS, VERDICT_STYLES } from '../lib/verdicts'
 import { Notice } from './Notice'
 import { VerdictBadge } from './VerdictBadge'
 
@@ -14,6 +15,7 @@ function getCitationAnchor(claimId: string, number: number): string {
 }
 
 function ExplanationText({ claimId, text }: { claimId: string; text: string }) {
+  const { claim } = useMessages()
   return (
     <p className="text-body text-ink">
       {text.split(CITATION_MARKER).map((part, index) => {
@@ -24,7 +26,7 @@ function ExplanationText({ claimId, text }: { claimId: string; text: string }) {
             key={index}
             href={`#${getCitationAnchor(claimId, Number(number))}`}
             className="mx-0.5 inline-flex min-w-5 items-center justify-center rounded-sm border border-border-control px-1 align-text-top font-mono text-meta text-ink hover:border-brand-600 hover:text-brand-700"
-            aria-label={`Źródło ${number}`}
+            aria-label={claim.sourceLabel(number)}
           >
             {number}
           </a>
@@ -35,16 +37,17 @@ function ExplanationText({ claimId, text }: { claimId: string; text: string }) {
 }
 
 function StrengthMeter({ strength }: { strength: NonNullable<ClaimResult['strength']> }) {
+  const { claim, strengthLevels } = useMessages()
   const steps = STRENGTH_STEPS[strength.level]
   const { factors } = strength
   const facts = [
-    { label: 'Niezależne źródła', value: String(factors.independent_sources) },
-    { label: 'Najlepszy poziom źródła', value: factors.best_tier ?? '–' },
+    { label: claim.independentSources, value: String(factors.independent_sources) },
+    { label: claim.bestTier, value: factors.best_tier ?? '–' },
     {
-      label: 'Wiek najnowszego źródła',
-      value: factors.freshness_days === null ? 'brak daty' : `${factors.freshness_days} dni`,
+      label: claim.newestAge,
+      value: factors.freshness_days === null ? claim.noDate : claim.days(factors.freshness_days),
     },
-    { label: 'Zgodność cytatów', value: `${Math.round(factors.agreement * 100)}%` },
+    { label: claim.quoteAgreement, value: `${Math.round(factors.agreement * 100)}%` },
   ]
   return (
     <div className="rounded-md border border-border p-4">
@@ -55,7 +58,7 @@ function StrengthMeter({ strength }: { strength: NonNullable<ClaimResult['streng
           ))}
         </span>
         <p className="text-body-sm text-ink">
-          Siła podstawy: <span className="font-semibold">{STRENGTH_LABELS[strength.level]}</span>
+          {claim.strength}: <span className="font-semibold">{strengthLevels[strength.level]}</span>
         </p>
       </div>
       <dl className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-4">
@@ -71,20 +74,21 @@ function StrengthMeter({ strength }: { strength: NonNullable<ClaimResult['streng
 }
 
 function InterpretationBlock({ claim }: { claim: ClaimResult }) {
+  const messages = useMessages().claim
   return (
-    <section aria-label="Interpretacja Prawdowida" className="flex flex-col gap-4">
+    <section aria-label={messages.interpretation} className="flex flex-col gap-4">
       <h4 className="flex items-center gap-2 text-label uppercase tracking-wide text-ink-muted">
         <Scale aria-hidden className="size-4" />
-        Interpretacja Prawdowida
+        {messages.interpretation}
       </h4>
       <ExplanationText claimId={claim.claim_id} text={claim.explanation_pl} />
       {claim.missing_context_pl && (
-        <Notice tone="warning" title="Brakujący kontekst">
+        <Notice tone="warning" title={messages.missingContext}>
           {claim.missing_context_pl}
         </Notice>
       )}
       {claim.conflicts.map((conflict) => (
-        <Notice key={conflict.summary_pl} tone="warning" title="Źródła się różnią">
+        <Notice key={conflict.summary_pl} tone="warning" title={messages.sourcesDiffer}>
           {conflict.summary_pl}{' '}
           {conflict.citations.map((number) => (
             <a
@@ -98,7 +102,7 @@ function InterpretationBlock({ claim }: { claim: ClaimResult }) {
         </Notice>
       ))}
       {claim.unresolved_pl && (
-        <Notice tone="neutral" title="Czego nie udało się ustalić">
+        <Notice tone="neutral" title={messages.unresolved}>
           {claim.unresolved_pl}
         </Notice>
       )}
@@ -108,6 +112,7 @@ function InterpretationBlock({ claim }: { claim: ClaimResult }) {
 }
 
 function CitationItem({ claimId, citation }: { claimId: string; citation: Citation }) {
+  const { claim, sourceTypes } = useMessages()
   return (
     <li
       id={getCitationAnchor(claimId, citation.n)}
@@ -126,15 +131,15 @@ function CitationItem({ claimId, citation }: { claimId: string; citation: Citati
         >
           {citation.title.replace(/ - Portal Gov\.pl$/, '')}
           <ExternalLink aria-hidden className="size-3.5 shrink-0" />
-          <span className="sr-only">(otwiera się w nowej karcie)</span>
+          <span className="sr-only">{claim.opensInNewTab}</span>
         </a>
         <p className="font-mono text-meta break-words text-ink-subtle">
-          {citation.publisher} · {getHostname(citation.url)} · {SOURCE_TYPE_LABELS[citation.source_type]} · opubl.{' '}
-          {citation.published_at ?? 'brak daty'} · pobrano {citation.retrieved_at}
+          {citation.publisher} · {getHostname(citation.url)} · {sourceTypes[citation.source_type]} · {claim.published}{' '}
+          {citation.published_at ?? claim.noDate} · {claim.retrieved} {citation.retrieved_at}
         </p>
         {citation.archival && (
           <span className="w-fit rounded-sm bg-warning-bg px-2 py-0.5 text-label text-warning">
-            Materiał archiwalny
+            {claim.archival}
           </span>
         )}
       </div>
@@ -143,11 +148,12 @@ function CitationItem({ claimId, citation }: { claimId: string; citation: Citati
 }
 
 function SourcesBlock({ claim }: { claim: ClaimResult }) {
+  const messages = useMessages().claim
   return (
-    <section aria-label="Co mówią źródła" className="flex flex-col gap-3 rounded-lg bg-surface-subtle p-4 sm:p-5">
+    <section aria-label={messages.whatSourcesSay} className="flex flex-col gap-3 rounded-lg bg-surface-subtle p-4 sm:p-5">
       <div>
-        <h4 className="text-label uppercase tracking-wide text-ink-muted">Co mówią źródła</h4>
-        <p className="text-body-sm text-ink-subtle">Dosłowne cytaty, bez naszej interpretacji.</p>
+        <h4 className="text-label uppercase tracking-wide text-ink-muted">{messages.whatSourcesSay}</h4>
+        <p className="text-body-sm text-ink-subtle">{messages.verbatimQuotes}</p>
       </div>
       {claim.citations.length > 0 ? (
         <ol className="flex flex-col gap-2">
@@ -157,7 +163,7 @@ function SourcesBlock({ claim }: { claim: ClaimResult }) {
         </ol>
       ) : (
         <p className="text-body-sm text-ink-muted">
-          W katalogu źródeł nie ma fragmentów, które dotyczą tego twierdzenia.
+          {messages.noFragments}
         </p>
       )}
     </section>
@@ -165,6 +171,7 @@ function SourcesBlock({ claim }: { claim: ClaimResult }) {
 }
 
 function ContextNotices({ notices }: { notices: ContextNotice[] }) {
+  const { claim } = useMessages()
   if (notices.length === 0) return null
   return (
     <div className="flex flex-col gap-2">
@@ -172,13 +179,7 @@ function ContextNotices({ notices }: { notices: ContextNotice[] }) {
         <Notice
           key={notice.text_pl}
           tone={notice.kind === 'incident_match' ? 'system' : 'warning'}
-          title={
-            {
-              incident_match: 'Kontekst: znany przypadek',
-              source_status: 'Status źródła',
-              archival_material: 'Materiał archiwalny',
-            }[notice.kind]
-          }
+          title={claim.noticeTitles[notice.kind]}
         >
           {notice.text_pl}
         </Notice>
@@ -188,6 +189,7 @@ function ContextNotices({ notices }: { notices: ContextNotice[] }) {
 }
 
 export function ClaimCard({ claim, index, total }: { claim: ClaimResult; index: number; total: number }) {
+  const messages = useMessages()
   const { borderClass } = VERDICT_STYLES[claim.verdict]
   return (
     <article
@@ -196,14 +198,14 @@ export function ClaimCard({ claim, index, total }: { claim: ClaimResult; index: 
     >
       <header className="flex flex-col gap-3 border-b border-border p-4 sm:p-6">
         <p className="font-mono text-meta text-ink-subtle">
-          Twierdzenie {index + 1} z {total}
+          {messages.claim.position(index + 1, total)}
         </p>
         <h3 id={`twierdzenie-${claim.claim_id}`} className="text-heading font-semibold text-ink">
           {claim.text}
         </h3>
         <div className="flex flex-wrap items-center gap-3">
           <VerdictBadge verdict={claim.verdict} />
-          <p className="text-body-sm text-ink-muted">{VERDICT_STYLES[claim.verdict].description}</p>
+          <p className="text-body-sm text-ink-muted">{messages.verdicts[claim.verdict].description}</p>
         </div>
       </header>
       <div className="grid gap-6 p-4 sm:p-6 ">

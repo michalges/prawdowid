@@ -9,6 +9,6 @@ export const Route = createFileRoute('/zrodla')({
   component: function SourcesRoute() {
     return <SourcesPage catalog={Route.useLoaderData()} />
   },
-  pendingComponent: () => <RouteLoading text="Wczytujemy katalog…" />,
+  pendingComponent: () => <RouteLoading what="catalog" />,
   errorComponent: RouteError,
 })

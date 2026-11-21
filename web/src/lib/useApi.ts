@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 
 import { ApiError } from '../api/client'
+import { getMessages } from './i18n'
 
 type ApiState<T> = { status: 'loading' } | { status: 'error'; message: string } | { status: 'ready'; data: T }
 
 export function getErrorText(error: unknown): string {
-  return error instanceof ApiError ? error.message : 'Coś poszło nie tak. Spróbuj ponownie.'
+  return error instanceof ApiError ? error.message : getMessages().errors.generic
 }
 
 /** Loads data once per `key`; `initialData` skips the request (e.g. a result passed via navigation). */

@@ -3,6 +3,7 @@ import { useRef, useState } from 'react'
 import type { FormEvent, KeyboardEvent } from 'react'
 
 import type { CheckInput } from '../api/types'
+import { useMessages } from '../lib/i18n'
 
 const MAX_TEXT_CHARS = 10_000
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024
@@ -36,6 +37,7 @@ export function CheckForm({
   onDraftChange: (text: string) => void
   onSubmit: (input: CheckInput, label: string) => void
 }) {
+  const { form, check } = useMessages()
   const [image, setImage] = useState<SelectedImage | null>(null)
   const [error, setError] = useState<string | null>(null)
   const fileInput = useRef<HTMLInputElement>(null)
@@ -44,8 +46,8 @@ export function CheckForm({
 
   async function selectImage(file: File | undefined) {
     if (!file) return
-    if (!file.type.startsWith('image/')) return setError('Wybierz plik obrazu (PNG, JPG, WEBP).')
-    if (file.size > MAX_IMAGE_BYTES) return setError('Obraz jest za duży. Maksymalnie 5 MB.')
+    if (!file.type.startsWith('image/')) return setError(form.notAnImage)
+    if (file.size > MAX_IMAGE_BYTES) return setError(form.imageTooLarge)
     setError(null)
     setImage({ name: file.name, dataUrl: await readAsDataUrl(file) })
   }
@@ -53,7 +55,7 @@ export function CheckForm({
   function submit(event?: FormEvent) {
     event?.preventDefault()
     if (!canSubmit) return
-    onSubmit(getCheckInput(text, image), text.trim() || image?.name || 'Zrzut ekranu')
+    onSubmit(getCheckInput(text, image), text.trim() || image?.name || form.screenshot)
     setText('')
     setImage(null)
   }
@@ -65,7 +67,7 @@ export function CheckForm({
   return (
     <form onSubmit={submit} className="flex flex-col gap-3">
       <label htmlFor="tresc-zgloszenia" className="sr-only">
-        Co chcesz sprawdzić?
+        {check.title}
       </label>
       <div className="rounded-lg border border-border-control bg-surface shadow-card focus-within:border-brand-600 focus-within:shadow-focus">
         <textarea
@@ -75,7 +77,7 @@ export function CheckForm({
           onKeyDown={submitOnShortcut}
           rows={3}
           maxLength={MAX_TEXT_CHARS}
-          placeholder="Wklej treść wiadomości, posta albo link do artykułu…"
+          placeholder={form.placeholder}
           aria-describedby="tresc-pomoc"
           className="block w-full resize-y rounded-t-lg bg-transparent px-4 py-3 text-body text-ink placeholder:text-ink-subtle focus:outline-none"
         />
@@ -97,7 +99,7 @@ export function CheckForm({
                   type="button"
                   onClick={() => setImage(null)}
                   className="inline-flex size-11 items-center justify-center rounded-md hover:bg-surface-sunken"
-                  aria-label="Usuń obraz"
+                  aria-label={form.removeImage}
                 >
                   <X aria-hidden className="size-4" />
                 </button>
@@ -108,7 +110,7 @@ export function CheckForm({
                 className="inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-md px-3 text-body-sm font-medium text-ink-muted hover:bg-surface-subtle hover:text-ink"
               >
                 <ImagePlus aria-hidden className="size-4" />
-                Dodaj zrzut ekranu
+                {form.addScreenshot}
               </label>
             )}
             <span className="font-mono text-meta text-ink-subtle">
@@ -120,12 +122,12 @@ export function CheckForm({
             disabled={!canSubmit}
             className="inline-flex min-h-11 items-center rounded-md bg-brand-600 px-6 text-body font-semibold text-ink-inverse hover:bg-brand-700 active:bg-brand-800 disabled:cursor-not-allowed disabled:bg-surface-sunken disabled:text-ink-subtle"
           >
-            {isBusy ? 'Sprawdzamy…' : 'Sprawdź'}
+            {isBusy ? form.submitting : form.submit}
           </button>
         </div>
       </div>
       <p id="tresc-pomoc" className="sr-only">
-        Możesz wkleić kilka zdań naraz: rozdzielimy je na osobne twierdzenia. Ctrl+Enter wysyła.
+        {form.help}
       </p>
       {error && (
         <p role="alert" className="text-body-sm text-warning">

@@ -1,9 +1,12 @@
 import type { ErrorComponentProps } from '@tanstack/react-router'
 
+import { useMessages } from '../lib/i18n'
+import type { Messages } from '../locales/pl'
 import { getErrorText } from '../lib/useApi'
 
-export function RouteLoading({ text }: { text: string }) {
-  return <output className="block text-body text-ink-muted">{text}</output>
+export function RouteLoading({ what }: { what: keyof Messages['loading'] }) {
+  const { loading } = useMessages()
+  return <output className="block text-body text-ink-muted">{loading[what]}</output>
 }
 
 export function RouteError({ error }: ErrorComponentProps) {
