@@ -8,6 +8,8 @@ export const en: Messages = {
     mainNav: 'Main navigation',
     nav: { check: 'Check', history: 'History', sources: 'Sources', method: 'How it works', discord: 'Discord' },
     language: 'Language',
+    openMenu: 'Open menu',
+    closeMenu: 'Close menu',
   },
   notFound: { title: 'Page not found', back: 'Back to checking' },
   loading: { result: 'Loading the result…', catalog: 'Loading the catalogue…' },
@@ -139,7 +141,7 @@ export const en: Messages = {
     intro:
       'A public list of the places we search. Tier A is official sources, B is accredited fact-checkers, C is other reliable sources. A source alone never decides a verdict.',
     stats: (documents: number, chunks: number) => `${documents} documents · ${chunks} passages`,
-    documentsShort: (documents: number) => `${documents} docs`,
+    documentsShort: (documents: number) => `${documents} ${documents === 1 ? 'doc' : 'docs'}`,
     tier: (tier: string) => `tier ${tier}`,
     licenseUnverified: 'licence under review',
     excluded: 'excluded:',

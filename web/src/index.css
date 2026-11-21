@@ -11,3 +11,15 @@
     @apply outline-2 outline-offset-2 outline-brand-600;
   }
 }
+
+@keyframes sheet-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  dialog[open] {
+    animation: none;
+  }
+}

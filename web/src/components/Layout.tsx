@@ -1,5 +1,5 @@
 import { Link, Outlet } from '@tanstack/react-router'
-import { Check, ChevronDown, Languages } from 'lucide-react'
+import { Check, ChevronDown, Languages, Menu, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
 import { setLocale, useLocale, useMessages } from '../lib/i18n'
@@ -15,6 +15,7 @@ const NAV_ITEMS = [
 ] as const
 const LOCALE_LABELS: Record<Locale, string> = { pl: 'Polski', en: 'English' }
 const LOCALES: Locale[] = ['pl', 'en']
+const SHEET_LINK_CLASS = 'flex min-h-12 items-center rounded-md px-3 text-body font-medium'
 const NAV_LINK_CLASS =
   'relative inline-flex min-h-14 items-center px-3 text-body-sm font-medium transition-colors after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:transition-colors'
 
@@ -96,6 +97,92 @@ function LocaleSwitcher() {
   )
 }
 
+function NavLinks({ variant, onNavigate }: { variant: 'bar' | 'sheet'; onNavigate?: () => void }) {
+  const { layout } = useMessages()
+  const isBar = variant === 'bar'
+  return (
+    <ul className={isBar ? 'flex' : 'flex flex-col gap-1'}>
+      {NAV_ITEMS.map((item) => (
+        <li key={item.to}>
+          <Link
+            to={item.to}
+            onClick={onNavigate}
+            activeOptions={{ exact: item.to === '/' }}
+            activeProps={{
+              className: isBar
+                ? `${NAV_LINK_CLASS} font-semibold text-ink after:bg-brand-600`
+                : `${SHEET_LINK_CLASS} bg-brand-50 font-semibold text-brand-700`,
+              'aria-current': 'page',
+            }}
+            inactiveProps={{
+              className: isBar
+                ? `${NAV_LINK_CLASS} text-ink-muted after:bg-transparent hover:text-ink hover:after:bg-border-control`
+                : `${SHEET_LINK_CLASS} text-ink hover:bg-surface-subtle`,
+            }}
+          >
+            {layout.nav[item.key]}
+          </Link>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+/** Below `md` the links move into a side sheet; a native dialog gives focus trapping and Escape. */
+function MobileNav() {
+  const { layout } = useMessages()
+  const dialog = useRef<HTMLDialogElement>(null)
+
+  function closeSheet() {
+    dialog.current?.close()
+  }
+
+  useEffect(() => {
+    const element = dialog.current
+    if (!element) return
+    function closeOnBackdropClick(event: MouseEvent) {
+      if (event.target === element) element?.close()
+    }
+    element.addEventListener('click', closeOnBackdropClick)
+    return () => element.removeEventListener('click', closeOnBackdropClick)
+  }, [])
+
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => dialog.current?.showModal()}
+        aria-label={layout.openMenu}
+        className="inline-flex size-11 items-center justify-center rounded-md text-ink hover:bg-surface-subtle"
+      >
+        <Menu aria-hidden className="size-5" />
+      </button>
+      <dialog
+        ref={dialog}
+        aria-label={layout.mainNav}
+        className="fixed inset-y-0 right-0 left-auto m-0 h-dvh max-h-dvh w-[min(20rem,85vw)] max-w-none bg-surface p-0 shadow-card backdrop:bg-ink/40 backdrop:backdrop-blur-sm open:animate-[sheet-in_200ms_ease-out]"
+      >
+        <div className="flex h-full flex-col gap-6 p-4">
+          <div className="flex items-center justify-between">
+            <Wordmark />
+            <button
+              type="button"
+              onClick={closeSheet}
+              aria-label={layout.closeMenu}
+              className="inline-flex size-11 items-center justify-center rounded-md text-ink hover:bg-surface-subtle"
+            >
+              <X aria-hidden className="size-5" />
+            </button>
+          </div>
+          <nav aria-label={layout.mainNav}>
+            <NavLinks variant="sheet" onNavigate={closeSheet} />
+          </nav>
+        </div>
+      </dialog>
+    </>
+  )
+}
+
 /** Full-height app shell: a slim header and one centred column, like a chat app. */
 export function Layout() {
   const { layout } = useMessages()
@@ -108,30 +195,17 @@ export function Layout() {
         {layout.skipToContent}
       </a>
       <header className="sticky top-0 z-10 border-b border-border bg-surface/95 backdrop-blur">
-        <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-x-6 px-4">
+        <div className="mx-auto flex min-h-14 max-w-3xl items-center justify-between gap-x-6 px-4">
           <Wordmark />
-          <nav aria-label={layout.mainNav} className="flex items-center gap-3">
-            <ul className="flex flex-wrap">
-              {NAV_ITEMS.map((item) => (
-                <li key={item.to}>
-                  <Link
-                    to={item.to}
-                    activeOptions={{ exact: item.to === '/' }}
-                    activeProps={{
-                      className: `${NAV_LINK_CLASS} font-semibold text-ink after:bg-brand-600`,
-                      'aria-current': 'page',
-                    }}
-                    inactiveProps={{
-                      className: `${NAV_LINK_CLASS} text-ink-muted after:bg-transparent hover:text-ink hover:after:bg-border-control`,
-                    }}
-                  >
-                    {layout.nav[item.key]}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          <div className="flex items-center gap-2 md:gap-3">
+            <nav aria-label={layout.mainNav} className="hidden md:block">
+              <NavLinks variant="bar" />
+            </nav>
             <LocaleSwitcher />
-          </nav>
+            <div className="md:hidden">
+              <MobileNav />
+            </div>
+          </div>
         </div>
       </header>
       <main id="tresc" className="mx-auto flex w-full max-w-3xl flex-1 flex-col px-4">

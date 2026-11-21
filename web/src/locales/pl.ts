@@ -16,6 +16,8 @@ export const pl = {
     mainNav: 'Główna nawigacja',
     nav: { check: 'Sprawdź', history: 'Historia', sources: 'Źródła', method: 'Jak to działa', discord: 'Discord' },
     language: 'Język',
+    openMenu: 'Otwórz menu',
+    closeMenu: 'Zamknij menu',
   },
   notFound: { title: 'Nie ma takiej strony', back: 'Wróć do sprawdzania' },
   loading: { result: 'Wczytujemy wynik…', catalog: 'Wczytujemy katalog…' },
