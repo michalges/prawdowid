@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { ArrowRight } from 'lucide-react'
 
 import type { Verdict } from '../api/types'
 import { TransparencyNote } from '../components/TransparencyNote'
@@ -18,16 +19,16 @@ const STEPS = [
 
 export function MethodPage() {
   return (
-    <div className="flex flex-col py-8 gap-10">
-      <section className="flex flex-col gap-3">
+    <div className="divide-y divide-border py-2">
+      <header className="flex flex-col gap-3 py-8 sm:py-10">
         <h1 className="text-title font-semibold text-ink">Jak to działa</h1>
         <p className="text-body text-ink-muted">
           Prawdowid pomaga ocenić informację na podstawie źródeł. Zawsze oddziela to, co mówią źródła, od naszej
           interpretacji. Nie jest automatycznym „sędzią prawdy”.
         </p>
-      </section>
+      </header>
 
-      <section className="flex flex-col gap-4">
+      <section className="flex flex-col gap-5 py-8 sm:py-10">
         <h2 className="text-heading font-semibold text-ink">Pięć kroków sprawdzenia</h2>
         <ol className="flex flex-col gap-4">
           {STEPS.map(([title, text], index) => (
@@ -44,7 +45,7 @@ export function MethodPage() {
         </ol>
       </section>
 
-      <section className="flex flex-col gap-4">
+      <section className="flex flex-col gap-5 py-8 sm:py-10">
         <h2 className="text-heading font-semibold text-ink">Możliwe wyniki</h2>
         <ul className="flex flex-col gap-3">
           {(Object.keys(VERDICT_STYLES) as Verdict[]).map((verdict) => (
@@ -56,12 +57,9 @@ export function MethodPage() {
             </li>
           ))}
         </ul>
-        <p className="text-body-sm text-ink-muted">
-          Awaria, zbyt wiele zapytań albo niejasne pytanie to nie są oceny. Pokazujemy je osobno, na niebiesko.
-        </p>
       </section>
 
-      <section className="flex flex-col gap-3">
+      <section className="flex flex-col gap-4 py-8 sm:py-10">
         <h2 className="text-heading font-semibold text-ink">Siła podstawy</h2>
         <p className="text-body text-ink-muted">
           Siłę oceny liczymy z jawnych danych: liczby niezależnych wydawców, poziomu źródeł, ich aktualności i zgodności
@@ -69,17 +67,20 @@ export function MethodPage() {
         </p>
       </section>
 
-      <section className="flex flex-col gap-3">
+      <section className="flex flex-col gap-4 py-8 sm:py-10">
         <h2 className="text-heading font-semibold text-ink">Czego nie robimy</h2>
         <ul className="flex list-disc flex-col gap-1 pl-5 text-body text-ink-muted">
           <li>Nie oceniamy treści po samej domenie, autorze ani popularności.</li>
-          <li>Nie twierdzimy, że wykrywamy obrazy wygenerowane przez AI.</li>
           <li>Nie omijamy płatnych ani zablokowanych stron.</li>
           <li>Nie zapisujemy obrazów: zostaje tylko odczytany, zamaskowany tekst.</li>
         </ul>
         <TransparencyNote isDetailed />
-        <Link to="/zrodla" className="w-fit font-medium text-brand-700 underline underline-offset-2">
+        <Link
+          to="/zrodla"
+          className="inline-flex min-h-11 w-fit items-center gap-2 rounded-md bg-ink px-6 text-body font-semibold text-ink-inverse hover:bg-ink/85 active:bg-ink/75"
+        >
           Zobacz katalog źródeł
+          <ArrowRight aria-hidden="true" className="size-4" />
         </Link>
       </section>
     </div>

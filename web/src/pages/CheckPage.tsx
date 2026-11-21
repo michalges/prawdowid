@@ -41,7 +41,7 @@ function ProgressPanel({ stepIndex }: { stepIndex: number }) {
         />
       </div>
       <p className="text-body text-ink">{PROGRESS_STEPS[stepIndex]}</p>
-      <p className="text-body-sm text-ink-subtle">Zwykle trwa to od 10 do 30 sekund.</p>
+      <p className="text-body-sm text-ink-subtle">Czas sprawdzenia zależy od dostępności źródeł.</p>
     </output>
   )
 }
@@ -89,9 +89,17 @@ export function CheckPage() {
   const threadEnd = useRef<HTMLDivElement>(null)
   const isBusy = exchanges.some((exchange) => exchange.state === 'pending')
 
+  const isEmpty = exchanges.length === 0
+
   useEffect(() => {
     savedExchanges = exchanges
   }, [exchanges])
+
+  useEffect(() => {
+    if (!isEmpty) return
+    document.documentElement.setAttribute('data-hero', '')
+    return () => document.documentElement.removeAttribute('data-hero')
+  }, [isEmpty])
 
   function updateExchange(id: number, getNext: (current: Exchange) => Exchange) {
     setExchanges((current) => current.map((exchange) => (exchange.id === id ? getNext(exchange) : exchange)))
@@ -124,14 +132,18 @@ export function CheckPage() {
 
   const composer = <CheckForm isBusy={isBusy} draft={draft} onDraftChange={setDraft} onSubmit={runCheck} />
 
-  if (exchanges.length === 0) {
+  if (isEmpty) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-6 pb-[12vh]">
-        <div className="flex flex-col gap-2 text-center">
-          <h1 className="text-title font-semibold text-ink">Co chcesz sprawdzić?</h1>
-          <p className="text-body text-ink-muted">Porównamy to z oficjalnymi źródłami i pokażemy dosłowne cytaty.</p>
+      <div className="flex flex-1 flex-col items-center gap-6 pb-12">
+        <div className="flex w-full flex-col items-center gap-6 pt-[12vh]">
+          <div className="flex flex-col gap-2 text-center">
+            <h1 className="text-title font-semibold text-ink">Co chcesz sprawdzić?</h1>
+            <p className="text-body text-ink-muted">
+              Porównamy to z oficjalnymi źródłami i pokażemy dosłowne cytaty.
+            </p>
+          </div>
+          <div className="w-full">{composer}</div>
         </div>
-        <div className="w-full">{composer}</div>
         <ExampleChips onExample={setDraft} />
         <TransparencyNote />
       </div>
@@ -146,7 +158,11 @@ export function CheckPage() {
         ))}
       </ol>
       <div ref={threadEnd} />
-      <div className="sticky bottom-0 -mx-4 mt-auto bg-linear-to-t from-surface from-70% to-transparent px-4 pt-6 pb-4">
+      <div className="sticky bottom-0 z-1 -mx-4 mt-auto px-4 pt-6 pb-4">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 -top-24 bottom-0 -z-10 mask-[linear-gradient(to_bottom,transparent,rgba(0,0,0,0.12)_1.5rem,rgba(0,0,0,0.55)_4.5rem,black_7rem)] bg-surface/85 backdrop-blur-2xl"
+        />
         {composer}
         <div className="mt-3">
           <TransparencyNote />

@@ -8,13 +8,15 @@ const NAV_ITEMS = [
   { to: '/zrodla', label: 'Źródła' },
   { to: '/jak-to-dziala', label: 'Jak to działa' },
 ] as const
-const NAV_LINK_CLASS = 'inline-flex min-h-11 items-center rounded-pill px-3 text-body-sm font-medium'
+const NAV_LINK_CLASS =
+  'relative inline-flex min-h-14 items-center px-3 text-body-sm font-medium transition-colors after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:transition-colors'
 
 function Wordmark() {
   return (
     <Link to="/" className="flex items-center gap-2 rounded-md" aria-label="Prawdowid, strona główna">
-      <LogoMark className="size-7" />
-      <span className="text-heading font-bold tracking-tight text-ink">Prawdowid</span>
+      <LogoMark className="size-7 hero:hidden" />
+      <LogoMark isReversed className="hidden size-7 hero:block" />
+      <span className="text-heading font-bold tracking-tight text-ink hero:text-ink-inverse">Prawdowid</span>
     </Link>
   )
 }
@@ -22,26 +24,29 @@ function Wordmark() {
 /** Full-height app shell: a slim header and one centred column, like a chat app. */
 export function Layout() {
   return (
-    <div className="flex min-h-dvh flex-col">
+    <div className="flex min-h-dvh flex-col overflow-x-clip">
       <a
         href="#tresc"
         className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-20 focus:rounded-md focus:bg-surface focus:px-4 focus:py-2"
       >
         Przejdź do treści
       </a>
-      <header className="sticky top-0 z-10 border-b border-border bg-surface/95 backdrop-blur">
-        <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-x-6 gap-y-1 px-4 py-2">
+      <header className="sticky top-0 z-10 border-b border-border bg-surface/95 backdrop-blur hero:border-brand-700 hero:bg-brand-600 hero:backdrop-blur-none">
+        <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-x-6 px-4">
           <Wordmark />
           <nav aria-label="Główna nawigacja">
-            <ul className="flex flex-wrap gap-0.5">
+            <ul className="flex flex-wrap">
               {NAV_ITEMS.map((item) => (
                 <li key={item.to}>
                   <Link
                     to={item.to}
                     activeOptions={{ exact: item.to === '/' }}
-                    activeProps={{ className: `${NAV_LINK_CLASS} bg-brand-50 text-brand-800`, 'aria-current': 'page' }}
+                    activeProps={{
+                      className: `${NAV_LINK_CLASS} font-semibold text-ink after:bg-brand-600 hero:text-ink-inverse hero:after:bg-ink-inverse`,
+                      'aria-current': 'page',
+                    }}
                     inactiveProps={{
-                      className: `${NAV_LINK_CLASS} text-ink-muted hover:bg-surface-subtle hover:text-ink`,
+                      className: `${NAV_LINK_CLASS} text-ink-muted after:bg-transparent hover:text-ink hover:after:bg-border-control hero:text-ink-inverse/80 hero:hover:text-ink-inverse hero:hover:after:bg-ink-inverse/40`,
                     }}
                   >
                     {item.label}
