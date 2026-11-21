@@ -4,6 +4,7 @@
 @layer base {
   html {
     @apply bg-surface font-sans text-body text-ink antialiased;
+    scrollbar-gutter: stable;
   }
 
   :focus-visible {
