@@ -44,6 +44,7 @@ def test_case_paraphrase_can_omit_time_but_cannot_change_it_or_reverse_the_claim
     assert not is_close_paraphrase(claim, f"Od jutra {repeat}")
     assert not is_close_paraphrase(claim, repeat.replace("wprowadzają", "znoszą"))
 
+
 ARTICLE_HTML = """<html><head><title>Komunikat testowy</title>
 <meta property="article:published_time" content="2026-11-19T10:00:00+01:00"></head>
 <body><nav><a href="/web/test/inny">Inny</a><a href="https://other.test/x">Obcy</a></nav>

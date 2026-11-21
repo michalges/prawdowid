@@ -16,6 +16,7 @@ class ExtractedClaim(StrictModel):
     search_query: str = Field(max_length=300)
     time_reference: str | None
     high_risk: bool
+    text_en: str | None = Field(default=None, max_length=600)
 
 
 class ClaimExtraction(StrictModel):

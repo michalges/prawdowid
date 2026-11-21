@@ -419,7 +419,7 @@ class VerificationPipeline:
     ) -> list[ContextNotice]:
         notices = self.source_status.get_notices(normalized.url)
         if self.incidents:
-            notices += self.incidents.get_notices(claim.text)
+            notices += self.incidents.get_notices(claim.text_en or claim.text)
         return notices
 
     async def _record_cases(
@@ -452,7 +452,7 @@ class VerificationPipeline:
         limitations = [*BASE_LIMITATIONS_PL, *normalized.limitations_pl]
         if normalized.fetched_title:
             title = get_masked_text(normalized.fetched_title).text[:300]
-            observed = f'Tytuł odczytany z przesłanej strony to „{title}”.'
+            observed = f"Tytuł odczytany z przesłanej strony to „{title}”."
             if normalized.fetched_published_at:
                 observed += f" Odczytana data publikacji to {normalized.fetched_published_at}."
             limitations.append(observed)
