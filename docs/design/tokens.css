@@ -1,0 +1,71 @@
+/*
+ * Prawdowid design tokens for Tailwind CSS v4 (`@import "tailwindcss";` then this file).
+ * Mirrors docs/design/tokens.json; keep both in sync. Rules: docs/DESIGN.md.
+ * Without Tailwind v4, rename `@theme` to `:root` and use the variables directly.
+ * Spacing uses Tailwind's default 4px scale (p-1 = 4px … p-12 = 48px).
+ * Fonts are not loaded here: see "Fonts" in docs/DESIGN.md.
+ */
+
+@theme {
+  --color-brand-50: #fdf0f2;
+  --color-brand-100: #fbd9df;
+  --color-brand-600: #d4213d;
+  --color-brand-700: #b01a33;
+  --color-brand-800: #8c1428;
+
+  --color-surface: #ffffff;
+  --color-surface-subtle: #f6f6f8;
+  --color-surface-sunken: #eceef1;
+  --color-border: #e3e4e8;
+  --color-border-control: #858b97;
+
+  --color-ink: #16181d;
+  --color-ink-muted: #4d5360;
+  --color-ink-subtle: #6b7180;
+  --color-ink-inverse: #ffffff;
+
+  --color-verdict-true: #0b6e4f;
+  --color-verdict-true-bg: #e7f4ee;
+  --color-verdict-false: #8a1538;
+  --color-verdict-false-bg: #fbe9ee;
+  --color-verdict-misleading: #8a5300;
+  --color-verdict-misleading-bg: #fdf2d8;
+  --color-verdict-insufficient: #475467;
+  --color-verdict-insufficient-bg: #eef0f3;
+  --color-verdict-unverifiable: #4a4594;
+  --color-verdict-unverifiable-bg: #eeedf8;
+
+  --color-system: #1f5fae;
+  --color-system-bg: #eaf2fb;
+  --color-warning: #8a5300;
+  --color-warning-bg: #fdf2d8;
+
+  --font-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+
+  --text-display: 40px;
+  --text-display--line-height: 44px;
+  --text-title: 28px;
+  --text-title--line-height: 34px;
+  --text-heading: 20px;
+  --text-heading--line-height: 28px;
+  --text-body: 16px;
+  --text-body--line-height: 24px;
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 20px;
+  --text-label: 13px;
+  --text-label--line-height: 16px;
+  --text-quote: 17px;
+  --text-quote--line-height: 27px;
+  --text-meta: 12px;
+  --text-meta--line-height: 16px;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-pill: 999px;
+
+  --shadow-card: 0 1px 2px rgba(22, 24, 29, 0.06), 0 1px 1px rgba(22, 24, 29, 0.04);
+  --shadow-focus: 0 0 0 3px rgba(212, 33, 61, 0.28);
+}

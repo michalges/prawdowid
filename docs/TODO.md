@@ -57,7 +57,9 @@ What's missing or incomplete, kept current while working. Order follows CONCEPT 
 
 ## Track B: channels
 - [x] Shared chat renderer + `ChannelAdapter` protocol (`channels/chat.py`)
-- [ ] Web UI (React + Vite + TS + Tailwind) → built into `web/dist`, served by FastAPI at `/` (also needs the `/wynik/{id}` route used in chat links)
+- [ ] Web UI (React + Vite + TS + Tailwind) → built into `web/dist`, served by FastAPI at `/` (also needs the `/wynik/{id}` route used in chat links). Use `docs/DESIGN.md` + `docs/design/tokens.css`
+- [ ] Discord embeds: take colours from `discord.*` from `docs/design/tokens.json`
+- [ ] Design: no logo yet (wordmark only, see `docs/DESIGN.md` §9)
 - [ ] Discord bot (`/sprawdz`, DMs, mentions) using `channels/chat.py`
 - [ ] Demo chat adapter (`/demo-chat`)
 - [ ] Mobile app (Expo)

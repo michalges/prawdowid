@@ -119,6 +119,8 @@ Every external dependency (LLM, embeddings if remote, Discord) sits **behind an 
 ├─ docs/
 │   ├─ ARCHITECTURE.md          # data flow, models, providers, limits (formal req.)
 │   ├─ SOURCES.md               # sources, licenses, qualification/update/exclusion rules
+│   ├─ DESIGN.md                # visual foundations: tokens + UI rules (all channels)
+│   ├─ design/tokens.{json,css} # design tokens (source of truth + Tailwind v4 @theme)
 │   ├─ RISKS.md                 # hallucinations, source bias, privacy, injection, availability, abuse
 │   ├─ COSTS.md                 # cost of 1,000 queries, channel costs, scaling behaviour
 │   └─ TEST_RESULTS.md          # metrics from §6 of the brief + how to reproduce
@@ -408,6 +410,7 @@ Plus a **public hosted demo URL**, an invite link for the Discord bot, and a dow
 - Python: uv only; ruff check + format + pytest must pass before every commit. Never commit secrets, `.env`, personal data, or a corpus that breaks licenses.
 - Every external provider needs a mock; the eval and tests must run offline with mocks.
 - User-facing text is **Polish, plain language** (aim for B1 level), short sentences.
+- UI in every channel uses the tokens and rules in [`docs/DESIGN.md`](DESIGN.md). No hard-coded colours or fonts; screens and components are up to you.
 - Don't add dependencies without a one-line justification in the commit.
 - **Licenses must allow transferring the rights to MSZ** (Regulamin §4: the winners sign a copyright transfer and declare that the solution is free of legal defects). Prefer MIT/Apache/BSD code and models. Avoid non-commercial or unclear model licenses, and record each model's license in `docs/ARCHITECTURE.md`.
 - If this document conflicts with a task or the brief, stop and flag it. Don't silently diverge.
