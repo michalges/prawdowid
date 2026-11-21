@@ -95,3 +95,8 @@ What's missing or incomplete, kept current while working. Order follows CONCEPT 
 ## Open questions
 - [ ] The organizer's full source list URL (brief §7) and incident DB: watch the Discord
 - [x] Organizer PDFs contain personal names: removed from git history, kept locally, git-ignored
+
+## Prod findings (2026-11-21)
+- [ ] Prod footer shows `openrouter/qwen/qwen3.8-flash`, not the documented `google/gemini-3.8-flash`: check `LLM_MODEL` in the deployment
+- [ ] Prod source collection lacks the KPRM article on Russian objects in Polish airspace that exists locally: rebuild/redeploy `corpus.sqlite`
+- [ ] Przewodów (2022) isn't covered by any source in the collection
