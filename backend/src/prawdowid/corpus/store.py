@@ -2,6 +2,7 @@
 
 import hashlib
 import sqlite3
+from collections import Counter
 from contextlib import closing
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
@@ -50,6 +51,9 @@ class CorpusStats:
     distinct_hosts: int
     documents_by_source: dict[str, int]
     documents_by_type: dict[str, int]
+    documents_by_host: dict[str, int]
+    documents_with_published_at: int
+    documents_with_retrieved_at: int
 
 
 CHUNK_SELECT = """
@@ -254,7 +258,9 @@ class LoadedCorpus:
         return self.vectors[positions[0]] if len(positions) else None
 
     def get_stats(self) -> CorpusStats:
-        documents = self.connection.execute("SELECT COUNT(*) FROM documents").fetchone()[0]
+        rows = self.connection.execute(
+            "SELECT url, published_at, retrieved_at FROM documents"
+        ).fetchall()
         by_source = dict(
             self.connection.execute(
                 "SELECT source_id, COUNT(*) FROM documents GROUP BY source_id"
@@ -265,14 +271,14 @@ class LoadedCorpus:
                 "SELECT source_type, COUNT(*) FROM documents GROUP BY source_type"
             ).fetchall()
         )
-        hosts = {
-            urlsplit(row[0]).netloc
-            for row in self.connection.execute("SELECT url FROM documents").fetchall()
-        }
+        hosts = Counter(urlsplit(url).hostname or "" for url, _, _ in rows)
         return CorpusStats(
-            documents=documents,
+            documents=len(rows),
             chunks=self.chunk_count,
             distinct_hosts=len(hosts),
+            documents_by_host=dict(sorted(hosts.items())),
+            documents_with_published_at=sum(bool(published_at) for _, published_at, _ in rows),
+            documents_with_retrieved_at=sum(bool(retrieved_at) for _, _, retrieved_at in rows),
             documents_by_source=by_source,
             documents_by_type=by_type,
         )

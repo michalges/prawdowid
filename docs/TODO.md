@@ -17,17 +17,18 @@ What's missing or incomplete, kept current while working. Order follows CONCEPT 
 - [x] `python -m prawdowid.ingest {check,build,stats}`: polite fetch (robots.txt, per-host delay, SSRF guard), trafilatura, chunking, FTS5 + vectors, `corpus_version`, idempotent rebuilds, excluded sources removed
 - [x] Listing crawler skips menus/nav and prefers article-like links
 - [~] Per-source verification (`docs/SOURCES.md` §5). Found so far (2026-11-21):
-  - `cert_komunikaty`: robots.txt disallows `/komunikaty/`, so it's excluded
+  - [x] Verified the seven hostname additions and documented exclusions in `docs/SOURCES.md`
   - `gov_ostrzezenia`, `msz_podrozujacy`: client-side rendered, so they're pointers only
   - `rcb_raport_dobowy`: the report is the page itself, so it's `page` mode
-  - The other 30+ entries are still `license_verified: false`, and demo builds need `--allow-unverified`
+  - [ ] Review the legacy seed source licence flags before distributing a prebuilt corpus
 - [ ] MSZ travel advisories: find the per-country advisory URLs (or an official feed) and ingest them. This is high value, since the organizer is MSZ.
 - [ ] RCB daily report: keep daily snapshots (today each build replaces yesterday's text)
-- [ ] Ingest a static set of fact-check articles (Demagog, AFP Sprawdzam) so the corpus has ≥ 2 source types without API keys (see the stats below)
-- [ ] Add sources outside safety/transport: ISAP, EUR-Lex, GUS, dane.gov.pl, europa.eu
+- [x] Ingest a static set of Demagog fact-check excerpts so the corpus has ≥ 2 source types without API keys
+- [x] Add economics and EU policy sources from GUS, Eurostat and the European Commission
+- [ ] Find crawlable, extractable official legal and open-data pages (see the skipped sources in `docs/SOURCES.md`)
 - [ ] Get the organizer's incident DB (JSON/CSV) → `backend/data/incidents/` (loader ready)
 - [ ] EUvsDisinfo export per the organizer's PDF → `backend/data/incidents/`
-- [ ] Reach the brief minimum (`ingest stats` prints it): ≥ 100 docs, ≥ 10 domains, ≥ 2 types
+- [x] Reach the brief minimum (`ingest stats` prints it): ≥ 100 docs, ≥ 10 domains, ≥ 2 types
 - [ ] Prebuilt `corpus.sqlite` as a release asset, so the jury doesn't need to crawl
 
 ### A3. Retrieval
@@ -69,7 +70,8 @@ What's missing or incomplete, kept current while working. Order follows CONCEPT 
 
 ## Track C: quality
 - [x] `eval/run_eval.py` (all brief §6 metrics, `--cases` for the jury's set, `--base-url` for a deployment, manual-review sample) → `docs/TEST_RESULTS.md`
-- [~] `eval/cases.jsonl`: seeded from real corpus documents. Needs ≥ 30 cases, ≥ 3 per scenario A–J (B, C, F, H, I need more real material)
+- [x] Expand `eval/cases.jsonl` to ≥ 30 cases with corpus-backed partly true, outdated and conflicting-source examples
+- [ ] Expand scenario coverage to ≥ 3 cases per scenario A–J
 - [ ] Fill in the manual citation review (`eval/manual_review.tsv`, 20 rows)
 
 ## Track D: delivery

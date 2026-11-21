@@ -57,10 +57,12 @@ def run_stats(_arguments: argparse.Namespace) -> int:
         stats.documents >= BRIEF_MIN_DOCUMENTS
         and stats.distinct_hosts >= BRIEF_MIN_DOMAINS
         and len(stats.documents_by_type) >= BRIEF_MIN_TYPES
+        and stats.documents_with_retrieved_at == stats.documents
     )
     print(
         f"Brief minimum (>= {BRIEF_MIN_DOCUMENTS} docs, >= {BRIEF_MIN_DOMAINS} domains, "
-        f">= {BRIEF_MIN_TYPES} types): {'OK' if meets_brief else 'NOT MET'}"
+        f">= {BRIEF_MIN_TYPES} types, retrieval dates for all docs): "
+        f"{'OK' if meets_brief else 'NOT MET'}"
     )
     return 0
 

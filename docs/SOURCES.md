@@ -1,30 +1,73 @@
 # SOURCES.md: Prawdowid source catalog & rules
 
-The machine-readable catalog is [`backend/data/sources.yaml`](../data/sources.yaml) (schema: CONCEPT §6.3). It is also served at `GET /v1/sources`.
+The machine-readable catalog is [`backend/data/sources.yaml`](../backend/data/sources.yaml) (schema: CONCEPT §6.3). It is also served at `GET /v1/sources`.
 It is seeded from the **organizer's example list** (MSZ challenge Discord). The organizer says these are examples and we don't have to implement all of them.
 
 ## 1. Coverage at a glance
 
-| Area | Ingested (`listing` / `page`) | Pointer only (`live_link`) |
+The local demo corpus contains **116 documents across 12 distinct URL hostnames and two source
+types**. This meets the brief's numerical minimum (100 documents, 10 domains and two types)
+using the ingest CLI's hostname count. All 116 rows have `published_at` and `retrieved_at`
+populated at date precision. Publication metadata can reflect a publisher's update date.
+
+| Hostname | Type | Documents |
+|---|---|---:|
+| www.gov.pl | official_primary | 48 |
+| kgsok.pl | official_primary | 15 |
+| mazowiecka.policja.gov.pl | official_primary | 15 |
+| policja.pl | official_primary | 15 |
+| www.umgdy.gov.pl | official_primary | 9 |
+| publikacje.new.stat.gov.pl | official_primary | 4 |
+| demagog.org.pl | fact_check | 3 |
+| ec.europa.eu | official_primary | 2 |
+| poland.representation.ec.europa.eu | official_primary | 2 |
+| commission.europa.eu | official_primary | 1 |
+| moje.cert.pl | official_primary | 1 |
+| ssgk.stat.gov.pl | official_primary | 1 |
+| **Total** | **113 official_primary · 3 fact_check** | **116** |
+
+The build extended the existing 102-document local seed. Its legacy licence flags still need
+a per-source review before redistribution. The 14 new documents use verified terms and curated
+`page` entries so the dated evidence stays addressable. The two GUS hosts share a publisher,
+as do the Commission and its Polish Representation. Hostname count measures corpus coverage.
+It does not establish publisher independence.
+
+### Rebuild and audit the expansion
+
+Run from `backend/` with the demo seed in `data/corpus.sqlite`.
+
+```sh
+uv run python -m prawdowid.ingest build --only cert_komunikaty,gus_cpi,gus_economic_review,commission_news,commission_poland_news,eurostat_inflation,demagog_reviews,eli_acts
+uv run python -m prawdowid.ingest stats
+```
+
+The catalog and `GET /v1/sources` list source entries and reuse terms. The SQLite
+`documents` table records each ingested URL, publisher, licence, source type and dates.
+The development SQLite file is gitignored.
+
+### Source checks on 2026-11-21
+
+| Publisher and scope | Robots and extraction | Reuse |
 |---|---|---|
-| Warnings & crisis management | gov.pl ostrzeżenia, RSO (MSWiA), RCB raport dobowy, RCB, MSWiA, KPRM | n/a |
-| Foreign affairs / travel | MSZ informacje dla podróżujących | Odyseusz |
-| Police, fire service, defence | Policja (KGP), Mazowiecka Policja, KG PSP, MON | n/a |
-| Health, radiation, cyber | GIS ostrzeżenia, PAA, CERT Polska komunikaty | PAA monitoring, GIOŚ powietrze |
-| Road | GDDKiA informacje drogowe + lista utrudnień, 19 111 | GDDKiA mapa |
-| Rail | UTK pasażerowie, SOK | Portal Pasażera |
-| Air | ULC, ULC prawa pasażera, MI prawa pasażerów | n/a |
-| Sea & inland water | SAR, UM Gdynia, UM Szczecin warunki żeglugi, Wody Polskie komunikaty | IMGW Bałtyk |
-| Weather & hydrology | n/a | IMGW meteo, IMGW hydro |
-| Fact-checks (API) | Google Fact Check Tools (ClaimReview) | n/a |
-| Disinformation DB (API, context only) | EUvsDisinfo | n/a |
+| GUS price and GDP releases | [Publications robots](https://publikacje.new.stat.gov.pl/robots.txt) allows the selected pages. The [monthly review robots URL](https://ssgk.stat.gov.pl/robots.txt) returned 404. Both hosts published usable text and dates. | Attribute GUS and the source URL. [Copyright notice](https://stat.gov.pl/copyright) |
+| European Commission and its Polish Representation | The [Commission](https://commission.europa.eu/robots.txt) and [Representation](https://poland.representation.ec.europa.eu/robots.txt) allow the selected paths. The extracted dates and text came from Polish-language pages. | CC BY 4.0 for EU-owned text, with attribution and indication of changes. [Legal notice](https://commission.europa.eu/legal-notice_pl) |
+| Eurostat releases | [Robots](https://ec.europa.eu/robots.txt) allows the selected press releases. The two English-language releases had dates and usable prose. | Attribute Eurostat. EU-owned editorial content is CC BY 4.0. [Reuse notice](https://ec.europa.eu/eurostat/help/copyright-notice) |
+| CERT Polska advisory | [Robots](https://moje.cert.pl/robots.txt) explicitly allows `/komunikaty/` despite the general disallow. The selected advisory supplied text and a date. | CC BY-SA 4.0 for advisories, as stated in the footer. [Source advisory](https://moje.cert.pl/komunikaty/2026/73/prosba-o-wycene-ale-towarem-jest-dostep-do-twojego-komputera/) |
+| Demagog | [Robots](https://demagog.org.pl/robots.txt) allows the selected articles, signals reference use and disallows AI training. All three articles supplied text and dates. | The local noncommercial demo keeps excerpts with the publisher and original URL. [Reuse terms](https://demagog.org.pl/zasady-udostepniania-tresci/) · [Methodology and IFCN/EFCSN membership](https://demagog.org.pl/metodologia/) |
 
-**Brief minimum (§5 "Źródła"): ≥ 100 documents, ≥ 10 domains, ≥ 2 source types.**
-- Domains: the catalog has 15+ distinct domains with ingestable content (gov.pl, policja.pl, mazowiecka.policja.gov.pl, moje.cert.pl, drogi.gddkia.gov.pl, ulc.gov.pl, utk.gov.pl, kgsok.pl, sar.gov.pl, umgdy.gov.pl, ums.gov.pl, …). ✅
-- Documents: the `listing` sources (news and warnings archives) easily exceed 100 articles. ✅ Ingest enough history (e.g. the last 6–12 months) so that older claims are still checkable.
-- Types: `official_primary` plus `fact_check` and `disinfo_db`, which currently come only through APIs. ⚠️ To be safe, also **ingest a static set of fact-check articles** (e.g. Demagog, AFP Sprawdzam) as `fact_check` documents, so the corpus itself has ≥ 2 types even when API keys are missing.
+### Skipped candidates
 
-**Thematic gap:** the list is about safety, warnings and transport. Claims about politics, the economy, the EU or history need more sources from CONCEPT §6.2 (ISAP, EUR-Lex, GUS, europa.eu). The jury will ask their own questions, so out-of-corpus topics must **abstain**, not guess.
+| Candidate | Reason |
+|---|---|
+| PAP | The publisher expressly reserves text and data mining rights. [Terms §1.5](https://www.pap.pl/regulamin) |
+| ISAP and UTK | Their robots files disallow general crawlers. [ISAP robots](https://isap.sejm.gov.pl/robots.txt) · [UTK robots](https://utk.gov.pl/robots.txt) |
+| ELI | Robots allowed the URL and the official act is outside copyright under Article 4. The HTML extractor retained the table of contents and inferred an unrelated date, so the candidate was removed. [Official act](https://eli.gov.pl/eli/DU/2023/1524/ogl) · [Article 4](https://eli.gov.pl/api/acts/DU/2021/1062/text.html) |
+| Legacy GUS URL | The old publication URL returned 404. GUS's new Publications portal carries the release. |
+| ULC, Consilium and EUR-Lex | ULC served a challenge page, Consilium returned 403, and EUR-Lex returned an empty 202 for robots.txt. |
+| dane.gov.pl | The tested robots URL returned the app's HTML shell. The portal was deferred pending a verifiable dataset source and its reuse terms. |
+| NBP | The robots request timed out. |
+| Fakenews.pl and PKP Intercity | Robots allowed access. Reuse permission for indexed text was not verified. |
+| EUvsDisinfo | Deferred to the existing context-only incident import. This build did not establish reuse terms for a static copy of case text. [About the database](https://euvsdisinfo.eu/about/) |
 
 ## 2. Fetch modes (how a source is used)
 
