@@ -108,14 +108,6 @@ def add_summary_fields(embed: discord.Embed, result: dict, web_base_url: str) ->
             value=get_truncated(result["extracted_text_pl"], EMBED_FIELD_LIMIT),
             inline=False,
         )
-    case = result.get("case")
-    if case:
-        title = (
-            "📨 Przekazano moderatorowi"
-            if case["status"] == "przekazano_moderatorowi"
-            else "📥 Zalecamy przekazanie moderatorowi"
-        )
-        embed.add_field(name=title, value=case["message_pl"], inline=False)
     link = f"{web_base_url.rstrip('/')}/wynik/{result['check_id']}"
     embed.add_field(
         name="\u200b",

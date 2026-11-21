@@ -1,7 +1,7 @@
-import { Check, Copy, Inbox, Send } from 'lucide-react'
+import { Check, Copy } from 'lucide-react'
 import { useState } from 'react'
 
-import type { CaseInfo, CheckResult, CheckStatus } from '../api/types'
+import type { CheckResult, CheckStatus } from '../api/types'
 import { getClaimCountLabel } from '../lib/format'
 import { ClaimCard } from './ClaimCard'
 import { Notice } from './Notice'
@@ -21,28 +21,6 @@ function StatusPanel({ status, message }: { status: Exclude<CheckStatus, 'ok'>; 
       <h2 className="text-heading font-semibold text-system">{STATUS_TITLES[status]}</h2>
       <p className="mt-2 text-body text-ink">{message}</p>
     </output>
-  )
-}
-
-function CaseBox({ caseInfo }: { caseInfo: CaseInfo }) {
-  const isHandedOver = caseInfo.status === 'przekazano_moderatorowi'
-  const Icon = isHandedOver ? Send : Inbox
-  return (
-    <section
-      className={`flex gap-3 rounded-lg p-4 sm:p-5 ${
-        isHandedOver ? 'bg-verdict-true-bg text-verdict-true' : 'bg-verdict-insufficient-bg text-verdict-insufficient'
-      }`}
-    >
-      <Icon aria-hidden className="mt-0.5 size-5 shrink-0" />
-      <div>
-        <h2 className="text-body font-semibold">
-          {isHandedOver ? 'Przekazano moderatorowi' : 'Zalecamy przekazanie moderatorowi'}
-        </h2>
-        <p className="text-body-sm text-ink">
-          {caseInfo.message_pl} Podobnych zgłoszeń: {caseInfo.similar_reports}.
-        </p>
-      </div>
-    </section>
   )
 }
 
@@ -109,7 +87,6 @@ export function ResultView({ result }: { result: CheckResult }) {
         <ClaimCard key={claim.claim_id} claim={claim} index={index} total={result.claims.length} />
       ))}
 
-      {result.case && <CaseBox caseInfo={result.case} />}
 
       <section className="rounded-lg border border-border p-4 sm:p-5">
         <h2 className="text-label uppercase tracking-wide text-ink-muted">Ograniczenia</h2>
