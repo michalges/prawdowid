@@ -1,0 +1,73 @@
+# Prawdowid
+
+Source-based verification of claims for Polish citizens (MSZ "PRAWDOWID" challenge). You send a claim, a link or a
+screenshot. Prawdowid splits it into checkable claims and searches an auditable catalog of official sources. For each
+claim it returns a plain-Polish result with verified quotes, or honestly says there isn't enough evidence.
+It supports judgement. It is **not** an automatic "judge of truth".
+
+Design: [`docs/CONCEPT.md`](docs/CONCEPT.md) · sources: [`docs/SOURCES.md`](docs/SOURCES.md) ·
+open work: [`docs/TODO.md`](docs/TODO.md) · test results: [`docs/TEST_RESULTS.md`](docs/TEST_RESULTS.md)
+
+## Quick start (jury)
+
+```bash
+cp .env.example .env              # set OPENROUTER_API_KEY (or LLM_PROVIDER=ollama for self-hosting)
+docker compose --profile ingest run --rm ingest   # build the demo corpus from the source catalog (~5 min)
+docker compose up --build api     # http://localhost:8000/docs (OpenAPI), /health, /v1/sources
+```
+
+Without Docker (Python 3.12 + [uv](https://docs.astral.sh/uv/)):
+
+```bash
+cd backend
+uv sync
+uv run python -m prawdowid.ingest build --allow-unverified --max-docs 15
+uv run prawdowid                  # serves on :8000
+```
+
+Try a check:
+
+```bash
+curl -s localhost:8000/v1/checks -H 'content-type: application/json' -d '{
+  "channel": "web", "session_id": "demo-session-1",
+  "input": {"type": "text", "text": "Rada Ministrów przyjęła 10 listopada 2026 projekt ustawy o systemie ETIAS."}
+}' | python -m json.tool
+```
+
+`--allow-unverified` builds a local demo corpus from sources whose reuse terms haven't been formally verified yet
+(see `docs/SOURCES.md` §3, §5).
+
+## API
+
+| Endpoint | Purpose |
+|---|---|
+| `POST /v1/checks` | Run a check: `text`, `url` or `image` input; the same call for every channel |
+| `GET /v1/checks/{id}` | A stored result |
+| `DELETE /v1/sessions/{id}` | Delete a session's data |
+| `GET /v1/sources` | The auditable source catalog with document counts |
+| `GET /health` | Components, model, corpus version, where data is processed |
+| `GET /metrics`, `GET /v1/cases`, `GET /v1/export` | Admin (`Authorization: Bearer $ADMIN_TOKEN`) |
+
+Every result separates **source material** (citations: title, publisher, date, link, verified quote) from **Prawdowid's
+interpretation** (verdict, explanation, strength factors). Technical failures, rate limits and unclear questions come
+back as statuses, never as verdicts.
+
+## Development
+
+```bash
+cd backend
+uv run ruff check . && uv run ruff format --check . && uv run pytest
+uv run python eval/run_eval.py    # brief §6 metrics → docs/TEST_RESULTS.md (uses the configured LLM; costs a few cents)
+uv run python eval/run_eval.py --cases path/to/jury_cases.jsonl
+```
+
+Tests run fully offline with mock providers. Their fixtures use synthetic `example.test` documents.
+
+## Data & privacy
+
+- Obvious personal data (e-mail, phone, PESEL, IBAN, card and ID numbers) is masked before the LLM call and before storage.
+- Checks are deleted after `RETENTION_DAYS` (default 30). Sessions can be deleted via the API.
+- Retrieval, embeddings and OCR run locally.
+- The LLM runs through OpenRouter (a US intermediary) with provider data collection denied. For EU-only or self-hosted
+  processing, use `LLM_PROVIDER=mistral` or `LLM_PROVIDER=ollama`.
+- No API keys, personal data or organizer PDFs are committed. The PDFs contain personal names and stay local.
