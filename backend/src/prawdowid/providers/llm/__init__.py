@@ -25,6 +25,9 @@ KNOWN_PRICES_PER_MTOK_USD = {
 """(input, output) USD per million tokens, checked on openrouter.ai/api/v1/models on 2026-11-21.
 LLM_PRICE_*_PER_MTOK_USD override these."""
 
+OPENROUTER_EU_BASE_URL = "https://eu.openrouter.ai/api/v1"
+"""In-region processing (EU/EEA, UK, CH); needs an OpenRouter Business or Enterprise plan."""
+
 DEFAULT_BASE_URLS = {
     LLMProviderName.OPENROUTER: "https://openrouter.ai/api/v1",
     LLMProviderName.MISTRAL: "https://api.mistral.ai/v1",
@@ -55,6 +58,12 @@ def get_llm_provider(settings: Settings) -> LLMProvider:
         key = settings.openrouter_api_key
     api_key = key.get_secret_value() if key else None
     base_url = settings.llm_base_url or DEFAULT_BASE_URLS.get(name, "")
+    if (
+        name is LLMProviderName.OPENROUTER
+        and settings.openrouter_eu_routing
+        and not settings.llm_base_url
+    ):
+        base_url = OPENROUTER_EU_BASE_URL
     if name not in (LLMProviderName.MOCK, LLMProviderName.FAILING) and not model:
         return FailingLLMProvider(
             error=LLMConfigError(f"LLM_MODEL must be set for LLM_PROVIDER={name}"),
