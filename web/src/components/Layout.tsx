@@ -7,9 +7,8 @@ const NAV_ITEMS = [
   { to: '/historia', label: 'Historia' },
   { to: '/zrodla', label: 'Źródła' },
   { to: '/jak-to-dziala', label: 'Jak to działa' },
+  { to: '/discord', label: 'Discord' },
 ] as const
-const DISCORD_INVITE_URL =
-  'https://discord.com/oauth2/authorize?client_id=1573671960204943420&scope=bot%20applications.commands&permissions=84992'
 const NAV_LINK_CLASS =
   'relative inline-flex min-h-14 items-center px-3 text-body-sm font-medium transition-colors after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full after:transition-colors'
 
@@ -54,17 +53,6 @@ export function Layout() {
                   </Link>
                 </li>
               ))}
-              <li>
-                <a
-                  href={DISCORD_INVITE_URL}
-                  target="_blank"
-                  rel="noreferrer"
-                  className={`${NAV_LINK_CLASS} text-ink-muted after:bg-transparent hover:text-ink hover:after:bg-border-control`}
-                >
-                  Bot Discord
-                  <span className="sr-only"> (otwiera się w nowej karcie)</span>
-                </a>
-              </li>
             </ul>
           </nav>
         </div>

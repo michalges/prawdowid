@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DiscordRouteImport } from './routes/discord'
 import { Route as HistoriaRouteImport } from './routes/historia'
 import { Route as JakToDzialaRouteImport } from './routes/jak-to-dziala'
 import { Route as ZrodlaRouteImport } from './routes/zrodla'
@@ -18,6 +19,11 @@ import { Route as WynikCheckIdRouteImport } from './routes/wynik.$checkId'
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiscordRoute = DiscordRouteImport.update({
+  id: '/discord',
+  path: '/discord',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HistoriaRoute = HistoriaRouteImport.update({
@@ -43,6 +49,7 @@ const WynikCheckIdRoute = WynikCheckIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/discord': typeof DiscordRoute
   '/historia': typeof HistoriaRoute
   '/jak-to-dziala': typeof JakToDzialaRoute
   '/zrodla': typeof ZrodlaRoute
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/discord': typeof DiscordRoute
   '/historia': typeof HistoriaRoute
   '/jak-to-dziala': typeof JakToDzialaRoute
   '/zrodla': typeof ZrodlaRoute
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/discord': typeof DiscordRoute
   '/historia': typeof HistoriaRoute
   '/jak-to-dziala': typeof JakToDzialaRoute
   '/zrodla': typeof ZrodlaRoute
@@ -66,12 +75,24 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/historia' | '/jak-to-dziala' | '/zrodla' | '/wynik/$checkId'
+    | '/'
+    | '/discord'
+    | '/historia'
+    | '/jak-to-dziala'
+    | '/zrodla'
+    | '/wynik/$checkId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/historia' | '/jak-to-dziala' | '/zrodla' | '/wynik/$checkId'
+  to:
+    | '/'
+    | '/discord'
+    | '/historia'
+    | '/jak-to-dziala'
+    | '/zrodla'
+    | '/wynik/$checkId'
   id:
     | '__root__'
     | '/'
+    | '/discord'
     | '/historia'
     | '/jak-to-dziala'
     | '/zrodla'
@@ -80,6 +101,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DiscordRoute: typeof DiscordRoute
   HistoriaRoute: typeof HistoriaRoute
   JakToDzialaRoute: typeof JakToDzialaRoute
   ZrodlaRoute: typeof ZrodlaRoute
@@ -93,6 +115,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/discord': {
+      id: '/discord'
+      path: '/discord'
+      fullPath: '/discord'
+      preLoaderRoute: typeof DiscordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/historia': {
@@ -128,6 +157,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DiscordRoute: DiscordRoute,
   HistoriaRoute: HistoriaRoute,
   JakToDzialaRoute: JakToDzialaRoute,
   ZrodlaRoute: ZrodlaRoute,

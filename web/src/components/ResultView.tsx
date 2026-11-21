@@ -123,7 +123,7 @@ export function ResultView({ result }: { result: CheckResult }) {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <ShareButton checkId={result.check_id} />
         <p className="font-mono text-meta text-ink-subtle">
-          {result.model_info.llm} · korpus {result.model_info.corpus_version ?? 'brak'} ·{' '}
+          {result.model_info.llm} · wersja zbioru źródeł {result.model_info.corpus_version ?? 'brak'} ·{' '}
           {(result.latency_ms / 1000).toFixed(1)} s · id {result.check_id.slice(0, 8)}
         </p>
       </div>

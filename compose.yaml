@@ -59,7 +59,6 @@ services:
       retries: 3
 
   discord:
-    profiles: [discord]
     build:
       context: ./channels/discord_bot
       args:

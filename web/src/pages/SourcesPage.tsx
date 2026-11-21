@@ -72,7 +72,7 @@ export function SourcesPage({ catalog }: { catalog: SourceCatalog }) {
           to inne wiarygodne źródła. Samo źródło nigdy nie przesądza o ocenie.
         </p>
         <p className="font-mono text-meta text-ink-subtle">
-          {catalog.documents} dokumentów · {catalog.chunks} fragmentów · wersja korpusu{' '}
+          {catalog.documents} dokumentów · {catalog.chunks} fragmentów · wersja zbioru źródeł{' '}
           {catalog.corpus_version ?? 'brak'}
         </p>
       </div>
