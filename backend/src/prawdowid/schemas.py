@@ -99,6 +99,7 @@ class CheckRequest(StrictModel):
     channel: Channel
     session_id: str = Field(min_length=8, max_length=128, pattern=r"^[A-Za-z0-9_-]+$")
     input: CheckInput
+    language: Literal["pl", "en"] = "pl"
 
 
 class StrengthFactors(StrictModel):

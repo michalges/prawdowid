@@ -430,3 +430,40 @@ def test_unknown_channel_and_bad_session_are_rejected(make_client) -> None:
 
     assert client.post("/v1/checks", json=unknown_channel).status_code == 422
     assert client.post("/v1/checks", json=bad_session).status_code == 422
+
+
+def test_english_request_translates_prose_but_keeps_verbatim_quotes(make_client) -> None:
+    scripted = get_scripted_responder()
+
+    def respond(system, blocks, schema):
+        if schema.__name__ == "Translation":
+            return {"texts": [f"EN: {block.content}" for block in blocks]}
+        return scripted(system, blocks, schema)
+
+    request = {**get_text_request(STORM_CLAIM), "language": "en"}
+    body = (
+        make_client(llm=MockLLMProvider(responder=respond)).post("/v1/checks", json=request).json()
+    )
+
+    claim = body["claims"][0]
+    assert claim["text"].startswith("EN: ")
+    assert claim["explanation_pl"].startswith("EN: ")
+    assert all(text.startswith("EN: ") for text in body["limitations_pl"])
+    assert not claim["citations"][0]["quote"].startswith("EN: ")
+
+
+def test_english_request_keeps_polish_when_translation_count_mismatches(make_client) -> None:
+    scripted = get_scripted_responder()
+
+    def respond(system, blocks, schema):
+        if schema.__name__ == "Translation":
+            return {"texts": ["only one"]}
+        return scripted(system, blocks, schema)
+
+    request = {**get_text_request(STORM_CLAIM), "language": "en"}
+    body = (
+        make_client(llm=MockLLMProvider(responder=respond)).post("/v1/checks", json=request).json()
+    )
+
+    assert body["status"] == "ok"
+    assert body["claims"][0]["text"] == STORM_CLAIM

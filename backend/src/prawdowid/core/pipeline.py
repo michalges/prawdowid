@@ -23,6 +23,7 @@ from prawdowid.core.render import DEFAULT_EXPLANATIONS, get_claim_result
 from prawdowid.core.retrieval import HybridRetriever, RetrievalError, get_evidence
 from prawdowid.core.source_status import SourceStatusRegistry
 from prawdowid.core.strength import GateDecision, get_gate_decision, get_strength
+from prawdowid.core.translate import get_translated_result
 from prawdowid.corpus.models import SourceEntry
 from prawdowid.providers.factcheck import FactCheckError, FactCheckProvider
 from prawdowid.providers.llm import get_prices_per_mtok
@@ -150,6 +151,10 @@ class VerificationPipeline:
             )
             masked_input, input_type = "", request.input.type.value
         result.check_id = check_id
+        if request.language == "en":
+            result, translation_usage = await get_translated_result(self.llm, result)
+            usage = usage + translation_usage
+            result.est_cost_usd = self._get_cost(usage)
         self._persist(request, result, usage, masked_input, input_type)
         return result
 
