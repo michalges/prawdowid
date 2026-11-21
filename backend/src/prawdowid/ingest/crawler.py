@@ -76,6 +76,7 @@ def get_document(source: SourceEntry, url: str, article: ExtractedArticle) -> Co
         publisher=source.publisher,
         published_at=article.published_at,
         retrieved_at=datetime.now(UTC).date(),
+        language=source.language,
         source_type=source.type,
         quality_tier=source.quality_tier,
         license=source.license,

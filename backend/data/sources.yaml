@@ -1,6 +1,6 @@
 # Prawdowid source catalog (open, auditable). Rules: docs/SOURCES.md. Schema: docs/CONCEPT.md §6.3.
 # Seeded from the organizer's example list (MSZ challenge Discord, 2026-11-21).
-# Every entry starts with license_verified: false. Check terms + robots.txt before the first ingest.
+# Check terms and robots.txt before first ingest. Set license_verified only after checking the reuse terms.
 #
 # fetch_mode:
 #   listing    crawl a news/warnings index page, ingest each linked article (published_at from the article)
@@ -326,18 +326,19 @@
   publisher: CERT Polska (NASK)
   domain: moje.cert.pl
   urls:
-    - https://moje.cert.pl/komunikaty/
+    - https://moje.cert.pl/komunikaty/2026/73/prosba-o-wycene-ale-towarem-jest-dostep-do-twojego-komputera/
   type: official_primary
   quality_tier: A
-  fetch_mode: listing
+  fetch_mode: page
   use: evidence
   store_mode: full_text
-  update: daily
-  license: "Verify terms"
-  license_verified: false
-  qualification: "National CSIRT security advisories (phishing, scams)"
-  excluded: true
-  exclusion_reason: "robots.txt disallows /komunikaty/ (checked 2026-11-21); look for an allowed feed or the cert.pl news section"
+  update: manual
+  license: "CC BY-SA 4.0 (advisory text, unless otherwise noted)"
+  license_verified: true
+  qualification: "National CSIRT security advisory"
+  notes: "The advisory footer declares the licence. robots.txt explicitly allows /komunikaty/."
+  excluded: false
+  exclusion_reason: null
 
 # --- Transport: road, rail, air, sea, inland water --------------------------------
 
@@ -703,5 +704,141 @@
   license_verified: false
   qualification: "Known pro-Kremlin disinformation cases; used to say 'similar narratives appeared in hostile information operations'"
   notes: "Access as described in the organizer's PDF; tokens from the organizer on request. Needs EUVSDISINFO_TOKEN."
+  excluded: false
+  exclusion_reason: null
+
+# --- Dated statistics, legal texts, EU policy and fact checks -------------------
+
+- id: gus_cpi
+  name: GUS – ceny i rachunki narodowe
+  publisher: Główny Urząd Statystyczny
+  domain: publikacje.new.stat.gov.pl
+  urls:
+    - https://publikacje.new.stat.gov.pl/portal-publikacje/wskazniki-cen-towarow-i-uslug-konsumpcyjnych-w-grudniu-2024-r
+    - https://publikacje.new.stat.gov.pl/portal-publikacje/wskazniki-cen-towarow-i-uslug-konsumpcyjnych-w-grudniu-2025-r
+    - https://publikacje.new.stat.gov.pl/portal-publikacje/produkt-krajowy-brutto-w-2025-r-szacunek-wstepny
+    - https://publikacje.new.stat.gov.pl/portal-publikacje/produkt-krajowy-brutto-zaktualizowany-szacunek-za-2025-r
+  type: official_primary
+  quality_tier: A
+  fetch_mode: page
+  use: evidence
+  store_mode: full_text
+  update: manual
+  license: "GUS data, reuse with source acknowledgement"
+  license_verified: true
+  qualification: "Official consumer price and GDP releases. Reuse notice: https://stat.gov.pl/copyright"
+  excluded: false
+  exclusion_reason: null
+
+- id: eli_acts
+  name: ELI – akty prawne
+  publisher: Dziennik Ustaw
+  domain: eli.gov.pl
+  urls:
+    - https://eli.gov.pl/api/acts/DU/2023/1524/text.html
+  type: official_primary
+  quality_tier: A
+  fetch_mode: page
+  use: evidence
+  store_mode: full_text
+  update: manual
+  license: "Polish official acts, excluded from copyright under Article 4"
+  license_verified: true
+  qualification: "Official legal texts. Reuse basis: https://eli.gov.pl/api/acts/DU/2021/1062/text.html"
+  excluded: true
+  exclusion_reason: "HTML extraction retained the contents list and inferred an unrelated date."
+
+- id: commission_news
+  name: Komisja Europejska – gospodarka i euro
+  publisher: Komisja Europejska
+  domain: commission.europa.eu
+  urls:
+    - https://commission.europa.eu/topics/economy-and-euro_pl
+  type: official_primary
+  quality_tier: A
+  fetch_mode: page
+  use: evidence
+  store_mode: full_text
+  update: manual
+  license: "CC BY 4.0 for EU-owned text, unless otherwise noted"
+  license_verified: true
+  qualification: "Commission reporting on EU policy. Reuse notice: https://commission.europa.eu/legal-notice_pl"
+  excluded: false
+  exclusion_reason: null
+
+- id: commission_poland_news
+  name: Przedstawicielstwo Komisji Europejskiej – aktualności
+  publisher: Komisja Europejska – Przedstawicielstwo w Polsce
+  domain: poland.representation.ec.europa.eu
+  urls:
+    - https://poland.representation.ec.europa.eu/aktualnosci-i-wydarzenia/aktualnosci/sprawozdanie-z-konwergencji-2024-06-27_pl
+    - https://poland.representation.ec.europa.eu/aktualnosci-i-wydarzenia/aktualnosci/pomoc-dla-polskich-rolnikow-2025-10-13_pl
+  type: official_primary
+  quality_tier: A
+  fetch_mode: page
+  use: evidence
+  store_mode: full_text
+  update: manual
+  license: "CC BY 4.0 for EU-owned text, unless otherwise noted"
+  license_verified: true
+  qualification: "Official Polish-language Commission notices. Reuse notice: https://commission.europa.eu/legal-notice_pl"
+  excluded: false
+  exclusion_reason: null
+
+- id: gus_economic_review
+  name: GUS – Sytuacja społeczno-gospodarcza kraju
+  publisher: Główny Urząd Statystyczny
+  domain: ssgk.stat.gov.pl
+  urls:
+    - https://ssgk.stat.gov.pl/01.2025/Ceny_towarow_i_uslug_konsumpcyjnych.html
+  type: official_primary
+  quality_tier: A
+  fetch_mode: page
+  use: evidence
+  store_mode: full_text
+  update: manual
+  license: "GUS data, reuse with source acknowledgement"
+  license_verified: true
+  qualification: "Official monthly economic review. Reuse notice: https://stat.gov.pl/copyright"
+  excluded: false
+  exclusion_reason: null
+
+- id: eurostat_inflation
+  name: Eurostat – inflation releases
+  publisher: Eurostat
+  domain: ec.europa.eu
+  urls:
+    - https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/2-19012026-ap
+    - https://ec.europa.eu/eurostat/en/web/products-euro-indicators/w/2-25022026-ap
+  type: official_primary
+  quality_tier: A
+  fetch_mode: page
+  use: evidence
+  store_mode: full_text
+  update: manual
+  language: en
+  license: "Eurostat reuse with source acknowledgement, CC BY 4.0 for EU-owned editorial text"
+  license_verified: true
+  qualification: "Official harmonised inflation releases. Reuse notice: https://ec.europa.eu/eurostat/help/copyright-notice"
+  excluded: false
+  exclusion_reason: null
+
+- id: demagog_reviews
+  name: Demagog – weryfikacja informacji
+  publisher: Stowarzyszenie Demagog
+  domain: demagog.org.pl
+  urls:
+    - https://demagog.org.pl/wypowiedzi/za-tuska-inflacja-spadla-z-poziomu-18-proc-to-manipulacja/
+    - https://demagog.org.pl/wypowiedzi/inflacja-za-pis-i-obecnie-szlapka-manipuluje-danymi/
+    - https://demagog.org.pl/fake_news/euro-w-polsce-jeszcze-w-tym-roku-nie-ma-takiej-decyzji/
+  type: fact_check
+  quality_tier: B
+  fetch_mode: page
+  use: evidence
+  store_mode: excerpt_only
+  update: manual
+  license: "Demagog reuse terms, attributed short extracts for noncommercial demo use"
+  license_verified: true
+  qualification: "IFCN and EFCSN member. Short attributed excerpts only. Terms: https://demagog.org.pl/zasady-udostepniania-tresci/"
   excluded: false
   exclusion_reason: null

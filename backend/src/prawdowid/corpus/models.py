@@ -33,6 +33,7 @@ class SourceEntry(BaseModel):
     id: str = Field(pattern=r"^[a-z0-9_]+$")
     name: str
     publisher: str
+    language: str = "pl"
     domain: str
     urls: list[HttpUrl] = Field(min_length=1)
     type: SourceType
