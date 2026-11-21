@@ -232,12 +232,16 @@ def get_fetcher(handler) -> SafeFetcher:
 def test_fetcher_respects_robots_txt() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
         if request.url.path == "/robots.txt":
-            return httpx.Response(200, text="User-agent: *\nDisallow: /private/")
+            return httpx.Response(
+                200, text="User-agent: *\nDisallow: /private/\nAllow: /private/advisories/"
+            )
         return httpx.Response(200, text=ARTICLE_HTML, headers={"content-type": "text/html"})
 
     fetcher = get_fetcher(handler)
 
     assert asyncio.run(fetcher.fetch("https://site.example.test/public")).status_code == 200
+    allowed = asyncio.run(fetcher.fetch("https://site.example.test/private/advisories/update"))
+    assert allowed.status_code == 200
     with pytest.raises(FetchError) as error:
         asyncio.run(fetcher.fetch("https://site.example.test/private/page"))
     assert error.value.kind is FetchErrorKind.ROBOTS_DISALLOWED

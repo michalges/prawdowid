@@ -7,9 +7,9 @@ import time
 from dataclasses import dataclass, field
 from enum import StrEnum
 from urllib.parse import urljoin, urlsplit
-from urllib.robotparser import RobotFileParser
 
 import httpx
+from protego import Protego
 
 ALLOWED_SCHEMES = frozenset({"http", "https"})
 ALLOWED_PORTS = frozenset({80, 443})
@@ -76,7 +76,7 @@ class SafeFetcher:
     min_host_interval_s: float = 1.0
     check_addresses: bool = True
     transport: httpx.AsyncBaseTransport | None = None
-    _robots: dict[str, RobotFileParser | None] = field(default_factory=dict, init=False)
+    _robots: dict[str, Protego | None] = field(default_factory=dict, init=False)
     _last_request_at: dict[str, float] = field(default_factory=dict, init=False)
     _host_locks: dict[str, asyncio.Lock] = field(default_factory=dict, init=False)
 
@@ -138,18 +138,17 @@ class SafeFetcher:
         if origin not in self._robots:
             self._robots[origin] = await self._get_robots(client, origin)
         parser = self._robots[origin]
-        return parser is None or parser.can_fetch(self.user_agent, url)
+        return parser is None or parser.can_fetch(url, self.user_agent)
 
-    async def _get_robots(self, client: httpx.AsyncClient, origin: str) -> RobotFileParser | None:
+    async def _get_robots(self, client: httpx.AsyncClient, origin: str) -> Protego | None:
         try:
+            await self._wait_for_host(origin)
             response = await client.get(f"{origin}/robots.txt")
         except httpx.HTTPError:
             return None
         if response.status_code >= 400:
             return None
-        parser = RobotFileParser()
-        parser.parse(response.text.splitlines())
-        return parser
+        return Protego.parse(response.text)
 
     async def _wait_for_host(self, url: str) -> None:
         host = urlsplit(url).netloc
