@@ -1,0 +1,691 @@
+# Prawdowid source catalog (open, auditable). Rules: docs/SOURCES.md. Schema: docs/CONCEPT.md §6.3.
+# Seeded from the organizer's example list (MSZ challenge Discord, 2026-11-21).
+# Every entry starts with license_verified: false. Check terms + robots.txt before the first ingest.
+#
+# fetch_mode:
+#   listing    crawl a news/warnings index page, ingest each linked article (published_at from the article)
+#   page       ingest one static reference page
+#   live_link  dynamic map/dashboard/app; NOT ingested and never cited. Only shown as "check live data here"
+#   api        queried at check time through a provider with a mock (see docs/SOURCES.md §4)
+# use:
+#   evidence      can support or refute a claim
+#   context_only  shown as a context notice, never decides a verdict (CONCEPT §7.3)
+#   pointer       link for the user only
+
+# --- Government: warnings & crisis management ---------------------------------
+
+- id: gov_ostrzezenia
+  name: System ostrzeżeń (gov.pl)
+  publisher: KPRM / gov.pl
+  domain: gov.pl
+  urls:
+    - https://www.gov.pl/web/gov/ostrzezenia
+  # The organizer's ...#/_/mazowieckie/wszystkie link is the same page with a client-side region filter.
+  type: official_primary
+  quality_tier: A
+  fetch_mode: listing
+  use: evidence
+  store_mode: full_text
+  update: daily
+  license: "Public sector information (verify gov.pl terms)"
+  license_verified: false
+  qualification: "Official national warnings portal"
+  notes: "Check whether the warnings list renders without JS; if not, switch to live_link."
+  excluded: false
+  exclusion_reason: null
+
+- id: mswia_rso
+  name: Regionalny System Ostrzegania (RSO)
+  publisher: Ministerstwo Spraw Wewnętrznych i Administracji
+  domain: gov.pl
+  urls:
+    - https://www.gov.pl/web/mswia/regionalny-system-ostrzegania
+  type: official_primary
+  quality_tier: A
+  fetch_mode: page
+  use: evidence
+  store_mode: full_text
+  update: weekly
+  license: "Public sector information (verify gov.pl terms)"
+  license_verified: false
+  qualification: "MSWiA service for notifying citizens about threats"
+  excluded: false
+  exclusion_reason: null
+
+- id: rcb_raport_dobowy
+  name: Raport dobowy RCB
+  publisher: Rządowe Centrum Bezpieczeństwa
+  domain: gov.pl
+  urls:
+    - https://www.gov.pl/web/rcb/raport-dobowy3
+  type: official_primary
+  quality_tier: A
+  fetch_mode: listing
+  use: evidence
+  store_mode: full_text
+  update: daily
+  license: "Public sector information (verify gov.pl terms)"
+  license_verified: false
+  qualification: "Daily summary of crisis situations in Poland and relevant events abroad, by KCZK/RCB"
+  excluded: false
+  exclusion_reason: null
+
+- id: rcb_home
+  name: Rządowe Centrum Bezpieczeństwa
+  publisher: Rządowe Centrum Bezpieczeństwa
+  domain: gov.pl
+  urls:
+    - https://www.gov.pl/web/rcb/strona-glowna-rzadowego-centrum-bezpieczenstwa
+  type: official_primary
+  quality_tier: A
+  fetch_mode: listing
+  use: evidence
+  store_mode: full_text
+  update: daily
+  license: "Public sector information (verify gov.pl terms)"
+  license_verified: false
+  qualification: "Government crisis management center"
+  excluded: false
+  exclusion_reason: null
+
+- id: mswia
+  name: MSWiA
+  publisher: Ministerstwo Spraw Wewnętrznych i Administracji
+  domain: gov.pl
+  urls:
+    - https://www.gov.pl/web/mswia
+  type: official_primary
+  quality_tier: A
+  fetch_mode: listing
+  use: evidence
+  store_mode: full_text
+  update: daily
+  license: "Public sector information (verify gov.pl terms)"
+  license_verified: false
+  qualification: "Ministry of the Interior"
+  excluded: false
+  exclusion_reason: null
+
+- id: kprm_premier
+  name: Premier (KPRM)
+  publisher: Kancelaria Prezesa Rady Ministrów
+  domain: gov.pl
+  urls:
+    - https://www.gov.pl/web/premier
+  type: official_primary
+  quality_tier: A
+  fetch_mode: listing
+  use: evidence
+  store_mode: full_text
+  update: daily
+  license: "Public sector information (verify gov.pl terms)"
+  license_verified: false
+  qualification: "Prime Minister's office"
+  excluded: false
+  exclusion_reason: null
+
+# --- Foreign affairs / travel (organizer: MSZ) ----------------------------------
+
+- id: msz_podrozujacy
+  name: Informacje dla podróżujących
+  publisher: Ministerstwo Spraw Zagranicznych
+  domain: gov.pl
+  urls:
+    - https://www.gov.pl/web/dyplomacja/informacje-dla-podrozujacych
+  type: official_primary
+  quality_tier: A
+  fetch_mode: listing
+  use: evidence
+  store_mode: full_text
+  update: daily
+  license: "Public sector information (verify gov.pl terms)"
+  license_verified: false
+  qualification: "Official MSZ travel advisories per country"
+  excluded: false
+  exclusion_reason: null
+
+- id: msz_odyseusz
+  name: Odyseusz
+  publisher: Ministerstwo Spraw Zagranicznych
+  domain: odyseusz.gov.pl
+  urls:
+    - https://odyseusz.gov.pl/
+  type: official_primary
+  quality_tier: A
+  fetch_mode: live_link
+  use: pointer
+  store_mode: metadata_only
+  update: manual
+  license: "Verify terms"
+  license_verified: false
+  qualification: "MSZ registration service for Polish citizens travelling abroad"
+  notes: "Application, not a content source. Recommend it to users; don't ingest."
+  excluded: false
+  exclusion_reason: null
+
+# --- Police, fire service, defence ---------------------------------------------
+
+- id: policja_aktualnosci
+  name: Policja – aktualności
+  publisher: Komenda Główna Policji
+  domain: policja.pl
+  urls:
+    - https://policja.pl/pol/aktualnosci
+  type: official_primary
+  quality_tier: A
+  fetch_mode: listing
+  use: evidence
+  store_mode: full_text
+  update: daily
+  license: "Verify policja.pl terms"
+  license_verified: false
+  qualification: "National Police news"
+  excluded: false
+  exclusion_reason: null
+
+- id: policja_mazowiecka
+  name: Mazowiecka Policja – aktualności
+  publisher: Komenda Wojewódzka Policji z siedzibą w Radomiu
+  domain: mazowiecka.policja.gov.pl
+  urls:
+    - https://mazowiecka.policja.gov.pl/ra/aktualnosci/aktualnosci
+  type: official_primary
+  quality_tier: A
+  fetch_mode: listing
+  use: evidence
+  store_mode: full_text
+  update: daily
+  license: "Verify terms"
+  license_verified: false
+  qualification: "Regional police news (Mazowieckie)"
+  excluded: false
+  exclusion_reason: null
+
+- id: kgpsp_aktualnosci
+  name: Państwowa Straż Pożarna – aktualności
+  publisher: Komenda Główna Państwowej Straży Pożarnej
+  domain: gov.pl
+  urls:
+    - https://www.gov.pl/web/kgpsp/aktualnosci
+  type: official_primary
+  quality_tier: A
+  fetch_mode: listing
+  use: evidence
+  store_mode: full_text
+  update: daily
+  license: "Public sector information (verify gov.pl terms)"
+  license_verified: false
+  qualification: "National Fire Service news"
+  excluded: false
+  exclusion_reason: null
+
+- id: mon_aktualnosci
+  name: Ministerstwo Obrony Narodowej – aktualności
+  publisher: Ministerstwo Obrony Narodowej
+  domain: gov.pl
+  urls:
+    - https://www.gov.pl/web/obrona-narodowa/aktualnosci5
+  type: official_primary
+  quality_tier: A
+  fetch_mode: listing
+  use: evidence
+  store_mode: full_text
+  update: daily
+  license: "Public sector information (verify gov.pl terms)"
+  license_verified: false
+  qualification: "Ministry of National Defence news"
+  excluded: false
+  exclusion_reason: null
+
+# --- Health, radiation, air, cyber ----------------------------------------------
+
+- id: gis_ostrzezenia
+  name: GIS – ostrzeżenia
+  publisher: Główny Inspektorat Sanitarny
+  domain: gov.pl
+  urls:
+    - https://www.gov.pl/web/gis/ostrzezenia
+  type: official_primary
+  quality_tier: A
+  fetch_mode: listing
+  use: evidence
+  store_mode: full_text
+  update: daily
+  license: "Public sector information (verify gov.pl terms)"
+  license_verified: false
+  qualification: "Official public-health warnings (e.g. product recalls)"
+  excluded: false
+  exclusion_reason: null
+
+- id: paa
+  name: Państwowa Agencja Atomistyki
+  publisher: Państwowa Agencja Atomistyki
+  domain: gov.pl
+  urls:
+    - https://www.gov.pl/web/paa/panstwowa-agencja-atomistyki
+  type: official_primary
+  quality_tier: A
+  fetch_mode: listing
+  use: evidence
+  store_mode: full_text
+  update: daily
+  license: "Public sector information (verify gov.pl terms)"
+  license_verified: false
+  qualification: "National nuclear and radiation safety authority"
+  excluded: false
+  exclusion_reason: null
+
+- id: paa_monitoring
+  name: PAA – monitoring radiacyjny
+  publisher: Państwowa Agencja Atomistyki
+  domain: monitoring.paa.gov.pl
+  urls:
+    - https://monitoring.paa.gov.pl/
+  type: official_primary
+  quality_tier: A
+  fetch_mode: live_link
+  use: pointer
+  store_mode: metadata_only
+  update: manual
+  license: "Verify terms"
+  license_verified: false
+  qualification: "Live radiation monitoring"
+  notes: "Live dashboard. Point users to it for 'radiation level' claims."
+  excluded: false
+  exclusion_reason: null
+
+- id: gios_powietrze
+  name: GIOŚ – jakość powietrza
+  publisher: Główny Inspektorat Ochrony Środowiska
+  domain: powietrze.gios.gov.pl
+  urls:
+    - https://powietrze.gios.gov.pl/pjp/
+  type: official_primary
+  quality_tier: A
+  fetch_mode: live_link
+  use: pointer
+  store_mode: metadata_only
+  update: manual
+  license: "Verify terms"
+  license_verified: false
+  qualification: "Official air-quality measurements"
+  notes: "Live data. An API may be a later premium source."
+  excluded: false
+  exclusion_reason: null
+
+- id: cert_komunikaty
+  name: CERT Polska – komunikaty
+  publisher: CERT Polska (NASK)
+  domain: moje.cert.pl
+  urls:
+    - https://moje.cert.pl/komunikaty/
+  type: official_primary
+  quality_tier: A
+  fetch_mode: listing
+  use: evidence
+  store_mode: full_text
+  update: daily
+  license: "Verify terms"
+  license_verified: false
+  qualification: "National CSIRT security advisories (phishing, scams)"
+  excluded: false
+  exclusion_reason: null
+
+# --- Transport: road, rail, air, sea, inland water --------------------------------
+
+- id: mi_infrastruktura
+  name: Ministerstwo Infrastruktury
+  publisher: Ministerstwo Infrastruktury
+  domain: gov.pl
+  urls:
+    - https://www.gov.pl/web/infrastruktura
+    - https://www.gov.pl/web/infrastruktura/aktualnosci
+  type: official_primary
+  quality_tier: A
+  fetch_mode: listing
+  use: evidence
+  store_mode: full_text
+  update: daily
+  license: "Public sector information (verify gov.pl terms)"
+  license_verified: false
+  qualification: "Ministry of Infrastructure news"
+  excluded: false
+  exclusion_reason: null
+
+- id: mi_prawa_pasazerow
+  name: MI – prawa pasażerów, infolinia, kontakt
+  publisher: Ministerstwo Infrastruktury
+  domain: gov.pl
+  urls:
+    - https://www.gov.pl/web/infrastruktura/prawa-pasazerow
+    - https://www.gov.pl/web/infrastruktura/infolinia-dla-obywatela
+    - https://www.gov.pl/web/infrastruktura/dane-kontaktowe
+  type: official_primary
+  quality_tier: A
+  fetch_mode: page
+  use: evidence
+  store_mode: full_text
+  update: weekly
+  license: "Public sector information (verify gov.pl terms)"
+  license_verified: false
+  qualification: "Official passenger-rights and contact reference"
+  excluded: false
+  exclusion_reason: null
+
+- id: gddkia_informacje
+  name: GDDKiA – informacje drogowe
+  publisher: Generalna Dyrekcja Dróg Krajowych i Autostrad
+  domain: drogi.gddkia.gov.pl
+  urls:
+    - https://drogi.gddkia.gov.pl/informacje-drogowe
+    - https://drogi.gddkia.gov.pl/informacje-drogowe/lista-utrudnien
+  type: official_primary
+  quality_tier: A
+  fetch_mode: listing
+  use: evidence
+  store_mode: full_text
+  update: daily
+  license: "Verify terms"
+  license_verified: false
+  qualification: "Official national-road disruption list"
+  notes: "Changes fast. Freshness matters more than usual (archival notice after 1 day)."
+  excluded: false
+  exclusion_reason: null
+
+- id: gddkia_mapa
+  name: GDDKiA – mapa informacji drogowej
+  publisher: Generalna Dyrekcja Dróg Krajowych i Autostrad
+  domain: drogi.gddkia.gov.pl
+  urls:
+    - https://drogi.gddkia.gov.pl/mapy/mapa-informacji-drogowej
+  type: official_primary
+  quality_tier: A
+  fetch_mode: live_link
+  use: pointer
+  store_mode: metadata_only
+  update: manual
+  license: "Verify terms"
+  license_verified: false
+  qualification: "Live road map"
+  excluded: false
+  exclusion_reason: null
+
+- id: gddkia_19111
+  name: GDDKiA – informacja drogowa 19 111
+  publisher: Generalna Dyrekcja Dróg Krajowych i Autostrad
+  domain: gov.pl
+  urls:
+    - https://www.gov.pl/web/gddkia/informacja-drogowa---19-111
+  type: official_primary
+  quality_tier: A
+  fetch_mode: page
+  use: evidence
+  store_mode: full_text
+  update: weekly
+  license: "Public sector information (verify gov.pl terms)"
+  license_verified: false
+  qualification: "Official road-information hotline page"
+  excluded: false
+  exclusion_reason: null
+
+- id: ulc
+  name: Urząd Lotnictwa Cywilnego
+  publisher: Urząd Lotnictwa Cywilnego
+  domain: ulc.gov.pl
+  urls:
+    - https://ulc.gov.pl/
+  type: official_primary
+  quality_tier: A
+  fetch_mode: listing
+  use: evidence
+  store_mode: full_text
+  update: daily
+  license: "Verify terms"
+  license_verified: false
+  qualification: "Civil aviation authority"
+  excluded: false
+  exclusion_reason: null
+
+- id: ulc_prawa_pasazera
+  name: ULC – prawa pasażera
+  publisher: Urząd Lotnictwa Cywilnego
+  domain: ulc.gov.pl
+  urls:
+    - https://ulc.gov.pl/prawa-pasazera
+    - https://ulc.gov.pl/prawa-pasazera/poradnik-dla-pasazerow
+  type: official_primary
+  quality_tier: A
+  fetch_mode: page
+  use: evidence
+  store_mode: full_text
+  update: weekly
+  license: "Verify terms"
+  license_verified: false
+  qualification: "Air passenger rights guide"
+  excluded: false
+  exclusion_reason: null
+
+- id: portal_pasazera
+  name: Portal Pasażera
+  publisher: PKP Polskie Linie Kolejowe S.A.
+  domain: portalpasazera.pl
+  urls:
+    - https://portalpasazera.pl/
+  type: official_primary
+  quality_tier: A
+  fetch_mode: live_link
+  use: pointer
+  store_mode: metadata_only
+  update: manual
+  license: "Verify terms"
+  license_verified: false
+  qualification: "Rail infrastructure manager's timetable and disruption portal"
+  notes: "Live search app. Disruption notices may be ingestable; check first."
+  excluded: false
+  exclusion_reason: null
+
+- id: utk_pasazerowie
+  name: UTK – pasażerowie
+  publisher: Urząd Transportu Kolejowego
+  domain: utk.gov.pl
+  urls:
+    - https://utk.gov.pl/pl/pasazerowie
+  type: official_primary
+  quality_tier: A
+  fetch_mode: listing
+  use: evidence
+  store_mode: full_text
+  update: weekly
+  license: "Verify terms"
+  license_verified: false
+  qualification: "Rail transport regulator, passenger information"
+  excluded: false
+  exclusion_reason: null
+
+- id: kgsok
+  name: Straż Ochrony Kolei
+  publisher: Komenda Główna Straży Ochrony Kolei
+  domain: kgsok.pl
+  urls:
+    - https://kgsok.pl/
+  type: official_primary
+  quality_tier: A
+  fetch_mode: listing
+  use: evidence
+  store_mode: full_text
+  update: weekly
+  license: "Verify terms"
+  license_verified: false
+  qualification: "Railway protection service"
+  excluded: false
+  exclusion_reason: null
+
+- id: sar
+  name: Morska Służba Poszukiwania i Ratownictwa (SAR)
+  publisher: Morska Służba Poszukiwania i Ratownictwa
+  domain: sar.gov.pl
+  urls:
+    - https://www.sar.gov.pl/
+  type: official_primary
+  quality_tier: A
+  fetch_mode: listing
+  use: evidence
+  store_mode: full_text
+  update: weekly
+  license: "Verify terms"
+  license_verified: false
+  qualification: "Maritime search and rescue service"
+  excluded: false
+  exclusion_reason: null
+
+- id: um_gdynia
+  name: Urząd Morski w Gdyni
+  publisher: Urząd Morski w Gdyni
+  domain: umgdy.gov.pl
+  urls:
+    - https://www.umgdy.gov.pl/
+  type: official_primary
+  quality_tier: A
+  fetch_mode: listing
+  use: evidence
+  store_mode: full_text
+  update: weekly
+  license: "Verify terms"
+  license_verified: false
+  qualification: "Maritime administration (Gdynia)"
+  excluded: false
+  exclusion_reason: null
+
+- id: um_szczecin_zegluga
+  name: Urząd Morski w Szczecinie – warunki żeglugi
+  publisher: Urząd Morski w Szczecinie
+  domain: ums.gov.pl
+  urls:
+    - https://www.ums.gov.pl/bezpieczenstwo-morskie/warunki-zeglugi
+  type: official_primary
+  quality_tier: A
+  fetch_mode: listing
+  use: evidence
+  store_mode: full_text
+  update: daily
+  license: "Verify terms"
+  license_verified: false
+  qualification: "Maritime administration (Szczecin), navigation conditions"
+  excluded: false
+  exclusion_reason: null
+
+- id: wody_polskie_nawigacja
+  name: Wody Polskie – komunikaty nawigacyjne
+  publisher: Państwowe Gospodarstwo Wodne Wody Polskie
+  domain: gov.pl
+  urls:
+    - https://www.gov.pl/web/wody-polskie/komunikaty-nawigacyjne
+  type: official_primary
+  quality_tier: A
+  fetch_mode: listing
+  use: evidence
+  store_mode: full_text
+  update: daily
+  license: "Public sector information (verify gov.pl terms)"
+  license_verified: false
+  qualification: "Inland waterway navigation notices"
+  excluded: false
+  exclusion_reason: null
+
+# --- Weather & hydrology (IMGW-PIB) ---------------------------------------------
+
+- id: imgw_meteo
+  name: IMGW – meteo
+  publisher: Instytut Meteorologii i Gospodarki Wodnej – PIB
+  domain: meteo.imgw.pl
+  urls:
+    - https://meteo.imgw.pl/
+  type: official_primary
+  quality_tier: A
+  fetch_mode: live_link
+  use: pointer
+  store_mode: metadata_only
+  update: manual
+  license: "Verify terms"
+  license_verified: false
+  qualification: "Official weather service, forecasts and warnings"
+  notes: "Live app. IMGW public data (danepubliczne.imgw.pl) may serve warnings via API; check later."
+  excluded: false
+  exclusion_reason: null
+
+- id: imgw_hydro
+  name: IMGW – hydro
+  publisher: Instytut Meteorologii i Gospodarki Wodnej – PIB
+  domain: hydro.imgw.pl
+  urls:
+    - https://hydro.imgw.pl/
+  type: official_primary
+  quality_tier: A
+  fetch_mode: live_link
+  use: pointer
+  store_mode: metadata_only
+  update: manual
+  license: "Verify terms"
+  license_verified: false
+  qualification: "Official hydrological service (river levels, flood warnings)"
+  excluded: false
+  exclusion_reason: null
+
+- id: imgw_baltyk
+  name: IMGW – Bałtyk
+  publisher: Instytut Meteorologii i Gospodarki Wodnej – PIB
+  domain: baltyk.imgw.pl
+  urls:
+    - https://baltyk.imgw.pl/
+  type: official_primary
+  quality_tier: A
+  fetch_mode: live_link
+  use: pointer
+  store_mode: metadata_only
+  update: manual
+  license: "Verify terms"
+  license_verified: false
+  qualification: "Official Baltic Sea conditions"
+  excluded: false
+  exclusion_reason: null
+
+# --- External APIs (queried at check time, behind providers with mocks) -----------
+
+- id: google_factcheck
+  name: Google Fact Check Tools API (ClaimReview)
+  publisher: "Individual fact-checking organizations (aggregated by Google)"
+  domain: factchecktools.googleapis.com
+  urls:
+    - https://developers.google.com/fact-check/tools/api/reference/rest
+    - https://toolbox.google.com/factcheck/explorer/search/list:recent;hl=pl
+  type: fact_check
+  quality_tier: B
+  fetch_mode: api
+  use: evidence
+  store_mode: excerpt_only
+  update: daily
+  license: "Google API Terms of Service + each publisher's terms (verify)"
+  license_verified: false
+  qualification: "ClaimReview markup from fact-checkers; tier B only when the publisher is an IFCN/EFCSN signatory"
+  notes: "Needs GOOGLE_FACTCHECK_API_KEY. The rating is the fact-checker's label, not ours; see docs/SOURCES.md §4."
+  excluded: false
+  exclusion_reason: null
+
+- id: euvsdisinfo
+  name: EUvsDisinfo database
+  publisher: EEAS East StratCom Task Force
+  domain: euvsdisinfo.eu
+  urls:
+    - https://euvsdisinfo.eu/public-docs/How_to_grab_all_Articles_and_Cases_from_disinfo.pdf
+  type: disinfo_db
+  quality_tier: B
+  fetch_mode: api
+  use: context_only
+  store_mode: excerpt_only
+  update: weekly
+  license: "Verify EUvsDisinfo terms"
+  license_verified: false
+  qualification: "Known pro-Kremlin disinformation cases; used to say 'similar narratives appeared in hostile information operations'"
+  notes: "Access as described in the organizer's PDF; tokens from the organizer on request. Needs EUVSDISINFO_TOKEN."
+  excluded: false
+  exclusion_reason: null
