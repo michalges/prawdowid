@@ -1,5 +1,7 @@
 import { Link, Outlet } from '@tanstack/react-router'
 
+import { LogoMark } from './LogoMark'
+
 const NAV_ITEMS = [
   { to: '/', label: 'Sprawdź' },
   { to: '/historia', label: 'Historia' },
@@ -11,10 +13,7 @@ const NAV_LINK_CLASS = 'inline-flex min-h-11 items-center rounded-pill px-3 text
 function Wordmark() {
   return (
     <Link to="/" className="flex items-center gap-2 rounded-md" aria-label="Prawdowid, strona główna">
-      <span aria-hidden className="flex h-4 w-6 flex-col overflow-hidden rounded-sm border border-border">
-        <span className="flex-1 bg-surface" />
-        <span className="flex-1 bg-brand-600" />
-      </span>
+      <LogoMark className="size-7" />
       <span className="text-heading font-bold tracking-tight text-ink">Prawdowid</span>
     </Link>
   )
