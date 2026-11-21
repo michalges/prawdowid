@@ -9,7 +9,7 @@ export function TransparencyNote({ isDetailed = false }: { isDetailed?: boolean 
     <div className="flex flex-col gap-1 text-center text-meta text-ink-subtle">
       <p>Wspierane przez AI: zawsze zajrzyj do źródeł. Prawdowid nie jest „sędzią prawdy”.</p>
       {model && isDetailed && <p className="text-body-sm text-ink-muted">{model.data_processing_pl}</p>}
-      {model && (
+      {model && isDetailed && (
         <p className="font-mono">
           {model.llm_provider} · korpus {model.corpus_version ?? 'brak'}
         </p>
