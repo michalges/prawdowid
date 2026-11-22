@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <title>Prawdowid extension stage</title>
+    <!-- Copied into the extension's dist/ at record time so the real popup can be framed same-origin. -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Source+Serif+4:wght@400;700&family=Noto+Color+Emoji&display=block"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        font-family: Roboto, 'Noto Color Emoji', sans-serif;
+        background: #dfe3ea;
+      }
+
+      .window {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        background: #ffffff;
+      }
+
+      .tabs {
+        height: 40px;
+        background: #dee1e6;
+        display: flex;
+        align-items: flex-end;
+        padding: 0 8px;
+        gap: 4px;
+      }
+
+      .tab {
+        height: 32px;
+        padding: 0 14px;
+        border-radius: 8px 8px 0 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 13px;
+        color: #3c4043;
+        width: 230px;
+      }
+
+      .tab.active {
+        background: #ffffff;
+      }
+
+      .favicon {
+        width: 16px;
+        height: 16px;
+        border-radius: 4px;
+        background: #b3261e;
+        flex: none;
+      }
+
+      .toolbar {
+        height: 46px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 12px;
+        border-bottom: 1px solid #dadce0;
+        color: #5f6368;
+        font-size: 18px;
+      }
+
+      .omnibox {
+        flex: 1;
+        height: 34px;
+        border-radius: 17px;
+        background: #f1f3f4;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        font-size: 14px;
+        color: #202124;
+      }
+
+      .omnibox span {
+        color: #5f6368;
+      }
+
+      .ext-icon {
+        position: relative;
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+      }
+
+      .ext-icon.active {
+        background: #e8eaed;
+      }
+
+      .ext-icon img {
+        width: 20px;
+        height: 20px;
+      }
+
+      .badge {
+        position: absolute;
+        right: -4px;
+        bottom: -2px;
+        min-width: 16px;
+        height: 14px;
+        padding: 0 3px;
+        border-radius: 7px;
+        background: #1f5fae;
+        color: #ffffff;
+        font-size: 10px;
+        line-height: 14px;
+        text-align: center;
+        display: none;
+      }
+
+      .page {
+        flex: 1;
+        overflow: hidden;
+        background: #ffffff;
+      }
+
+      .site-header {
+        height: 64px;
+        display: flex;
+        align-items: center;
+        padding: 0 120px;
+        border-bottom: 3px solid #202124;
+        font-family: 'Source Serif 4', serif;
+        font-weight: 700;
+        font-size: 28px;
+        color: #202124;
+        gap: 40px;
+      }
+
+      .site-header nav {
+        font-family: Roboto, sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        gap: 22px;
+        color: #5f6368;
+      }
+
+      .article {
+        max-width: 760px;
+        margin: 36px 0 0 120px;
+        color: #202124;
+      }
+
+      .kicker {
+        font-size: 13px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #b3261e;
+      }
+
+      .article h1 {
+        font-family: 'Source Serif 4', serif;
+        font-size: 40px;
+        line-height: 48px;
+        margin: 10px 0 12px;
+      }
+
+      .byline {
+        font-size: 14px;
+        color: #5f6368;
+        margin-bottom: 24px;
+      }
+
+      .article p {
+        font-family: 'Source Serif 4', serif;
+        font-size: 20px;
+        line-height: 34px;
+        margin: 0 0 18px;
+      }
+
+      .word {
+        border-radius: 2px;
+      }
+
+      .word.selected {
+        background: #b4d5fe;
+      }
+
+      .context-menu {
+        position: absolute;
+        width: 330px;
+        padding: 6px 0;
+        background: #ffffff;
+        border-radius: 8px;
+        box-shadow:
+          0 4px 18px rgba(0, 0, 0, 0.22),
+          0 0 0 1px rgba(0, 0, 0, 0.06);
+        font-size: 14px;
+        color: #202124;
+        display: none;
+        z-index: 20;
+      }
+
+      .context-menu.visible {
+        display: block;
+      }
+
+      .context-menu div {
+        padding: 7px 18px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .context-menu hr {
+        border: 0;
+        border-top: 1px solid #e8eaed;
+        margin: 5px 0;
+      }
+
+      .context-menu img {
+        width: 16px;
+        height: 16px;
+      }
+
+      .context-menu .hover {
+        background: #e8eaed;
+      }
+
+      .popup {
+        position: absolute;
+        right: 10px;
+        top: 84px;
+        width: 432px;
+        height: 640px;
+        border: 0;
+        border-radius: 10px;
+        background: #ffffff;
+        box-shadow:
+          0 8px 28px rgba(0, 0, 0, 0.28),
+          0 0 0 1px rgba(0, 0, 0, 0.06);
+        opacity: 0;
+        transform: translateY(-8px) scale(0.98);
+        transform-origin: top right;
+        transition:
+          opacity 180ms ease,
+          transform 180ms ease;
+        z-index: 30;
+      }
+
+      .popup.visible {
+        opacity: 1;
+        transform: none;
+      }
+
+      .cursor {
+        position: fixed;
+        width: 22px;
+        height: 30px;
+        pointer-events: none;
+        z-index: 1000;
+        transition:
+          left 500ms cubic-bezier(0.3, 0.7, 0.2, 1),
+          top 500ms cubic-bezier(0.3, 0.7, 0.2, 1);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="window">
+      <div class="tabs">
+        <div class="tab active"><div class="favicon"></div>Tunel do Szwecji gotowy?</div>
+        <div class="tab"><div class="favicon" style="background: #1a73e8"></div>Poczta</div>
+      </div>
+      <div class="toolbar">
+        <span>←</span><span>→</span><span>↻</span>
+        <div class="omnibox"><span>portal-codzienny.example/</span>&nbsp;kraj/tunel-gdynia-szwecja</div>
+        <div class="ext-icon" id="ext-icon"><img src="icons/icon-32.png" alt="" /><span class="badge" id="badge">…</span></div>
+        <span>⋮</span>
+      </div>
+      <div class="page">
+        <div class="site-header">
+          Portal Codzienny
+          <nav><span>Kraj</span><span>Świat</span><span>Gospodarka</span><span>Technologie</span></nav>
+        </div>
+        <div class="article">
+          <div class="kicker">Infrastruktura</div>
+          <h1>Kierowcy zachwyceni. „Jedziemy do Szwecji pod morzem”</h1>
+          <div class="byline">Opublikowano dziś, 07:45 · 4 min czytania</div>
+          <p>
+            Mieszkańcy Pomorza od rana dzielą się zdjęciami z inauguracji.
+            <span id="claim">W Gdyni otwarto podmorski tunel samochodowy do Szwecji.</span>
+            Przejazd ma trwać niecałe dwie godziny, a bilety mają kosztować mniej niż prom.
+          </p>
+          <p>Na nagraniach widać kolejki samochodów przy wjeździe i transparenty z napisem „Witaj, Skandynawio”.</p>
+        </div>
+      </div>
+    </div>
+    <div class="context-menu" id="menu">
+      <div>Kopiuj</div>
+      <div>Szukaj w internecie: „W Gdyni otwarto…”</div>
+      <div>Drukuj…</div>
+      <hr />
+      <div id="menu-item"><img src="icons/icon-16.png" alt="" />Sprawdź zaznaczony tekst w Prawdowidzie</div>
+      <hr />
+      <div>Zbadaj</div>
+    </div>
+    <iframe class="popup" id="popup" title="Prawdowid"></iframe>
+    <svg class="cursor" id="cursor" viewBox="0 0 22 30" style="left: 900px; top: 700px">
+      <path d="M2 2v22l6-6 4 9 4-2-4-9h8z" fill="#ffffff" stroke="#202124" stroke-width="1.6" stroke-linejoin="round" />
+    </svg>
+
+    <script src="extension_stage.js"></script>
+  </body>
+</html>

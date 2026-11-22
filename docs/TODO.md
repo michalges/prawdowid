@@ -86,6 +86,8 @@ What's missing or incomplete, kept current while working. Order follows CONCEPT 
 - [x] Coolify Compose deployment, source collection setup on first start and persistent storage
 - [ ] Deploy on Coolify, then publish the demo URL + Discord invite link
 - [ ] Description ≤ 4,000 characters, PDF deck ≤ 12 slides, video ≤ 3 min
+- [x] ~47 s horizontal pitch video of all four channels (`docs/design/demo/pitch.mp4`, scripts in `docs/design/demo/pitch/`)
+- [ ] Pitch video: add a royalty-free music track / voice-over (currently silent)
 
 ## Premium (after the gate passes; CONCEPT §9 order)
 - [x] OCR screenshots (Tesseract `pol`, transcript shown, limits disclosed)

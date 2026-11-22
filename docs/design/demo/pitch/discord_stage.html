@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="pl">
+  <head>
+    <meta charset="utf-8" />
+    <title>Prawdowid Discord stage</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600;700&family=Noto+Color+Emoji&family=IBM+Plex+Mono&display=block"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        font-family: 'Noto Sans', 'Noto Color Emoji', sans-serif;
+        background: #1e1f22;
+        color: #dbdee1;
+      }
+
+      .app {
+        display: grid;
+        grid-template-columns: 72px 240px 1fr;
+        height: 100%;
+      }
+
+      .servers {
+        background: #1e1f22;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        padding-top: 12px;
+      }
+
+      .server {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: #313338;
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        color: #dbdee1;
+      }
+
+      .server.active {
+        border-radius: 16px;
+        background: #4752c4;
+        color: #ffffff;
+      }
+
+      .channels {
+        background: #2b2d31;
+        padding: 0 8px;
+      }
+
+      .guild-name {
+        height: 48px;
+        display: flex;
+        align-items: center;
+        padding: 0 8px;
+        font-weight: 600;
+        color: #f2f3f5;
+        border-bottom: 1px solid #1f2023;
+        margin: 0 -8px 12px;
+        padding-left: 16px;
+      }
+
+      .category {
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: #949ba4;
+        margin: 16px 8px 4px;
+      }
+
+      .channel {
+        padding: 6px 8px;
+        border-radius: 4px;
+        color: #949ba4;
+        font-size: 15px;
+      }
+
+      .channel.active {
+        background: #404249;
+        color: #f2f3f5;
+      }
+
+      .chat {
+        background: #313338;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+
+      .chat-header {
+        height: 48px;
+        flex: none;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        font-weight: 600;
+        color: #f2f3f5;
+        border-bottom: 1px solid #26272b;
+        gap: 8px;
+      }
+
+      .chat-header span {
+        color: #80848e;
+        font-size: 22px;
+      }
+
+      .messages {
+        flex: 1;
+        overflow: hidden;
+        padding: 16px 0 8px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+      }
+
+      .scroller {
+        transition: transform 900ms cubic-bezier(0.3, 0.7, 0.2, 1);
+      }
+
+      .message {
+        display: grid;
+        grid-template-columns: 56px 1fr;
+        padding: 6px 16px 6px 0;
+        margin-top: 12px;
+        animation: appear 260ms ease both;
+      }
+
+      @keyframes appear {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+      }
+
+      .avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        margin-left: 16px;
+        background: linear-gradient(135deg, #f6b26b, #e06666);
+      }
+
+      .avatar img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+      }
+
+      .author {
+        font-weight: 600;
+        color: #f2f3f5;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .author time {
+        font-size: 12px;
+        font-weight: 400;
+        color: #949ba4;
+      }
+
+      .tag {
+        font-size: 10px;
+        font-weight: 600;
+        background: #5865f2;
+        color: #ffffff;
+        padding: 1px 5px;
+        border-radius: 4px;
+      }
+
+      .content {
+        font-size: 16px;
+        line-height: 22px;
+        color: #dbdee1;
+      }
+
+      .command-line {
+        font-size: 14px;
+        color: #949ba4;
+        margin: 0 0 2px 56px;
+        padding-top: 8px;
+      }
+
+      .command-line b {
+        color: #c9cdfb;
+        font-weight: 500;
+      }
+
+      .thinking {
+        color: #949ba4;
+        font-style: italic;
+      }
+
+      .embed {
+        margin-top: 8px;
+        max-width: 760px;
+        background: #2b2d31;
+        border-left: 4px solid var(--embed-color);
+        border-radius: 4px;
+        padding: 12px 16px 14px 12px;
+        display: grid;
+        gap: 8px;
+        animation: appear 300ms ease both;
+      }
+
+      .embed-title {
+        font-weight: 600;
+        color: #00a8fc;
+        font-size: 16px;
+        line-height: 22px;
+      }
+
+      .embed-description {
+        font-size: 14px;
+        line-height: 20px;
+      }
+
+      .field-name {
+        font-weight: 600;
+        font-size: 14px;
+        color: #f2f3f5;
+        margin-bottom: 2px;
+      }
+
+      .field-value {
+        font-size: 14px;
+        line-height: 20px;
+        white-space: pre-wrap;
+      }
+
+      .field-value a,
+      .embed-description a {
+        color: #00a8fc;
+        text-decoration: none;
+      }
+
+      .field-value code {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 12px;
+        background: #1e1f22;
+        padding: 1px 4px;
+        border-radius: 3px;
+      }
+
+      .embed-footer {
+        font-size: 12px;
+        color: #949ba4;
+      }
+
+      .composer {
+        flex: none;
+        margin: 0 16px 20px;
+        min-height: 48px;
+        border-radius: 8px;
+        background: #383a40;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        font-size: 16px;
+        color: #dbdee1;
+        gap: 8px;
+        position: relative;
+      }
+
+      .composer .placeholder {
+        color: #6d6f78;
+      }
+
+      .composer .slash {
+        background: #4e5058;
+        color: #f2f3f5;
+        padding: 1px 6px;
+        border-radius: 4px;
+        font-weight: 500;
+      }
+
+      .composer .option {
+        background: #2b2d31;
+        border-radius: 4px;
+        padding: 1px 6px;
+        color: #c9cdfb;
+      }
+
+      .caret {
+        display: inline-block;
+        width: 2px;
+        height: 20px;
+        background: #dbdee1;
+        animation: blink 1s steps(1) infinite;
+        vertical-align: middle;
+      }
+
+      @keyframes blink {
+        50% {
+          opacity: 0;
+        }
+      }
+
+      .suggestions {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 56px;
+        background: #2b2d31;
+        border-radius: 8px;
+        padding: 8px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        display: none;
+      }
+
+      .suggestions.visible {
+        display: block;
+      }
+
+      .suggestion {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px;
+        border-radius: 4px;
+        background: #404249;
+      }
+
+      .suggestion img {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+      }
+
+      .suggestion small {
+        color: #949ba4;
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <nav class="servers">
+        <div class="server">OS</div>
+        <div class="server active">KS</div>
+        <div class="server">GR</div>
+        <div class="server">+</div>
+      </nav>
+      <aside class="channels">
+        <div class="guild-name">Klub Seniora Mokotów</div>
+        <div class="category">Kanały tekstowe</div>
+        <div class="channel"># ogólny</div>
+        <div class="channel active"># sprawdzamy-newsy</div>
+        <div class="channel"># wycieczki</div>
+        <div class="channel"># ogłoszenia</div>
+      </aside>
+      <main class="chat">
+        <div class="chat-header"><span>#</span>sprawdzamy-newsy</div>
+        <div class="messages">
+          <div class="scroller" id="scroller">
+            <div class="message" style="animation: none">
+              <div class="avatar" style="background: linear-gradient(135deg, #6fa8dc, #3d85c6)"></div>
+              <div>
+                <div class="author">Marek <time>dzisiaj o 18:02</time></div>
+                <div class="content">Widziałem na grupie, że gaz ma być zamrożony na 2027. Ktoś wie, czy to prawda? 🤔</div>
+              </div>
+            </div>
+            <div id="feed"></div>
+          </div>
+        </div>
+        <div class="composer" id="composer">
+          <div class="suggestions" id="suggestions">
+            <div class="suggestion">
+              <img src="../../logo/discord/avatar-512.png" alt="" />
+              <div><b>/sprawdz</b> <small>Prawdowid · Sprawdź informację w oficjalnych źródłach</small></div>
+            </div>
+          </div>
+          <span class="placeholder" id="placeholder">Napisz na #sprawdzamy-newsy</span>
+          <span id="typed"></span><span class="caret" id="caret" style="display: none"></span>
+        </div>
+      </main>
+    </div>
+
+    <script>
+      const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+      const $ = (id) => document.getElementById(id)
+
+      function escapeHtml(text) {
+        return text.replace(/[&<>"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[char])
+      }
+
+      function getMarkdownHtml(text) {
+        return escapeHtml(text)
+          .replace(/\[([^\]]+)\]\((https?:[^)]+)\)/g, '<a>$1</a>')
+          .replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>')
+          .replace(/\*([^*]+)\*/g, '<i>$1</i>')
+          .replace(/`([^`]+)`/g, '<code>$1</code>')
+      }
+
+      function getEmbedElement(embed) {
+        const element = document.createElement('div')
+        element.className = 'embed'
+        element.style.setProperty('--embed-color', `#${(embed.color ?? 0).toString(16).padStart(6, '0')}`)
+        const parts = []
+        if (embed.title) parts.push(`<div class="embed-title">${escapeHtml(embed.title)}</div>`)
+        if (embed.description) parts.push(`<div class="embed-description">${getMarkdownHtml(embed.description)}</div>`)
+        for (const field of embed.fields ?? []) {
+          parts.push(
+            `<div><div class="field-name">${escapeHtml(field.name)}</div><div class="field-value">${getMarkdownHtml(field.value)}</div></div>`,
+          )
+        }
+        if (embed.footer) parts.push(`<div class="embed-footer">${escapeHtml(embed.footer.text)}</div>`)
+        element.innerHTML = parts.join('')
+        return element
+      }
+
+      function addMessage(html) {
+        const element = document.createElement('div')
+        element.innerHTML = html
+        while (element.firstChild) $('feed').append(element.firstChild)
+      }
+
+      async function typeText(text, delay) {
+        for (const char of text) {
+          $('typed').innerHTML += escapeHtml(char)
+          await wait(delay)
+        }
+      }
+
+      window.stage = {
+        async run(claim) {
+          $('placeholder').style.display = 'none'
+          $('caret').style.display = 'inline-block'
+          await wait(400)
+          $('typed').textContent = '/'
+          $('suggestions').classList.add('visible')
+          await wait(700)
+          $('suggestions').classList.remove('visible')
+          $('typed').innerHTML = '<span class="slash">/sprawdz</span> <span class="option">treść</span> '
+          await wait(350)
+          await typeText(claim, 16)
+          await wait(500)
+          $('typed').innerHTML = ''
+          $('caret').style.display = 'none'
+          $('placeholder').style.display = ''
+          addMessage(`
+            <div class="command-line">↳ <b>Ola</b> użyła <b>/sprawdz</b></div>
+            <div class="message" id="bot-message" style="margin-top: 0">
+              <div class="avatar" style="background: none"><img src="../../logo/discord/avatar-512.png" alt="" /></div>
+              <div id="bot-body">
+                <div class="author">Prawdowid <span class="tag">✓ APLIKACJA</span> <time>dzisiaj o 18:04</time></div>
+                <div class="content thinking">Prawdowid myśli…</div>
+              </div>
+            </div>`)
+          await wait(1500)
+          const body = $('bot-body')
+          body.querySelector('.thinking').remove()
+          for (const embed of window.EMBEDS[0]) body.append(getEmbedElement(embed))
+          $('scroller').style.transition = 'none'
+          await this.showBotMessageTop()
+          $('scroller').style.transition = ''
+        },
+
+        async showBotMessageTop() {
+          const container = $('scroller').parentElement.getBoundingClientRect()
+          const message = $('bot-message').getBoundingClientRect()
+          const offset = Math.max(container.top - message.top + 8, 0)
+          $('scroller').style.transform = `translateY(${offset}px)`
+          await wait(950)
+        },
+
+        async scrollToBottom() {
+          $('scroller').style.transform = 'translateY(0)'
+          await wait(950)
+        },
+      }
+    </script>
+  </body>
+</html>
