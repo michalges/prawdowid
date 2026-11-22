@@ -1,4 +1,4 @@
-export const DEFAULT_SERVER_URL = 'http://localhost:8080'
+export const DEFAULT_SERVER_URL = 'http://localhost:5173'
 
 const SERVER_URL_KEY = 'serverUrl'
 const SESSION_ID_KEY = 'sessionId'

@@ -8,7 +8,8 @@ logic, like the Discord bot.
 - Results show verdict, explanation, up to 3 quotes with source links, and a link to the full result on the web
   (`/wynik/{id}`).
 - Checks run in the service worker, so closing the popup doesn't cancel them. A badge marks a finished result.
-- **Options:** server address (default `http://localhost:8080`, the web app, whose nginx proxies `/v1`) and
+- **Options:** server address (default `http://localhost:5173`, the Vite dev server, which proxies `/v1` to the API on
+  `:8000`; use `http://localhost:8080` for the Docker Compose web app) and
   "Usuń moje dane" (`DELETE /v1/sessions/{id}`). Session ids are random per install (`ext-…`).
 
 ## Build & load
