@@ -67,6 +67,9 @@ What's missing or incomplete, kept current while working. Order follows CONCEPT 
 - [ ] Demo chat adapter (`/demo-chat`)
 - [x] Chrome extension (`channels/chrome_extension`, MV3): popup (text/link/current page/visible-tab screenshot), context menu on selection/link/page, results with quotes + link to `/wynik/{id}`, server setting, "Usuń moje dane"; API channel `browser_extension`
 - [ ] Chrome extension: set the default server to the deployed demo URL once it exists, then publish to the Chrome Web Store (listing, privacy disclosures)
+- [x] Android app (`mobile/`, Expo SDK 58): input + confirmation screen, result, history, settings, "Usuń moje dane"; Share menu (text, images) and text-selection menu (`ACTION_PROCESS_TEXT`) via local Kotlin module `modules/share-intent` + config plugin
+- [ ] Android app: build and test on an emulator/device (no Android SDK in the dev environment yet); release signing + Play Store listing
+- [ ] iOS app: Share Extension (not started; CONCEPT §7.6)
 - [ ] Chrome extension: check images via the context menu (needs per-image host permission)
 
 ## Track C: quality
